@@ -82,10 +82,11 @@ async function makeCover(browser, opts = {}) {
 			});
 		}
 
+		// TODO REVIEW encoding chain and if these need escaping at this point
 		// @ts-ignore
-		(document.querySelector('#author') || {}).innerText = escape(author);
+		(document.querySelector('#author') || {}).textContent = author;
 		// @ts-ignore
-		(document.querySelector('#title') || {}).innerText = escape(title);
+		(document.querySelector('#title') || {}).textContent = title;
 		return new Promise(done => {
 			requestAnimationFrame(() => done());
 		});
