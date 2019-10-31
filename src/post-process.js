@@ -63,6 +63,8 @@ class PostProcessor {
 					remote: true
 				});
 				this.cache.set(resource);
+			} else if (!(resource.save && resource.content)) {
+				resource.remote = true;
 			}
 			resource.addBacklinks(originalUrl);
 		});
