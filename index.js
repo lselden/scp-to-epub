@@ -83,7 +83,7 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 			alias: ['d', 'dir'],
 			describe: 'Temporary working directory',
 			// FIXME
-			default: path.join(__dirname, '../output')
+			default: path.join(__dirname, './output')
 		})
 		.option('keepTempFiles', {
 			describe: 'Keep temporary folder, instead of deleting',
