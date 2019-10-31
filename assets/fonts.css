@@ -1,0 +1,40 @@
+/* You can customize the fonts used in the stylesheet here */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
+}
+
+blockquote p {
+    text-indent: 0;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+b, strong {
+    font-weight: bold;
+}
+
+mark, .redacted, s, ins, del {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+pre, code, samp, kbd, var {
+    /* font-family: 'Epub Monospace'; */
+    font-family: 'Courier New', Courier, monospace;
+}
+
+
+.epub-collapse-header {
+    font-family: monospace;
+}
+
+/* Font-stacks */
+/* Typical usage: headings */
+/* .sans { font-family: sans-serif; }
+.serif { font-family: serif; }
+.monospace { font-family: monospace; } */
+
+/* We try to rely on RS’ typefaces, hence the huge font-stack */
+/* .humanist { font-family: "Myriad Pro", Seravek, Ember, "Trebuchet MS", "BN Trebuchet MS", "PT Sans", "Frutiger Neue", Roboto, sans-serif; }
+.geometric { font-family: Futura, "Century Gothic", "Apple SD Gothic Neo", AppleGothic, sans-serif; }
+.oldstyle { font-family: "Minion Pro", "Iowan Old Style", Palatino, "Palatino Linotype", "Palatino Nova", "BN Amasis", Cambria, FreeSerif, "Times New Roman", serif; }
+.modern { font-family: Athelas, Literata, Bookerly, "Merriweather Serif", Malabar, "BN Malabar", Georgia, "Droid Serif", serif; } */

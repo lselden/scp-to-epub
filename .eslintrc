@@ -1,0 +1,16 @@
+{
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaVersion": 2019
+    },
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "rules": {
+        "indent": ["error", "tab", {
+            "ignoredNodes": ["TemplateLiteral *"]
+        }],
+        "function-paren-newline": "off"
+    }
+}

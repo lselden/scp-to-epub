@@ -1,0 +1,102 @@
+@namespace epub "http://www.idpf.org/2007/ops";
+
+/*
+This file is used with the --view option to emulate what e-readers might see
+*/
+
+:root {
+    --foreground: #000000;
+    --background: #fbfbfb;
+    --border-color: #999;
+
+    --light-background: rgba(127, 127, 127, 0.05);
+    --mid-background: rgba(127, 127, 127, 0.3);
+    --foreground-color: rgba(0, 0, 0, 1);
+    --background-color: rgba(255, 255, 255, 0);
+    --link-color: #901;
+
+    --theme-white-color: #000000;
+    --theme-white-background: #fbfbfb;
+    --theme-white-border: #999;
+
+    --theme-sepia-color: #000000;
+    --theme-sepia-background: #f8f1e3;
+    --theme-sepia-border: #999;
+
+    --theme-gray-color: #c9caca;
+    --theme-gray-background: #5a5a5c;
+    --theme-gray-border: #c9caca;
+
+    --theme-night-color: #b0b0b0;
+    --theme-night-background: #121212;
+    --theme-night-border: #999;
+}
+
+:root[__ibooks_internal_theme*="White"] /* elements */ {
+    /* ... override your CSS here ... */
+    --foreground: var(--theme-white-color);
+    --background: var(--theme-white-background);
+    --border-color: var(--theme-white-border);
+}
+
+
+:root[__ibooks_internal_theme*="Sepia"] /* elements */ {
+    /* ... override your CSS here ... */
+    --foreground: var(--theme-sepia-color);
+    --background: var(--theme-sepia-background);
+    --border-color: var(--theme-sepia-border);
+}
+
+:root[__ibooks_internal_theme*="Gray"] /* elements */ {
+    /* ... override your CSS here ... */
+    --foreground: var(--theme-gray-color);
+    --background: var(--theme-gray-background);
+    --border-color: var(--theme-gray-border);
+    --link-color: #ff7f7f;
+}
+
+/* For Night Theme PLEASE READ COMMENTS BELOW */
+:root[__ibooks_internal_theme*="Night"] /* elements */ {
+    --foreground: var(--theme-night-color);
+    --background: var(--theme-night-background);
+    --border-color: var(--theme-night-border);
+    --link-color: #ef3a4e;
+    
+    /* ... override background-color: */
+    /* background: -webkit-linear-gradient(color, (the same) color); */
+
+    /* ... override text color: */
+    /* -webkit-text-fill-color: var(--foreground-color); */
+
+    /* ... override rest of your CSS here ... */
+}
+
+/*
+PLEASE READ CAREFULLY:
+iBooks adjusts HTML and CSS markup behind the scenes in many ways and when the Night theme is selected (not White or Sepia),
+these CSS styles (among others) are forced:
+:root {
+    background-color: black !important;
+}
+:root * {
+    background-color: transparent !important;
+    color: #bebebe !important;
+}
+If you need to override background or text color of *any* element in the Night theme, use the CSS above, but please WISELY
+and only when absolutely necessary.
+I believe that abusing this method will cause it banned by Apple in future iBooks releases.
+*/
+
+html, body {
+    margin: 1em;
+    color: var(--foreground);
+    background-color: var(--background);
+    box-sizing: border-box;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+	font-variant-numeric: proportional-nums;
+
+}
+
+a {
+    color: var(--link-color);
+}

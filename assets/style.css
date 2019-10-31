@@ -1,0 +1,3397 @@
+@namespace h "http://www.w3.org/1999/xhtml/";
+@namespace epub "http://www.idpf.org/2007/ops";
+@namespace svg "http://www.w3.org/2000/svg";
+
+.toc-list {
+    padding-left: 0em;
+    margin-left: 0em;
+    list-style-position: inside;
+}
+
+.toc-list .toc-list {
+    list-style-type: disc;
+}
+
+/* .toc-chapter {} */
+
+.chapter-header {
+    margin-top: 2.4em;
+    text-align: center;
+    page-break-after: always;
+    break-after: always;
+}
+
+/* all pages tagged...doesn't need page break */
+.chapter-header.system-page {
+    page-break-after: avoid;
+    break-after: avoid;
+}
+
+.chapter-footer {
+    text-align: center;
+}
+
+/* for doc parts they should break after the section, not the header */
+[role="doc-part"] .chapter-header {
+    page-break-after: avoid;
+    break-after: avoid;
+}
+
+[role="doc-part"] {
+    page-break-after: always;
+    break-after: always;
+}
+
+#page-title {
+    font-size: 200%;
+    font-weight: bold;
+    margin-top: 3.6em;
+    margin-bottom: 0;
+}
+#page-title + [role="doc-subtitle"] {
+    margin-top: 0;
+    font-size: 150%;
+    margin-bottom: 1.8em;
+}
+
+.chapter-meta ul, .chapter-meta ol {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    /* display: flex;
+    flex-wrap: wrap;
+    flex-direction: row; */
+}
+.chapter-meta li, .chapter-meta li {
+    display: block;
+    /* flex: auto; */
+    padding: 0 5%;
+    width: 24em;
+    min-width: 50%;
+    max-width: 100%;
+    text-align: left;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+
+/* @media (min-width: 48em) {
+    .chapter-meta li:nth-child(2n + 1) {
+        text-align: right;
+    }
+    .chapter-meta li:nth-child(2n) {
+        text-align: left;
+    }
+    .chapter-meta li:nth-child(2n + 1):last-child {
+        text-align: center;
+    }
+
+} */
+
+.offset-item {
+    clear: both;
+    page-break-before: always;
+}
+
+/* make sure float content is contained */
+section, article, section:after, article:after, [role="doc-footnote"] {
+    clear: both;
+}
+/* make sure float content is contained */
+section:after, article:after {
+    content: '';
+}
+
+mark {
+    background: none;
+    background-color: transparent;
+    background: linear-gradient(rgba(127, 127, 127, 127, 0), rgba(127, 127, 127, 127, 0));
+    /* text-decoration: underline;
+    text-decoration: underline double;
+    text-decoration-style: dotted;
+    text-decoration-color: currentColor; */
+}
+
+u {
+    text-decoration: underline;
+    text-decoration-style: solid;
+}
+
+/* the footnote reference */
+a[role~='doc-noteref'] {
+    vertical-align: super;
+    line-height: normal;
+    font-size: smaller;
+    text-decoration: none;
+}
+
+.inline-footnote {
+    padding: 0.25em 2em;
+    margin: 2em 2em 0 2em;
+    font-size: 0.8125em;
+    box-sizing: border-box;
+}
+
+.inline-footnote + .inline-footnote {
+    margin-top: 0;
+}
+
+figcaption {
+    border-bottom: 1pt solid currentColor;	
+}
+
+.scp-image-block {
+    max-width: 100%;
+    min-width: 50%;
+}
+
+/* .scp-image-block.epub-figure-right { min-width: 50%; }
+.epub-figure.scp-image-block.epub-figure-left { min-width: 50%; } */
+
+/* .scp-img-block > img { width: 100%; } */
+
+/* redundant whitespace is removed, this is put in its place - forces a page break */
+.epub-whitespace-break {
+    width: 0;
+    margin: 0.5em 0;
+    page-break-after: always;
+}
+
+.epub-backlink {
+    margin-top: -1em;
+    text-decoration-color: rgba(127, 127, 127, 127, 0);
+}
+
+/* tabs header - looks like a file folder tab */
+[role="tabpanel"] > h3:first-child {
+    border-bottom: 2pt solid currentColor;
+    padding: 0 1em;
+    display: flex;
+    justify-content: space-between;
+}
+
+.epub-tab-head {
+    border: 2pt solid currentColor;
+    border-bottom: none;
+    border-radius: 1ex 1ex 0 0;
+    padding: 0.125em 0.5em;
+    background: linear-gradient(rgba(127, 127, 127, 0.1), rgba(127, 127, 127, 0.1));
+}
+
+/* if theres an element with left+right margins defined that gets removed */
+.left-margin {
+    margin-left: 2%;
+    box-sizing: border-box;
+}
+
+.right-margin {
+    margin-right: 2%;
+    box-sizing: border-box;
+}
+
+.left-padding {
+    padding-left: 2%;
+    box-sizing: border-box;
+}
+
+.right-padding {
+    padding-right: 2%;
+    box-sizing: border-box;
+}
+
+/* ibooks opens appendix pages in a popup - this let syou target that situation */
+
+html[__ibooks_internal_theme] body.epub-is-supplemental {
+    padding: 2%;
+}
+
+/*******************************************/
+/** voiceover support, in theory **/
+
+mark::before, mark::after,
+del::before, del::after,
+ins::before, ins::after,
+s::before, s::after,
+.redacted::before {
+    clip-path: inset(100%);
+    clip: rect(1px, 1px, 1px, 1px);
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+}
+
+mark::before { content: " [highlight start] "; }
+mark::after { content: " [highlight end] "; }
+
+del::before { content: " [delete start] "; }
+del::after { content: " [delete end] "; }
+
+ins::before { content: " [insert start] "; }
+ins::after { content: " [insert end] "; }
+
+s::before { content: " [strikeout start] "; }
+s::after { content: " [strikeout end] "; }
+
+s::before { content: " [strikeout start] "; }
+s::after { content: " [strikeout end] "; }
+
+.redacted::before { content: " REDACTED "; }
+.redacted::after { content: " "; }
+
+.epub-collapse-header s {
+    text-decoration: none;
+    word-break: break-word;
+}
+
+/* change how the collapse headers are spoken */
+.epub-collapse-header s::before { content: ""; }
+.epub-collapse-header ins::before { content: "..."; }
+.epub-collapse-header s::after, .epub-collapse-header ins::after  { content: ""; }
+
+.epub-collapse-header [role="doc-subtitle"] {
+    display: inline-block;
+    font-size: 0.8125em;
+    word-break: break-word;
+}
+
+.redacted {
+    text-decoration: none;
+}
+
+mark.blackbox {
+    border: 3pt solid currentColor;
+    background: linear-gradient(rgba(127, 127, 127, 0.25), rgba(127, 127, 127, 0.25));
+}
+
+.wiki-content-table {
+    margin: 0.5em auto;
+    border-collapse: collapse;
+}
+
+.wiki-content-table th {
+    background: linear-gradient(rgba(127, 127, 127, 0.1), rgba(127, 127, 127, 0.1));
+}
+
+.wiki-content-table td, .wiki-content-table th {
+    border: 1px solid currentColor;
+    padding: 0.3em 0.7em;
+}
+
+.anom-bar-replace {
+    border-top-style: solid;
+    border-top-width: 5pt;
+    margin: 1em;
+    text-transform: uppercase;
+}
+
+.warning-box {
+    text-align: center;
+}
+
+blockquote {
+    border: 1px dashed currentColor;
+    border-radius: 0.125em;
+    padding: 0.25em;
+    margin-left: 0.125em;
+    margin-right: 0.125em;
+    font-style: normal;
+}
+
+/********************/
+.white {
+    color: #747474;
+    -webkit-text-fill-color: #747474;
+}
+
+.border-white {
+    border-color: #747474;
+}
+
+.silver {
+    color: #727373;
+    -webkit-text-fill-color: #727373;
+}
+
+.border-silver {
+    border-color: #727373;
+}
+
+.gray {
+    color: #515153;
+    -webkit-text-fill-color: #515153;
+}
+
+.border-gray {
+    border-color: #515153;
+}
+
+.red {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.border-red {
+    border-color: #800000;
+}
+
+.yellow {
+    color: #744900;
+    -webkit-text-fill-color: #744900;
+}
+
+.border-yellow {
+    border-color: #744900;
+}
+
+.green {
+    color: #008000;
+    -webkit-text-fill-color: #008000;
+}
+
+.border-green {
+    border-color: #008000;
+}
+
+.blue {
+    color: #002a80;
+    -webkit-text-fill-color: #002a80;
+}
+
+.border-blue {
+    border-color: #002a80;
+}
+
+.black {
+    color: #121212;
+    -webkit-text-fill-color: #121212;
+}
+
+.border-black {
+    border-color: #121212;
+}
+
+a {
+    color: #800000;
+    /* for kybooks support */
+    color: accentColor;
+}
+
+/* ibooks only */
+[__ibooks_internal_theme] a {
+    -webkit-text-fill-color: #800000;
+}
+
+.scheme-dark .white,
+html[data-color-scheme=dark] .white,
+html[__ibooks_internal_theme*=Gray] .white,
+html[__ibooks_internal_theme*=Night] .white {
+    color: #fbfbfb;
+    -webkit-text-fill-color: #fbfbfb;
+}
+
+.scheme-dark .border-white,
+html[data-color-scheme=dark] .border-white,
+html[__ibooks_internal_theme*=Gray] .border-white,
+html[__ibooks_internal_theme*=Night] .border-white {
+    border-color: #fbfbfb;
+}
+
+.scheme-dark .silver,
+html[data-color-scheme=dark] .silver,
+html[__ibooks_internal_theme*=Gray] .silver,
+html[__ibooks_internal_theme*=Night] .silver {
+    color: #d2d3d3;
+    -webkit-text-fill-color: #d2d3d3;
+}
+
+.scheme-dark .border-silver,
+html[data-color-scheme=dark] .border-silver,
+html[__ibooks_internal_theme*=Gray] .border-silver,
+html[__ibooks_internal_theme*=Night] .border-silver {
+    border-color: #d2d3d3;
+}
+
+.scheme-dark .gray,
+html[data-color-scheme=dark] .gray,
+html[__ibooks_internal_theme*=Gray] .gray,
+html[__ibooks_internal_theme*=Night] .gray {
+    color: #969698;
+    -webkit-text-fill-color: #969698;
+}
+
+.scheme-dark .border-gray,
+html[data-color-scheme=dark] .border-gray,
+html[__ibooks_internal_theme*=Gray] .border-gray,
+html[__ibooks_internal_theme*=Night] .border-gray {
+    border-color: #969698;
+}
+
+.scheme-dark .red,
+html[data-color-scheme=dark] .red,
+html[__ibooks_internal_theme*=Gray] .red,
+html[__ibooks_internal_theme*=Night] .red {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.scheme-dark .border-red,
+html[data-color-scheme=dark] .border-red,
+html[__ibooks_internal_theme*=Gray] .border-red,
+html[__ibooks_internal_theme*=Night] .border-red {
+    border-color: #ef6f6f;
+}
+
+.scheme-dark .yellow,
+html[data-color-scheme=dark] .yellow,
+html[__ibooks_internal_theme*=Gray] .yellow,
+html[__ibooks_internal_theme*=Night] .yellow {
+    color: #b98e39;
+    -webkit-text-fill-color: #b98e39;
+}
+
+.scheme-dark .border-yellow,
+html[data-color-scheme=dark] .border-yellow,
+html[__ibooks_internal_theme*=Gray] .border-yellow,
+html[__ibooks_internal_theme*=Night] .border-yellow {
+    border-color: #b98e39;
+}
+
+.scheme-dark .green,
+html[data-color-scheme=dark] .green,
+html[__ibooks_internal_theme*=Gray] .green,
+html[__ibooks_internal_theme*=Night] .green {
+    color: #2dad2d;
+    -webkit-text-fill-color: #2dad2d;
+}
+
+.scheme-dark .border-green,
+html[data-color-scheme=dark] .border-green,
+html[__ibooks_internal_theme*=Gray] .border-green,
+html[__ibooks_internal_theme*=Night] .border-green {
+    border-color: #2dad2d;
+}
+
+.scheme-dark .blue,
+html[data-color-scheme=dark] .blue,
+html[__ibooks_internal_theme*=Gray] .blue,
+html[__ibooks_internal_theme*=Night] .blue {
+    color: #6c96ec;
+    -webkit-text-fill-color: #6c96ec;
+}
+
+.scheme-dark .border-blue,
+html[data-color-scheme=dark] .border-blue,
+html[__ibooks_internal_theme*=Gray] .border-blue,
+html[__ibooks_internal_theme*=Night] .border-blue {
+    border-color: #6c96ec;
+}
+
+.scheme-dark .black,
+html[data-color-scheme=dark] .black,
+html[__ibooks_internal_theme*=Gray] .black,
+html[__ibooks_internal_theme*=Night] .black {
+    color: #969696;
+    -webkit-text-fill-color: #969696;
+}
+
+.scheme-dark .border-black,
+html[data-color-scheme=dark] .border-black,
+html[__ibooks_internal_theme*=Gray] .border-black,
+html[__ibooks_internal_theme*=Night] .border-black {
+    border-color: #969696;
+}
+
+.scheme-dark a,
+html[data-color-scheme=dark] a,
+html[__ibooks_internal_theme*=Gray] a,
+html[__ibooks_internal_theme*=Night] a {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-white {
+    background-color: #fbfbfb;
+}
+
+.bg-white.white,
+.bg-white .white {
+    color: #747474;
+    -webkit-text-fill-color: #747474;
+}
+
+.bg-white.border-white,
+.bg-white .border-white {
+    border-color: #747474;
+}
+
+.bg-white.silver,
+.bg-white .silver {
+    color: #727373;
+    -webkit-text-fill-color: #727373;
+}
+
+.bg-white.border-silver,
+.bg-white .border-silver {
+    border-color: #727373;
+}
+
+.bg-white.gray,
+.bg-white .gray {
+    color: #515153;
+    -webkit-text-fill-color: #515153;
+}
+
+.bg-white.border-gray,
+.bg-white .border-gray {
+    border-color: #515153;
+}
+
+.bg-white.red,
+.bg-white .red {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-white.border-red,
+.bg-white .border-red {
+    border-color: #800000;
+}
+
+.bg-white.yellow,
+.bg-white .yellow {
+    color: #744900;
+    -webkit-text-fill-color: #744900;
+}
+
+.bg-white.border-yellow,
+.bg-white .border-yellow {
+    border-color: #744900;
+}
+
+.bg-white.green,
+.bg-white .green {
+    color: #008000;
+    -webkit-text-fill-color: #008000;
+}
+
+.bg-white.border-green,
+.bg-white .border-green {
+    border-color: #008000;
+}
+
+.bg-white.blue,
+.bg-white .blue {
+    color: #002a80;
+    -webkit-text-fill-color: #002a80;
+}
+
+.bg-white.border-blue,
+.bg-white .border-blue {
+    border-color: #002a80;
+}
+
+.bg-white.black,
+.bg-white .black {
+    color: #121212;
+    -webkit-text-fill-color: #121212;
+}
+
+.bg-white.border-black,
+.bg-white .border-black {
+    border-color: #121212;
+}
+
+.bg-white a {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+html[__ibooks_internal_theme*=Sepia] .bg-white,
+.scheme-light.scheme-sepia .bg-white,
+.scheme-sepia .bg-white {
+    background: transparent;
+}
+
+.scheme-dark .bg-white,
+html[data-color-scheme=dark] .bg-white,
+html[__ibooks_internal_theme*=Gray] .bg-white,
+html[__ibooks_internal_theme*=Night] .bg-white {
+    background: transparent;
+}
+
+.scheme-dark .bg-white.white,
+html[data-color-scheme=dark] .bg-white.white,
+html[__ibooks_internal_theme*=Gray] .bg-white.white,
+html[__ibooks_internal_theme*=Night] .bg-white.white,
+.scheme-dark .bg-white .white,
+html[data-color-scheme=dark] .bg-white .white,
+html[__ibooks_internal_theme*=Gray] .bg-white .white,
+html[__ibooks_internal_theme*=Night] .bg-white .white {
+    color: #fbfbfb;
+    -webkit-text-fill-color: #fbfbfb;
+}
+
+.scheme-dark .bg-white.border-white,
+html[data-color-scheme=dark] .bg-white.border-white,
+html[__ibooks_internal_theme*=Gray] .bg-white.border-white,
+html[__ibooks_internal_theme*=Night] .bg-white.border-white,
+.scheme-dark .bg-white .border-white,
+html[data-color-scheme=dark] .bg-white .border-white,
+html[__ibooks_internal_theme*=Gray] .bg-white .border-white,
+html[__ibooks_internal_theme*=Night] .bg-white .border-white {
+    border-color: #fbfbfb;
+}
+
+.scheme-dark .bg-white.silver,
+html[data-color-scheme=dark] .bg-white.silver,
+html[__ibooks_internal_theme*=Gray] .bg-white.silver,
+html[__ibooks_internal_theme*=Night] .bg-white.silver,
+.scheme-dark .bg-white .silver,
+html[data-color-scheme=dark] .bg-white .silver,
+html[__ibooks_internal_theme*=Gray] .bg-white .silver,
+html[__ibooks_internal_theme*=Night] .bg-white .silver {
+    color: #d2d3d3;
+    -webkit-text-fill-color: #d2d3d3;
+}
+
+.scheme-dark .bg-white.border-silver,
+html[data-color-scheme=dark] .bg-white.border-silver,
+html[__ibooks_internal_theme*=Gray] .bg-white.border-silver,
+html[__ibooks_internal_theme*=Night] .bg-white.border-silver,
+.scheme-dark .bg-white .border-silver,
+html[data-color-scheme=dark] .bg-white .border-silver,
+html[__ibooks_internal_theme*=Gray] .bg-white .border-silver,
+html[__ibooks_internal_theme*=Night] .bg-white .border-silver {
+    border-color: #d2d3d3;
+}
+
+.scheme-dark .bg-white.gray,
+html[data-color-scheme=dark] .bg-white.gray,
+html[__ibooks_internal_theme*=Gray] .bg-white.gray,
+html[__ibooks_internal_theme*=Night] .bg-white.gray,
+.scheme-dark .bg-white .gray,
+html[data-color-scheme=dark] .bg-white .gray,
+html[__ibooks_internal_theme*=Gray] .bg-white .gray,
+html[__ibooks_internal_theme*=Night] .bg-white .gray {
+    color: #969698;
+    -webkit-text-fill-color: #969698;
+}
+
+.scheme-dark .bg-white.border-gray,
+html[data-color-scheme=dark] .bg-white.border-gray,
+html[__ibooks_internal_theme*=Gray] .bg-white.border-gray,
+html[__ibooks_internal_theme*=Night] .bg-white.border-gray,
+.scheme-dark .bg-white .border-gray,
+html[data-color-scheme=dark] .bg-white .border-gray,
+html[__ibooks_internal_theme*=Gray] .bg-white .border-gray,
+html[__ibooks_internal_theme*=Night] .bg-white .border-gray {
+    border-color: #969698;
+}
+
+.scheme-dark .bg-white.red,
+html[data-color-scheme=dark] .bg-white.red,
+html[__ibooks_internal_theme*=Gray] .bg-white.red,
+html[__ibooks_internal_theme*=Night] .bg-white.red,
+.scheme-dark .bg-white .red,
+html[data-color-scheme=dark] .bg-white .red,
+html[__ibooks_internal_theme*=Gray] .bg-white .red,
+html[__ibooks_internal_theme*=Night] .bg-white .red {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.scheme-dark .bg-white.border-red,
+html[data-color-scheme=dark] .bg-white.border-red,
+html[__ibooks_internal_theme*=Gray] .bg-white.border-red,
+html[__ibooks_internal_theme*=Night] .bg-white.border-red,
+.scheme-dark .bg-white .border-red,
+html[data-color-scheme=dark] .bg-white .border-red,
+html[__ibooks_internal_theme*=Gray] .bg-white .border-red,
+html[__ibooks_internal_theme*=Night] .bg-white .border-red {
+    border-color: #ef6f6f;
+}
+
+.scheme-dark .bg-white.yellow,
+html[data-color-scheme=dark] .bg-white.yellow,
+html[__ibooks_internal_theme*=Gray] .bg-white.yellow,
+html[__ibooks_internal_theme*=Night] .bg-white.yellow,
+.scheme-dark .bg-white .yellow,
+html[data-color-scheme=dark] .bg-white .yellow,
+html[__ibooks_internal_theme*=Gray] .bg-white .yellow,
+html[__ibooks_internal_theme*=Night] .bg-white .yellow {
+    color: #b98e39;
+    -webkit-text-fill-color: #b98e39;
+}
+
+.scheme-dark .bg-white.border-yellow,
+html[data-color-scheme=dark] .bg-white.border-yellow,
+html[__ibooks_internal_theme*=Gray] .bg-white.border-yellow,
+html[__ibooks_internal_theme*=Night] .bg-white.border-yellow,
+.scheme-dark .bg-white .border-yellow,
+html[data-color-scheme=dark] .bg-white .border-yellow,
+html[__ibooks_internal_theme*=Gray] .bg-white .border-yellow,
+html[__ibooks_internal_theme*=Night] .bg-white .border-yellow {
+    border-color: #b98e39;
+}
+
+.scheme-dark .bg-white.green,
+html[data-color-scheme=dark] .bg-white.green,
+html[__ibooks_internal_theme*=Gray] .bg-white.green,
+html[__ibooks_internal_theme*=Night] .bg-white.green,
+.scheme-dark .bg-white .green,
+html[data-color-scheme=dark] .bg-white .green,
+html[__ibooks_internal_theme*=Gray] .bg-white .green,
+html[__ibooks_internal_theme*=Night] .bg-white .green {
+    color: #2dad2d;
+    -webkit-text-fill-color: #2dad2d;
+}
+
+.scheme-dark .bg-white.border-green,
+html[data-color-scheme=dark] .bg-white.border-green,
+html[__ibooks_internal_theme*=Gray] .bg-white.border-green,
+html[__ibooks_internal_theme*=Night] .bg-white.border-green,
+.scheme-dark .bg-white .border-green,
+html[data-color-scheme=dark] .bg-white .border-green,
+html[__ibooks_internal_theme*=Gray] .bg-white .border-green,
+html[__ibooks_internal_theme*=Night] .bg-white .border-green {
+    border-color: #2dad2d;
+}
+
+.scheme-dark .bg-white.blue,
+html[data-color-scheme=dark] .bg-white.blue,
+html[__ibooks_internal_theme*=Gray] .bg-white.blue,
+html[__ibooks_internal_theme*=Night] .bg-white.blue,
+.scheme-dark .bg-white .blue,
+html[data-color-scheme=dark] .bg-white .blue,
+html[__ibooks_internal_theme*=Gray] .bg-white .blue,
+html[__ibooks_internal_theme*=Night] .bg-white .blue {
+    color: #6c96ec;
+    -webkit-text-fill-color: #6c96ec;
+}
+
+.scheme-dark .bg-white.border-blue,
+html[data-color-scheme=dark] .bg-white.border-blue,
+html[__ibooks_internal_theme*=Gray] .bg-white.border-blue,
+html[__ibooks_internal_theme*=Night] .bg-white.border-blue,
+.scheme-dark .bg-white .border-blue,
+html[data-color-scheme=dark] .bg-white .border-blue,
+html[__ibooks_internal_theme*=Gray] .bg-white .border-blue,
+html[__ibooks_internal_theme*=Night] .bg-white .border-blue {
+    border-color: #6c96ec;
+}
+
+.scheme-dark .bg-white.black,
+html[data-color-scheme=dark] .bg-white.black,
+html[__ibooks_internal_theme*=Gray] .bg-white.black,
+html[__ibooks_internal_theme*=Night] .bg-white.black,
+.scheme-dark .bg-white .black,
+html[data-color-scheme=dark] .bg-white .black,
+html[__ibooks_internal_theme*=Gray] .bg-white .black,
+html[__ibooks_internal_theme*=Night] .bg-white .black {
+    color: #969696;
+    -webkit-text-fill-color: #969696;
+}
+
+.scheme-dark .bg-white.border-black,
+html[data-color-scheme=dark] .bg-white.border-black,
+html[__ibooks_internal_theme*=Gray] .bg-white.border-black,
+html[__ibooks_internal_theme*=Night] .bg-white.border-black,
+.scheme-dark .bg-white .border-black,
+html[data-color-scheme=dark] .bg-white .border-black,
+html[__ibooks_internal_theme*=Gray] .bg-white .border-black,
+html[__ibooks_internal_theme*=Night] .bg-white .border-black {
+    border-color: #969696;
+}
+
+.scheme-dark .bg-white a,
+html[data-color-scheme=dark] .bg-white a,
+html[__ibooks_internal_theme*=Gray] .bg-white a,
+html[__ibooks_internal_theme*=Night] .bg-white a {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-silver {
+    background: #c9caca;
+}
+
+.bg-silver.white,
+.bg-silver .white {
+    color: #444444;
+    -webkit-text-fill-color: #444444;
+}
+
+.bg-silver.border-white,
+.bg-silver .border-white {
+    border-color: #444444;
+}
+
+.bg-silver.silver,
+.bg-silver .silver {
+    color: #424343;
+    -webkit-text-fill-color: #424343;
+}
+
+.bg-silver.border-silver,
+.bg-silver .border-silver {
+    border-color: #424343;
+}
+
+.bg-silver.gray,
+.bg-silver .gray {
+    color: #454547;
+    -webkit-text-fill-color: #454547;
+}
+
+.bg-silver.border-gray,
+.bg-silver .border-gray {
+    border-color: #454547;
+}
+
+.bg-silver.red,
+.bg-silver .red {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-silver.border-red,
+.bg-silver .border-red {
+    border-color: #800000;
+}
+
+.bg-silver.yellow,
+.bg-silver .yellow {
+    color: #653a00;
+    -webkit-text-fill-color: #653a00;
+}
+
+.bg-silver.border-yellow,
+.bg-silver .border-yellow {
+    border-color: #653a00;
+}
+
+.bg-silver.green,
+.bg-silver .green {
+    color: #005000;
+    -webkit-text-fill-color: #005000;
+}
+
+.bg-silver.border-green,
+.bg-silver .border-green {
+    border-color: #005000;
+}
+
+.bg-silver.blue,
+.bg-silver .blue {
+    color: #002a80;
+    -webkit-text-fill-color: #002a80;
+}
+
+.bg-silver.border-blue,
+.bg-silver .border-blue {
+    border-color: #002a80;
+}
+
+.bg-silver.black,
+.bg-silver .black {
+    color: #121212;
+    -webkit-text-fill-color: #121212;
+}
+
+.bg-silver.border-black,
+.bg-silver .border-black {
+    border-color: #121212;
+}
+
+.bg-silver a {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.scheme-dark .bg-silver,
+html[data-color-scheme=dark] .bg-silver,
+html[__ibooks_internal_theme*=Gray] .bg-silver,
+html[__ibooks_internal_theme*=Night] .bg-silver {
+    background-color: rgba(127, 127, 127, 0.17);
+    background: -webkit-linear-gradient(rgba(127, 127, 127, 0.17), rgba(127, 127, 127, 0.17));
+}
+
+.scheme-dark .bg-silver.white,
+html[data-color-scheme=dark] .bg-silver.white,
+html[__ibooks_internal_theme*=Gray] .bg-silver.white,
+html[__ibooks_internal_theme*=Night] .bg-silver.white,
+.scheme-dark .bg-silver .white,
+html[data-color-scheme=dark] .bg-silver .white,
+html[__ibooks_internal_theme*=Gray] .bg-silver .white,
+html[__ibooks_internal_theme*=Night] .bg-silver .white {
+    color: #fbfbfb;
+    -webkit-text-fill-color: #fbfbfb;
+}
+
+.scheme-dark .bg-silver.border-white,
+html[data-color-scheme=dark] .bg-silver.border-white,
+html[__ibooks_internal_theme*=Gray] .bg-silver.border-white,
+html[__ibooks_internal_theme*=Night] .bg-silver.border-white,
+.scheme-dark .bg-silver .border-white,
+html[data-color-scheme=dark] .bg-silver .border-white,
+html[__ibooks_internal_theme*=Gray] .bg-silver .border-white,
+html[__ibooks_internal_theme*=Night] .bg-silver .border-white {
+    border-color: #fbfbfb;
+}
+
+.scheme-dark .bg-silver.silver,
+html[data-color-scheme=dark] .bg-silver.silver,
+html[__ibooks_internal_theme*=Gray] .bg-silver.silver,
+html[__ibooks_internal_theme*=Night] .bg-silver.silver,
+.scheme-dark .bg-silver .silver,
+html[data-color-scheme=dark] .bg-silver .silver,
+html[__ibooks_internal_theme*=Gray] .bg-silver .silver,
+html[__ibooks_internal_theme*=Night] .bg-silver .silver {
+    color: #d2d3d3;
+    -webkit-text-fill-color: #d2d3d3;
+}
+
+.scheme-dark .bg-silver.border-silver,
+html[data-color-scheme=dark] .bg-silver.border-silver,
+html[__ibooks_internal_theme*=Gray] .bg-silver.border-silver,
+html[__ibooks_internal_theme*=Night] .bg-silver.border-silver,
+.scheme-dark .bg-silver .border-silver,
+html[data-color-scheme=dark] .bg-silver .border-silver,
+html[__ibooks_internal_theme*=Gray] .bg-silver .border-silver,
+html[__ibooks_internal_theme*=Night] .bg-silver .border-silver {
+    border-color: #d2d3d3;
+}
+
+.scheme-dark .bg-silver.gray,
+html[data-color-scheme=dark] .bg-silver.gray,
+html[__ibooks_internal_theme*=Gray] .bg-silver.gray,
+html[__ibooks_internal_theme*=Night] .bg-silver.gray,
+.scheme-dark .bg-silver .gray,
+html[data-color-scheme=dark] .bg-silver .gray,
+html[__ibooks_internal_theme*=Gray] .bg-silver .gray,
+html[__ibooks_internal_theme*=Night] .bg-silver .gray {
+    color: #969698;
+    -webkit-text-fill-color: #969698;
+}
+
+.scheme-dark .bg-silver.border-gray,
+html[data-color-scheme=dark] .bg-silver.border-gray,
+html[__ibooks_internal_theme*=Gray] .bg-silver.border-gray,
+html[__ibooks_internal_theme*=Night] .bg-silver.border-gray,
+.scheme-dark .bg-silver .border-gray,
+html[data-color-scheme=dark] .bg-silver .border-gray,
+html[__ibooks_internal_theme*=Gray] .bg-silver .border-gray,
+html[__ibooks_internal_theme*=Night] .bg-silver .border-gray {
+    border-color: #969698;
+}
+
+.scheme-dark .bg-silver.red,
+html[data-color-scheme=dark] .bg-silver.red,
+html[__ibooks_internal_theme*=Gray] .bg-silver.red,
+html[__ibooks_internal_theme*=Night] .bg-silver.red,
+.scheme-dark .bg-silver .red,
+html[data-color-scheme=dark] .bg-silver .red,
+html[__ibooks_internal_theme*=Gray] .bg-silver .red,
+html[__ibooks_internal_theme*=Night] .bg-silver .red {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.scheme-dark .bg-silver.border-red,
+html[data-color-scheme=dark] .bg-silver.border-red,
+html[__ibooks_internal_theme*=Gray] .bg-silver.border-red,
+html[__ibooks_internal_theme*=Night] .bg-silver.border-red,
+.scheme-dark .bg-silver .border-red,
+html[data-color-scheme=dark] .bg-silver .border-red,
+html[__ibooks_internal_theme*=Gray] .bg-silver .border-red,
+html[__ibooks_internal_theme*=Night] .bg-silver .border-red {
+    border-color: #ef6f6f;
+}
+
+.scheme-dark .bg-silver.yellow,
+html[data-color-scheme=dark] .bg-silver.yellow,
+html[__ibooks_internal_theme*=Gray] .bg-silver.yellow,
+html[__ibooks_internal_theme*=Night] .bg-silver.yellow,
+.scheme-dark .bg-silver .yellow,
+html[data-color-scheme=dark] .bg-silver .yellow,
+html[__ibooks_internal_theme*=Gray] .bg-silver .yellow,
+html[__ibooks_internal_theme*=Night] .bg-silver .yellow {
+    color: #b98e39;
+    -webkit-text-fill-color: #b98e39;
+}
+
+.scheme-dark .bg-silver.border-yellow,
+html[data-color-scheme=dark] .bg-silver.border-yellow,
+html[__ibooks_internal_theme*=Gray] .bg-silver.border-yellow,
+html[__ibooks_internal_theme*=Night] .bg-silver.border-yellow,
+.scheme-dark .bg-silver .border-yellow,
+html[data-color-scheme=dark] .bg-silver .border-yellow,
+html[__ibooks_internal_theme*=Gray] .bg-silver .border-yellow,
+html[__ibooks_internal_theme*=Night] .bg-silver .border-yellow {
+    border-color: #b98e39;
+}
+
+.scheme-dark .bg-silver.green,
+html[data-color-scheme=dark] .bg-silver.green,
+html[__ibooks_internal_theme*=Gray] .bg-silver.green,
+html[__ibooks_internal_theme*=Night] .bg-silver.green,
+.scheme-dark .bg-silver .green,
+html[data-color-scheme=dark] .bg-silver .green,
+html[__ibooks_internal_theme*=Gray] .bg-silver .green,
+html[__ibooks_internal_theme*=Night] .bg-silver .green {
+    color: #2dad2d;
+    -webkit-text-fill-color: #2dad2d;
+}
+
+.scheme-dark .bg-silver.border-green,
+html[data-color-scheme=dark] .bg-silver.border-green,
+html[__ibooks_internal_theme*=Gray] .bg-silver.border-green,
+html[__ibooks_internal_theme*=Night] .bg-silver.border-green,
+.scheme-dark .bg-silver .border-green,
+html[data-color-scheme=dark] .bg-silver .border-green,
+html[__ibooks_internal_theme*=Gray] .bg-silver .border-green,
+html[__ibooks_internal_theme*=Night] .bg-silver .border-green {
+    border-color: #2dad2d;
+}
+
+.scheme-dark .bg-silver.blue,
+html[data-color-scheme=dark] .bg-silver.blue,
+html[__ibooks_internal_theme*=Gray] .bg-silver.blue,
+html[__ibooks_internal_theme*=Night] .bg-silver.blue,
+.scheme-dark .bg-silver .blue,
+html[data-color-scheme=dark] .bg-silver .blue,
+html[__ibooks_internal_theme*=Gray] .bg-silver .blue,
+html[__ibooks_internal_theme*=Night] .bg-silver .blue {
+    color: #6c96ec;
+    -webkit-text-fill-color: #6c96ec;
+}
+
+.scheme-dark .bg-silver.border-blue,
+html[data-color-scheme=dark] .bg-silver.border-blue,
+html[__ibooks_internal_theme*=Gray] .bg-silver.border-blue,
+html[__ibooks_internal_theme*=Night] .bg-silver.border-blue,
+.scheme-dark .bg-silver .border-blue,
+html[data-color-scheme=dark] .bg-silver .border-blue,
+html[__ibooks_internal_theme*=Gray] .bg-silver .border-blue,
+html[__ibooks_internal_theme*=Night] .bg-silver .border-blue {
+    border-color: #6c96ec;
+}
+
+.scheme-dark .bg-silver.black,
+html[data-color-scheme=dark] .bg-silver.black,
+html[__ibooks_internal_theme*=Gray] .bg-silver.black,
+html[__ibooks_internal_theme*=Night] .bg-silver.black,
+.scheme-dark .bg-silver .black,
+html[data-color-scheme=dark] .bg-silver .black,
+html[__ibooks_internal_theme*=Gray] .bg-silver .black,
+html[__ibooks_internal_theme*=Night] .bg-silver .black {
+    color: #969696;
+    -webkit-text-fill-color: #969696;
+}
+
+.scheme-dark .bg-silver.border-black,
+html[data-color-scheme=dark] .bg-silver.border-black,
+html[__ibooks_internal_theme*=Gray] .bg-silver.border-black,
+html[__ibooks_internal_theme*=Night] .bg-silver.border-black,
+.scheme-dark .bg-silver .border-black,
+html[data-color-scheme=dark] .bg-silver .border-black,
+html[__ibooks_internal_theme*=Gray] .bg-silver .border-black,
+html[__ibooks_internal_theme*=Night] .bg-silver .border-black {
+    border-color: #969696;
+}
+
+.scheme-dark .bg-silver a,
+html[data-color-scheme=dark] .bg-silver a,
+html[__ibooks_internal_theme*=Gray] .bg-silver a,
+html[__ibooks_internal_theme*=Night] .bg-silver a {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-lightgray {
+    background: #c9caca;
+}
+
+.bg-lightgray.white,
+.bg-lightgray .white {
+    color: #444444;
+    -webkit-text-fill-color: #444444;
+}
+
+.bg-lightgray.border-white,
+.bg-lightgray .border-white {
+    border-color: #444444;
+}
+
+.bg-lightgray.silver,
+.bg-lightgray .silver {
+    color: #424343;
+    -webkit-text-fill-color: #424343;
+}
+
+.bg-lightgray.border-silver,
+.bg-lightgray .border-silver {
+    border-color: #424343;
+}
+
+.bg-lightgray.gray,
+.bg-lightgray .gray {
+    color: #454547;
+    -webkit-text-fill-color: #454547;
+}
+
+.bg-lightgray.border-gray,
+.bg-lightgray .border-gray {
+    border-color: #454547;
+}
+
+.bg-lightgray.red,
+.bg-lightgray .red {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-lightgray.border-red,
+.bg-lightgray .border-red {
+    border-color: #800000;
+}
+
+.bg-lightgray.yellow,
+.bg-lightgray .yellow {
+    color: #653a00;
+    -webkit-text-fill-color: #653a00;
+}
+
+.bg-lightgray.border-yellow,
+.bg-lightgray .border-yellow {
+    border-color: #653a00;
+}
+
+.bg-lightgray.green,
+.bg-lightgray .green {
+    color: #005000;
+    -webkit-text-fill-color: #005000;
+}
+
+.bg-lightgray.border-green,
+.bg-lightgray .border-green {
+    border-color: #005000;
+}
+
+.bg-lightgray.blue,
+.bg-lightgray .blue {
+    color: #002a80;
+    -webkit-text-fill-color: #002a80;
+}
+
+.bg-lightgray.border-blue,
+.bg-lightgray .border-blue {
+    border-color: #002a80;
+}
+
+.bg-lightgray.black,
+.bg-lightgray .black {
+    color: #121212;
+    -webkit-text-fill-color: #121212;
+}
+
+.bg-lightgray.border-black,
+.bg-lightgray .border-black {
+    border-color: #121212;
+}
+
+.bg-lightgray a {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-gray {
+    background-color: #5a5a5c;
+}
+
+.bg-gray.white,
+.bg-gray .white {
+    color: #fbfbfb;
+    -webkit-text-fill-color: #fbfbfb;
+}
+
+.bg-gray.border-white,
+.bg-gray .border-white {
+    border-color: #fbfbfb;
+}
+
+.bg-gray.silver,
+.bg-gray .silver {
+    color: #d2d3d3;
+    -webkit-text-fill-color: #d2d3d3;
+}
+
+.bg-gray.border-silver,
+.bg-gray .border-silver {
+    border-color: #d2d3d3;
+}
+
+.bg-gray.gray,
+.bg-gray .gray {
+    color: #d2d2d4;
+    -webkit-text-fill-color: #d2d2d4;
+}
+
+.bg-gray.border-gray,
+.bg-gray .border-gray {
+    border-color: #d2d2d4;
+}
+
+.bg-gray.red,
+.bg-gray .red {
+    color: #ffc3c3;
+    -webkit-text-fill-color: #ffc3c3;
+}
+
+.bg-gray.border-red,
+.bg-gray .border-red {
+    border-color: #ffc3c3;
+}
+
+.bg-gray.yellow,
+.bg-gray .yellow {
+    color: #f8cd78;
+    -webkit-text-fill-color: #f8cd78;
+}
+
+.bg-gray.border-yellow,
+.bg-gray .border-yellow {
+    border-color: #f8cd78;
+}
+
+.bg-gray.green,
+.bg-gray .green {
+    color: #6cec6c;
+    -webkit-text-fill-color: #6cec6c;
+}
+
+.bg-gray.border-green,
+.bg-gray .border-green {
+    border-color: #6cec6c;
+}
+
+.bg-gray.blue,
+.bg-gray .blue {
+    color: #aed8ff;
+    -webkit-text-fill-color: #aed8ff;
+}
+
+.bg-gray.border-blue,
+.bg-gray .border-blue {
+    border-color: #aed8ff;
+}
+
+.bg-gray.black,
+.bg-gray .black {
+    color: #d2d2d2;
+    -webkit-text-fill-color: #d2d2d2;
+}
+
+.bg-gray.border-black,
+.bg-gray .border-black {
+    border-color: #d2d2d2;
+}
+
+.bg-gray a {
+    color: #ffc3c3;
+    -webkit-text-fill-color: #ffc3c3;
+}
+
+.scheme-dark .bg-gray,
+html[data-color-scheme=dark] .bg-gray,
+html[__ibooks_internal_theme*=Gray] .bg-gray,
+html[__ibooks_internal_theme*=Night] .bg-gray {
+    background-color: rgba(127, 127, 127, 0.25);
+    background: -webkit-linear-gradient(rgba(127, 127, 127, 0.25), rgba(127, 127, 127, 0.25));
+}
+
+.bg-black {
+    background-color: #121212;
+}
+
+.bg-black.white,
+.bg-black .white {
+    color: #fbfbfb;
+    -webkit-text-fill-color: #fbfbfb;
+}
+
+.bg-black.border-white,
+.bg-black .border-white {
+    border-color: #fbfbfb;
+}
+
+.bg-black.silver,
+.bg-black .silver {
+    color: #d2d3d3;
+    -webkit-text-fill-color: #d2d3d3;
+}
+
+.bg-black.border-silver,
+.bg-black .border-silver {
+    border-color: #d2d3d3;
+}
+
+.bg-black.gray,
+.bg-black .gray {
+    color: #969698;
+    -webkit-text-fill-color: #969698;
+}
+
+.bg-black.border-gray,
+.bg-black .border-gray {
+    border-color: #969698;
+}
+
+.bg-black.red,
+.bg-black .red {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-black.border-red,
+.bg-black .border-red {
+    border-color: #ef6f6f;
+}
+
+.bg-black.yellow,
+.bg-black .yellow {
+    color: #b98e39;
+    -webkit-text-fill-color: #b98e39;
+}
+
+.bg-black.border-yellow,
+.bg-black .border-yellow {
+    border-color: #b98e39;
+}
+
+.bg-black.green,
+.bg-black .green {
+    color: #2dad2d;
+    -webkit-text-fill-color: #2dad2d;
+}
+
+.bg-black.border-green,
+.bg-black .border-green {
+    border-color: #2dad2d;
+}
+
+.bg-black.blue,
+.bg-black .blue {
+    color: #6c96ec;
+    -webkit-text-fill-color: #6c96ec;
+}
+
+.bg-black.border-blue,
+.bg-black .border-blue {
+    border-color: #6c96ec;
+}
+
+.bg-black.black,
+.bg-black .black {
+    color: #969696;
+    -webkit-text-fill-color: #969696;
+}
+
+.bg-black.border-black,
+.bg-black .border-black {
+    border-color: #969696;
+}
+
+.bg-black a {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-black a {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-red {
+    background-color: #d2a8a8;
+}
+
+.bg-red.white,
+.bg-red .white {
+    color: #444444;
+    -webkit-text-fill-color: #444444;
+}
+
+.bg-red.border-white,
+.bg-red .border-white {
+    border-color: #444444;
+}
+
+.bg-red.silver,
+.bg-red .silver {
+    color: #424343;
+    -webkit-text-fill-color: #424343;
+}
+
+.bg-red.border-silver,
+.bg-red .border-silver {
+    border-color: #424343;
+}
+
+.bg-red.gray,
+.bg-red .gray {
+    color: #454547;
+    -webkit-text-fill-color: #454547;
+}
+
+.bg-red.border-gray,
+.bg-red .border-gray {
+    border-color: #454547;
+}
+
+.bg-red.red,
+.bg-red .red {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-red.border-red,
+.bg-red .border-red {
+    border-color: #800000;
+}
+
+.bg-red.yellow,
+.bg-red .yellow {
+    color: #653a00;
+    -webkit-text-fill-color: #653a00;
+}
+
+.bg-red.border-yellow,
+.bg-red .border-yellow {
+    border-color: #653a00;
+}
+
+.bg-red.green,
+.bg-red .green {
+    color: #005000;
+    -webkit-text-fill-color: #005000;
+}
+
+.bg-red.border-green,
+.bg-red .border-green {
+    border-color: #005000;
+}
+
+.bg-red.blue,
+.bg-red .blue {
+    color: #002a80;
+    -webkit-text-fill-color: #002a80;
+}
+
+.bg-red.border-blue,
+.bg-red .border-blue {
+    border-color: #002a80;
+}
+
+.bg-red.black,
+.bg-red .black {
+    color: #121212;
+    -webkit-text-fill-color: #121212;
+}
+
+.bg-red.border-black,
+.bg-red .border-black {
+    border-color: #121212;
+}
+
+.bg-red a {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.scheme-dark .bg-red,
+html[data-color-scheme=dark] .bg-red,
+html[__ibooks_internal_theme*=Gray] .bg-red,
+html[__ibooks_internal_theme*=Night] .bg-red {
+    background-color: #360c0c;
+}
+
+.scheme-dark .bg-red.white,
+html[data-color-scheme=dark] .bg-red.white,
+html[__ibooks_internal_theme*=Gray] .bg-red.white,
+html[__ibooks_internal_theme*=Night] .bg-red.white,
+.scheme-dark .bg-red .white,
+html[data-color-scheme=dark] .bg-red .white,
+html[__ibooks_internal_theme*=Gray] .bg-red .white,
+html[__ibooks_internal_theme*=Night] .bg-red .white {
+    color: #fbfbfb;
+    -webkit-text-fill-color: #fbfbfb;
+}
+
+.scheme-dark .bg-red.border-white,
+html[data-color-scheme=dark] .bg-red.border-white,
+html[__ibooks_internal_theme*=Gray] .bg-red.border-white,
+html[__ibooks_internal_theme*=Night] .bg-red.border-white,
+.scheme-dark .bg-red .border-white,
+html[data-color-scheme=dark] .bg-red .border-white,
+html[__ibooks_internal_theme*=Gray] .bg-red .border-white,
+html[__ibooks_internal_theme*=Night] .bg-red .border-white {
+    border-color: #fbfbfb;
+}
+
+.scheme-dark .bg-red.silver,
+html[data-color-scheme=dark] .bg-red.silver,
+html[__ibooks_internal_theme*=Gray] .bg-red.silver,
+html[__ibooks_internal_theme*=Night] .bg-red.silver,
+.scheme-dark .bg-red .silver,
+html[data-color-scheme=dark] .bg-red .silver,
+html[__ibooks_internal_theme*=Gray] .bg-red .silver,
+html[__ibooks_internal_theme*=Night] .bg-red .silver {
+    color: #d2d3d3;
+    -webkit-text-fill-color: #d2d3d3;
+}
+
+.scheme-dark .bg-red.border-silver,
+html[data-color-scheme=dark] .bg-red.border-silver,
+html[__ibooks_internal_theme*=Gray] .bg-red.border-silver,
+html[__ibooks_internal_theme*=Night] .bg-red.border-silver,
+.scheme-dark .bg-red .border-silver,
+html[data-color-scheme=dark] .bg-red .border-silver,
+html[__ibooks_internal_theme*=Gray] .bg-red .border-silver,
+html[__ibooks_internal_theme*=Night] .bg-red .border-silver {
+    border-color: #d2d3d3;
+}
+
+.scheme-dark .bg-red.gray,
+html[data-color-scheme=dark] .bg-red.gray,
+html[__ibooks_internal_theme*=Gray] .bg-red.gray,
+html[__ibooks_internal_theme*=Night] .bg-red.gray,
+.scheme-dark .bg-red .gray,
+html[data-color-scheme=dark] .bg-red .gray,
+html[__ibooks_internal_theme*=Gray] .bg-red .gray,
+html[__ibooks_internal_theme*=Night] .bg-red .gray {
+    color: #969698;
+    -webkit-text-fill-color: #969698;
+}
+
+.scheme-dark .bg-red.border-gray,
+html[data-color-scheme=dark] .bg-red.border-gray,
+html[__ibooks_internal_theme*=Gray] .bg-red.border-gray,
+html[__ibooks_internal_theme*=Night] .bg-red.border-gray,
+.scheme-dark .bg-red .border-gray,
+html[data-color-scheme=dark] .bg-red .border-gray,
+html[__ibooks_internal_theme*=Gray] .bg-red .border-gray,
+html[__ibooks_internal_theme*=Night] .bg-red .border-gray {
+    border-color: #969698;
+}
+
+.scheme-dark .bg-red.red,
+html[data-color-scheme=dark] .bg-red.red,
+html[__ibooks_internal_theme*=Gray] .bg-red.red,
+html[__ibooks_internal_theme*=Night] .bg-red.red,
+.scheme-dark .bg-red .red,
+html[data-color-scheme=dark] .bg-red .red,
+html[__ibooks_internal_theme*=Gray] .bg-red .red,
+html[__ibooks_internal_theme*=Night] .bg-red .red {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.scheme-dark .bg-red.border-red,
+html[data-color-scheme=dark] .bg-red.border-red,
+html[__ibooks_internal_theme*=Gray] .bg-red.border-red,
+html[__ibooks_internal_theme*=Night] .bg-red.border-red,
+.scheme-dark .bg-red .border-red,
+html[data-color-scheme=dark] .bg-red .border-red,
+html[__ibooks_internal_theme*=Gray] .bg-red .border-red,
+html[__ibooks_internal_theme*=Night] .bg-red .border-red {
+    border-color: #ef6f6f;
+}
+
+.scheme-dark .bg-red.yellow,
+html[data-color-scheme=dark] .bg-red.yellow,
+html[__ibooks_internal_theme*=Gray] .bg-red.yellow,
+html[__ibooks_internal_theme*=Night] .bg-red.yellow,
+.scheme-dark .bg-red .yellow,
+html[data-color-scheme=dark] .bg-red .yellow,
+html[__ibooks_internal_theme*=Gray] .bg-red .yellow,
+html[__ibooks_internal_theme*=Night] .bg-red .yellow {
+    color: #b98e39;
+    -webkit-text-fill-color: #b98e39;
+}
+
+.scheme-dark .bg-red.border-yellow,
+html[data-color-scheme=dark] .bg-red.border-yellow,
+html[__ibooks_internal_theme*=Gray] .bg-red.border-yellow,
+html[__ibooks_internal_theme*=Night] .bg-red.border-yellow,
+.scheme-dark .bg-red .border-yellow,
+html[data-color-scheme=dark] .bg-red .border-yellow,
+html[__ibooks_internal_theme*=Gray] .bg-red .border-yellow,
+html[__ibooks_internal_theme*=Night] .bg-red .border-yellow {
+    border-color: #b98e39;
+}
+
+.scheme-dark .bg-red.green,
+html[data-color-scheme=dark] .bg-red.green,
+html[__ibooks_internal_theme*=Gray] .bg-red.green,
+html[__ibooks_internal_theme*=Night] .bg-red.green,
+.scheme-dark .bg-red .green,
+html[data-color-scheme=dark] .bg-red .green,
+html[__ibooks_internal_theme*=Gray] .bg-red .green,
+html[__ibooks_internal_theme*=Night] .bg-red .green {
+    color: #2dad2d;
+    -webkit-text-fill-color: #2dad2d;
+}
+
+.scheme-dark .bg-red.border-green,
+html[data-color-scheme=dark] .bg-red.border-green,
+html[__ibooks_internal_theme*=Gray] .bg-red.border-green,
+html[__ibooks_internal_theme*=Night] .bg-red.border-green,
+.scheme-dark .bg-red .border-green,
+html[data-color-scheme=dark] .bg-red .border-green,
+html[__ibooks_internal_theme*=Gray] .bg-red .border-green,
+html[__ibooks_internal_theme*=Night] .bg-red .border-green {
+    border-color: #2dad2d;
+}
+
+.scheme-dark .bg-red.blue,
+html[data-color-scheme=dark] .bg-red.blue,
+html[__ibooks_internal_theme*=Gray] .bg-red.blue,
+html[__ibooks_internal_theme*=Night] .bg-red.blue,
+.scheme-dark .bg-red .blue,
+html[data-color-scheme=dark] .bg-red .blue,
+html[__ibooks_internal_theme*=Gray] .bg-red .blue,
+html[__ibooks_internal_theme*=Night] .bg-red .blue {
+    color: #6c96ec;
+    -webkit-text-fill-color: #6c96ec;
+}
+
+.scheme-dark .bg-red.border-blue,
+html[data-color-scheme=dark] .bg-red.border-blue,
+html[__ibooks_internal_theme*=Gray] .bg-red.border-blue,
+html[__ibooks_internal_theme*=Night] .bg-red.border-blue,
+.scheme-dark .bg-red .border-blue,
+html[data-color-scheme=dark] .bg-red .border-blue,
+html[__ibooks_internal_theme*=Gray] .bg-red .border-blue,
+html[__ibooks_internal_theme*=Night] .bg-red .border-blue {
+    border-color: #6c96ec;
+}
+
+.scheme-dark .bg-red.black,
+html[data-color-scheme=dark] .bg-red.black,
+html[__ibooks_internal_theme*=Gray] .bg-red.black,
+html[__ibooks_internal_theme*=Night] .bg-red.black,
+.scheme-dark .bg-red .black,
+html[data-color-scheme=dark] .bg-red .black,
+html[__ibooks_internal_theme*=Gray] .bg-red .black,
+html[__ibooks_internal_theme*=Night] .bg-red .black {
+    color: #969696;
+    -webkit-text-fill-color: #969696;
+}
+
+.scheme-dark .bg-red.border-black,
+html[data-color-scheme=dark] .bg-red.border-black,
+html[__ibooks_internal_theme*=Gray] .bg-red.border-black,
+html[__ibooks_internal_theme*=Night] .bg-red.border-black,
+.scheme-dark .bg-red .border-black,
+html[data-color-scheme=dark] .bg-red .border-black,
+html[__ibooks_internal_theme*=Gray] .bg-red .border-black,
+html[__ibooks_internal_theme*=Night] .bg-red .border-black {
+    border-color: #969696;
+}
+
+.scheme-dark .bg-red a,
+html[data-color-scheme=dark] .bg-red a,
+html[__ibooks_internal_theme*=Gray] .bg-red a,
+html[__ibooks_internal_theme*=Night] .bg-red a {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-lightred {
+    background-color: #d2a8a8;
+}
+
+.bg-lightred.white,
+.bg-lightred .white {
+    color: #444444;
+    -webkit-text-fill-color: #444444;
+}
+
+.bg-lightred.border-white,
+.bg-lightred .border-white {
+    border-color: #444444;
+}
+
+.bg-lightred.silver,
+.bg-lightred .silver {
+    color: #424343;
+    -webkit-text-fill-color: #424343;
+}
+
+.bg-lightred.border-silver,
+.bg-lightred .border-silver {
+    border-color: #424343;
+}
+
+.bg-lightred.gray,
+.bg-lightred .gray {
+    color: #454547;
+    -webkit-text-fill-color: #454547;
+}
+
+.bg-lightred.border-gray,
+.bg-lightred .border-gray {
+    border-color: #454547;
+}
+
+.bg-lightred.red,
+.bg-lightred .red {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-lightred.border-red,
+.bg-lightred .border-red {
+    border-color: #800000;
+}
+
+.bg-lightred.yellow,
+.bg-lightred .yellow {
+    color: #653a00;
+    -webkit-text-fill-color: #653a00;
+}
+
+.bg-lightred.border-yellow,
+.bg-lightred .border-yellow {
+    border-color: #653a00;
+}
+
+.bg-lightred.green,
+.bg-lightred .green {
+    color: #005000;
+    -webkit-text-fill-color: #005000;
+}
+
+.bg-lightred.border-green,
+.bg-lightred .border-green {
+    border-color: #005000;
+}
+
+.bg-lightred.blue,
+.bg-lightred .blue {
+    color: #002a80;
+    -webkit-text-fill-color: #002a80;
+}
+
+.bg-lightred.border-blue,
+.bg-lightred .border-blue {
+    border-color: #002a80;
+}
+
+.bg-lightred.black,
+.bg-lightred .black {
+    color: #121212;
+    -webkit-text-fill-color: #121212;
+}
+
+.bg-lightred.border-black,
+.bg-lightred .border-black {
+    border-color: #121212;
+}
+
+.bg-lightred a {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-darkred {
+    background-color: #360c0c;
+}
+
+.bg-darkred.white,
+.bg-darkred .white {
+    color: #fbfbfb;
+    -webkit-text-fill-color: #fbfbfb;
+}
+
+.bg-darkred.border-white,
+.bg-darkred .border-white {
+    border-color: #fbfbfb;
+}
+
+.bg-darkred.silver,
+.bg-darkred .silver {
+    color: #d2d3d3;
+    -webkit-text-fill-color: #d2d3d3;
+}
+
+.bg-darkred.border-silver,
+.bg-darkred .border-silver {
+    border-color: #d2d3d3;
+}
+
+.bg-darkred.gray,
+.bg-darkred .gray {
+    color: #969698;
+    -webkit-text-fill-color: #969698;
+}
+
+.bg-darkred.border-gray,
+.bg-darkred .border-gray {
+    border-color: #969698;
+}
+
+.bg-darkred.red,
+.bg-darkred .red {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-darkred.border-red,
+.bg-darkred .border-red {
+    border-color: #ef6f6f;
+}
+
+.bg-darkred.yellow,
+.bg-darkred .yellow {
+    color: #b98e39;
+    -webkit-text-fill-color: #b98e39;
+}
+
+.bg-darkred.border-yellow,
+.bg-darkred .border-yellow {
+    border-color: #b98e39;
+}
+
+.bg-darkred.green,
+.bg-darkred .green {
+    color: #2dad2d;
+    -webkit-text-fill-color: #2dad2d;
+}
+
+.bg-darkred.border-green,
+.bg-darkred .border-green {
+    border-color: #2dad2d;
+}
+
+.bg-darkred.blue,
+.bg-darkred .blue {
+    color: #6c96ec;
+    -webkit-text-fill-color: #6c96ec;
+}
+
+.bg-darkred.border-blue,
+.bg-darkred .border-blue {
+    border-color: #6c96ec;
+}
+
+.bg-darkred.black,
+.bg-darkred .black {
+    color: #969696;
+    -webkit-text-fill-color: #969696;
+}
+
+.bg-darkred.border-black,
+.bg-darkred .border-black {
+    border-color: #969696;
+}
+
+.bg-darkred a {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-yellow {
+    background-color: #d2c4a8;
+}
+
+.bg-yellow.white,
+.bg-yellow .white {
+    color: #444444;
+    -webkit-text-fill-color: #444444;
+}
+
+.bg-yellow.border-white,
+.bg-yellow .border-white {
+    border-color: #444444;
+}
+
+.bg-yellow.silver,
+.bg-yellow .silver {
+    color: #424343;
+    -webkit-text-fill-color: #424343;
+}
+
+.bg-yellow.border-silver,
+.bg-yellow .border-silver {
+    border-color: #424343;
+}
+
+.bg-yellow.gray,
+.bg-yellow .gray {
+    color: #454547;
+    -webkit-text-fill-color: #454547;
+}
+
+.bg-yellow.border-gray,
+.bg-yellow .border-gray {
+    border-color: #454547;
+}
+
+.bg-yellow.red,
+.bg-yellow .red {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-yellow.border-red,
+.bg-yellow .border-red {
+    border-color: #800000;
+}
+
+.bg-yellow.yellow,
+.bg-yellow .yellow {
+    color: #653a00;
+    -webkit-text-fill-color: #653a00;
+}
+
+.bg-yellow.border-yellow,
+.bg-yellow .border-yellow {
+    border-color: #653a00;
+}
+
+.bg-yellow.green,
+.bg-yellow .green {
+    color: #005000;
+    -webkit-text-fill-color: #005000;
+}
+
+.bg-yellow.border-green,
+.bg-yellow .border-green {
+    border-color: #005000;
+}
+
+.bg-yellow.blue,
+.bg-yellow .blue {
+    color: #002a80;
+    -webkit-text-fill-color: #002a80;
+}
+
+.bg-yellow.border-blue,
+.bg-yellow .border-blue {
+    border-color: #002a80;
+}
+
+.bg-yellow.black,
+.bg-yellow .black {
+    color: #121212;
+    -webkit-text-fill-color: #121212;
+}
+
+.bg-yellow.border-black,
+.bg-yellow .border-black {
+    border-color: #121212;
+}
+
+.bg-yellow a {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.scheme-dark .bg-yellow,
+html[data-color-scheme=dark] .bg-yellow,
+html[__ibooks_internal_theme*=Gray] .bg-yellow,
+html[__ibooks_internal_theme*=Night] .bg-yellow {
+    background-color: #36280c;
+}
+
+.scheme-dark .bg-yellow.white,
+html[data-color-scheme=dark] .bg-yellow.white,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.white,
+html[__ibooks_internal_theme*=Night] .bg-yellow.white,
+.scheme-dark .bg-yellow .white,
+html[data-color-scheme=dark] .bg-yellow .white,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .white,
+html[__ibooks_internal_theme*=Night] .bg-yellow .white {
+    color: #fbfbfb;
+    -webkit-text-fill-color: #fbfbfb;
+}
+
+.scheme-dark .bg-yellow.border-white,
+html[data-color-scheme=dark] .bg-yellow.border-white,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.border-white,
+html[__ibooks_internal_theme*=Night] .bg-yellow.border-white,
+.scheme-dark .bg-yellow .border-white,
+html[data-color-scheme=dark] .bg-yellow .border-white,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .border-white,
+html[__ibooks_internal_theme*=Night] .bg-yellow .border-white {
+    border-color: #fbfbfb;
+}
+
+.scheme-dark .bg-yellow.silver,
+html[data-color-scheme=dark] .bg-yellow.silver,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.silver,
+html[__ibooks_internal_theme*=Night] .bg-yellow.silver,
+.scheme-dark .bg-yellow .silver,
+html[data-color-scheme=dark] .bg-yellow .silver,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .silver,
+html[__ibooks_internal_theme*=Night] .bg-yellow .silver {
+    color: #d2d3d3;
+    -webkit-text-fill-color: #d2d3d3;
+}
+
+.scheme-dark .bg-yellow.border-silver,
+html[data-color-scheme=dark] .bg-yellow.border-silver,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.border-silver,
+html[__ibooks_internal_theme*=Night] .bg-yellow.border-silver,
+.scheme-dark .bg-yellow .border-silver,
+html[data-color-scheme=dark] .bg-yellow .border-silver,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .border-silver,
+html[__ibooks_internal_theme*=Night] .bg-yellow .border-silver {
+    border-color: #d2d3d3;
+}
+
+.scheme-dark .bg-yellow.gray,
+html[data-color-scheme=dark] .bg-yellow.gray,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.gray,
+html[__ibooks_internal_theme*=Night] .bg-yellow.gray,
+.scheme-dark .bg-yellow .gray,
+html[data-color-scheme=dark] .bg-yellow .gray,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .gray,
+html[__ibooks_internal_theme*=Night] .bg-yellow .gray {
+    color: #969698;
+    -webkit-text-fill-color: #969698;
+}
+
+.scheme-dark .bg-yellow.border-gray,
+html[data-color-scheme=dark] .bg-yellow.border-gray,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.border-gray,
+html[__ibooks_internal_theme*=Night] .bg-yellow.border-gray,
+.scheme-dark .bg-yellow .border-gray,
+html[data-color-scheme=dark] .bg-yellow .border-gray,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .border-gray,
+html[__ibooks_internal_theme*=Night] .bg-yellow .border-gray {
+    border-color: #969698;
+}
+
+.scheme-dark .bg-yellow.red,
+html[data-color-scheme=dark] .bg-yellow.red,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.red,
+html[__ibooks_internal_theme*=Night] .bg-yellow.red,
+.scheme-dark .bg-yellow .red,
+html[data-color-scheme=dark] .bg-yellow .red,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .red,
+html[__ibooks_internal_theme*=Night] .bg-yellow .red {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.scheme-dark .bg-yellow.border-red,
+html[data-color-scheme=dark] .bg-yellow.border-red,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.border-red,
+html[__ibooks_internal_theme*=Night] .bg-yellow.border-red,
+.scheme-dark .bg-yellow .border-red,
+html[data-color-scheme=dark] .bg-yellow .border-red,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .border-red,
+html[__ibooks_internal_theme*=Night] .bg-yellow .border-red {
+    border-color: #ef6f6f;
+}
+
+.scheme-dark .bg-yellow.yellow,
+html[data-color-scheme=dark] .bg-yellow.yellow,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.yellow,
+html[__ibooks_internal_theme*=Night] .bg-yellow.yellow,
+.scheme-dark .bg-yellow .yellow,
+html[data-color-scheme=dark] .bg-yellow .yellow,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .yellow,
+html[__ibooks_internal_theme*=Night] .bg-yellow .yellow {
+    color: #b98e39;
+    -webkit-text-fill-color: #b98e39;
+}
+
+.scheme-dark .bg-yellow.border-yellow,
+html[data-color-scheme=dark] .bg-yellow.border-yellow,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.border-yellow,
+html[__ibooks_internal_theme*=Night] .bg-yellow.border-yellow,
+.scheme-dark .bg-yellow .border-yellow,
+html[data-color-scheme=dark] .bg-yellow .border-yellow,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .border-yellow,
+html[__ibooks_internal_theme*=Night] .bg-yellow .border-yellow {
+    border-color: #b98e39;
+}
+
+.scheme-dark .bg-yellow.green,
+html[data-color-scheme=dark] .bg-yellow.green,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.green,
+html[__ibooks_internal_theme*=Night] .bg-yellow.green,
+.scheme-dark .bg-yellow .green,
+html[data-color-scheme=dark] .bg-yellow .green,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .green,
+html[__ibooks_internal_theme*=Night] .bg-yellow .green {
+    color: #2dad2d;
+    -webkit-text-fill-color: #2dad2d;
+}
+
+.scheme-dark .bg-yellow.border-green,
+html[data-color-scheme=dark] .bg-yellow.border-green,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.border-green,
+html[__ibooks_internal_theme*=Night] .bg-yellow.border-green,
+.scheme-dark .bg-yellow .border-green,
+html[data-color-scheme=dark] .bg-yellow .border-green,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .border-green,
+html[__ibooks_internal_theme*=Night] .bg-yellow .border-green {
+    border-color: #2dad2d;
+}
+
+.scheme-dark .bg-yellow.blue,
+html[data-color-scheme=dark] .bg-yellow.blue,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.blue,
+html[__ibooks_internal_theme*=Night] .bg-yellow.blue,
+.scheme-dark .bg-yellow .blue,
+html[data-color-scheme=dark] .bg-yellow .blue,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .blue,
+html[__ibooks_internal_theme*=Night] .bg-yellow .blue {
+    color: #6c96ec;
+    -webkit-text-fill-color: #6c96ec;
+}
+
+.scheme-dark .bg-yellow.border-blue,
+html[data-color-scheme=dark] .bg-yellow.border-blue,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.border-blue,
+html[__ibooks_internal_theme*=Night] .bg-yellow.border-blue,
+.scheme-dark .bg-yellow .border-blue,
+html[data-color-scheme=dark] .bg-yellow .border-blue,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .border-blue,
+html[__ibooks_internal_theme*=Night] .bg-yellow .border-blue {
+    border-color: #6c96ec;
+}
+
+.scheme-dark .bg-yellow.black,
+html[data-color-scheme=dark] .bg-yellow.black,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.black,
+html[__ibooks_internal_theme*=Night] .bg-yellow.black,
+.scheme-dark .bg-yellow .black,
+html[data-color-scheme=dark] .bg-yellow .black,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .black,
+html[__ibooks_internal_theme*=Night] .bg-yellow .black {
+    color: #969696;
+    -webkit-text-fill-color: #969696;
+}
+
+.scheme-dark .bg-yellow.border-black,
+html[data-color-scheme=dark] .bg-yellow.border-black,
+html[__ibooks_internal_theme*=Gray] .bg-yellow.border-black,
+html[__ibooks_internal_theme*=Night] .bg-yellow.border-black,
+.scheme-dark .bg-yellow .border-black,
+html[data-color-scheme=dark] .bg-yellow .border-black,
+html[__ibooks_internal_theme*=Gray] .bg-yellow .border-black,
+html[__ibooks_internal_theme*=Night] .bg-yellow .border-black {
+    border-color: #969696;
+}
+
+.scheme-dark .bg-yellow a,
+html[data-color-scheme=dark] .bg-yellow a,
+html[__ibooks_internal_theme*=Gray] .bg-yellow a,
+html[__ibooks_internal_theme*=Night] .bg-yellow a {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-lightyellow {
+    background-color: #d2c4a8;
+}
+
+.bg-lightyellow.white,
+.bg-lightyellow .white {
+    color: #444444;
+    -webkit-text-fill-color: #444444;
+}
+
+.bg-lightyellow.border-white,
+.bg-lightyellow .border-white {
+    border-color: #444444;
+}
+
+.bg-lightyellow.silver,
+.bg-lightyellow .silver {
+    color: #424343;
+    -webkit-text-fill-color: #424343;
+}
+
+.bg-lightyellow.border-silver,
+.bg-lightyellow .border-silver {
+    border-color: #424343;
+}
+
+.bg-lightyellow.gray,
+.bg-lightyellow .gray {
+    color: #454547;
+    -webkit-text-fill-color: #454547;
+}
+
+.bg-lightyellow.border-gray,
+.bg-lightyellow .border-gray {
+    border-color: #454547;
+}
+
+.bg-lightyellow.red,
+.bg-lightyellow .red {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-lightyellow.border-red,
+.bg-lightyellow .border-red {
+    border-color: #800000;
+}
+
+.bg-lightyellow.yellow,
+.bg-lightyellow .yellow {
+    color: #653a00;
+    -webkit-text-fill-color: #653a00;
+}
+
+.bg-lightyellow.border-yellow,
+.bg-lightyellow .border-yellow {
+    border-color: #653a00;
+}
+
+.bg-lightyellow.green,
+.bg-lightyellow .green {
+    color: #005000;
+    -webkit-text-fill-color: #005000;
+}
+
+.bg-lightyellow.border-green,
+.bg-lightyellow .border-green {
+    border-color: #005000;
+}
+
+.bg-lightyellow.blue,
+.bg-lightyellow .blue {
+    color: #002a80;
+    -webkit-text-fill-color: #002a80;
+}
+
+.bg-lightyellow.border-blue,
+.bg-lightyellow .border-blue {
+    border-color: #002a80;
+}
+
+.bg-lightyellow.black,
+.bg-lightyellow .black {
+    color: #121212;
+    -webkit-text-fill-color: #121212;
+}
+
+.bg-lightyellow.border-black,
+.bg-lightyellow .border-black {
+    border-color: #121212;
+}
+
+.bg-lightyellow a {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-brown {
+    background-color: #36280c;
+}
+
+.bg-brown.white,
+.bg-brown .white {
+    color: #fbfbfb;
+    -webkit-text-fill-color: #fbfbfb;
+}
+
+.bg-brown.border-white,
+.bg-brown .border-white {
+    border-color: #fbfbfb;
+}
+
+.bg-brown.silver,
+.bg-brown .silver {
+    color: #d2d3d3;
+    -webkit-text-fill-color: #d2d3d3;
+}
+
+.bg-brown.border-silver,
+.bg-brown .border-silver {
+    border-color: #d2d3d3;
+}
+
+.bg-brown.gray,
+.bg-brown .gray {
+    color: #969698;
+    -webkit-text-fill-color: #969698;
+}
+
+.bg-brown.border-gray,
+.bg-brown .border-gray {
+    border-color: #969698;
+}
+
+.bg-brown.red,
+.bg-brown .red {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-brown.border-red,
+.bg-brown .border-red {
+    border-color: #ef6f6f;
+}
+
+.bg-brown.yellow,
+.bg-brown .yellow {
+    color: #b98e39;
+    -webkit-text-fill-color: #b98e39;
+}
+
+.bg-brown.border-yellow,
+.bg-brown .border-yellow {
+    border-color: #b98e39;
+}
+
+.bg-brown.green,
+.bg-brown .green {
+    color: #2dad2d;
+    -webkit-text-fill-color: #2dad2d;
+}
+
+.bg-brown.border-green,
+.bg-brown .border-green {
+    border-color: #2dad2d;
+}
+
+.bg-brown.blue,
+.bg-brown .blue {
+    color: #6c96ec;
+    -webkit-text-fill-color: #6c96ec;
+}
+
+.bg-brown.border-blue,
+.bg-brown .border-blue {
+    border-color: #6c96ec;
+}
+
+.bg-brown.black,
+.bg-brown .black {
+    color: #969696;
+    -webkit-text-fill-color: #969696;
+}
+
+.bg-brown.border-black,
+.bg-brown .border-black {
+    border-color: #969696;
+}
+
+.bg-brown a {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-green {
+    background-color: #a8d2a8;
+}
+
+.bg-green.white,
+.bg-green .white {
+    color: #444444;
+    -webkit-text-fill-color: #444444;
+}
+
+.bg-green.border-white,
+.bg-green .border-white {
+    border-color: #444444;
+}
+
+.bg-green.silver,
+.bg-green .silver {
+    color: #424343;
+    -webkit-text-fill-color: #424343;
+}
+
+.bg-green.border-silver,
+.bg-green .border-silver {
+    border-color: #424343;
+}
+
+.bg-green.gray,
+.bg-green .gray {
+    color: #454547;
+    -webkit-text-fill-color: #454547;
+}
+
+.bg-green.border-gray,
+.bg-green .border-gray {
+    border-color: #454547;
+}
+
+.bg-green.red,
+.bg-green .red {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-green.border-red,
+.bg-green .border-red {
+    border-color: #800000;
+}
+
+.bg-green.yellow,
+.bg-green .yellow {
+    color: #653a00;
+    -webkit-text-fill-color: #653a00;
+}
+
+.bg-green.border-yellow,
+.bg-green .border-yellow {
+    border-color: #653a00;
+}
+
+.bg-green.green,
+.bg-green .green {
+    color: #005000;
+    -webkit-text-fill-color: #005000;
+}
+
+.bg-green.border-green,
+.bg-green .border-green {
+    border-color: #005000;
+}
+
+.bg-green.blue,
+.bg-green .blue {
+    color: #002a80;
+    -webkit-text-fill-color: #002a80;
+}
+
+.bg-green.border-blue,
+.bg-green .border-blue {
+    border-color: #002a80;
+}
+
+.bg-green.black,
+.bg-green .black {
+    color: #121212;
+    -webkit-text-fill-color: #121212;
+}
+
+.bg-green.border-black,
+.bg-green .border-black {
+    border-color: #121212;
+}
+
+.bg-green a {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.scheme-dark .bg-green,
+html[data-color-scheme=dark] .bg-green,
+html[__ibooks_internal_theme*=Gray] .bg-green,
+html[__ibooks_internal_theme*=Night] .bg-green {
+    background-color: #0c360c;
+}
+
+.scheme-dark .bg-green.white,
+html[data-color-scheme=dark] .bg-green.white,
+html[__ibooks_internal_theme*=Gray] .bg-green.white,
+html[__ibooks_internal_theme*=Night] .bg-green.white,
+.scheme-dark .bg-green .white,
+html[data-color-scheme=dark] .bg-green .white,
+html[__ibooks_internal_theme*=Gray] .bg-green .white,
+html[__ibooks_internal_theme*=Night] .bg-green .white {
+    color: #fbfbfb;
+    -webkit-text-fill-color: #fbfbfb;
+}
+
+.scheme-dark .bg-green.border-white,
+html[data-color-scheme=dark] .bg-green.border-white,
+html[__ibooks_internal_theme*=Gray] .bg-green.border-white,
+html[__ibooks_internal_theme*=Night] .bg-green.border-white,
+.scheme-dark .bg-green .border-white,
+html[data-color-scheme=dark] .bg-green .border-white,
+html[__ibooks_internal_theme*=Gray] .bg-green .border-white,
+html[__ibooks_internal_theme*=Night] .bg-green .border-white {
+    border-color: #fbfbfb;
+}
+
+.scheme-dark .bg-green.silver,
+html[data-color-scheme=dark] .bg-green.silver,
+html[__ibooks_internal_theme*=Gray] .bg-green.silver,
+html[__ibooks_internal_theme*=Night] .bg-green.silver,
+.scheme-dark .bg-green .silver,
+html[data-color-scheme=dark] .bg-green .silver,
+html[__ibooks_internal_theme*=Gray] .bg-green .silver,
+html[__ibooks_internal_theme*=Night] .bg-green .silver {
+    color: #d2d3d3;
+    -webkit-text-fill-color: #d2d3d3;
+}
+
+.scheme-dark .bg-green.border-silver,
+html[data-color-scheme=dark] .bg-green.border-silver,
+html[__ibooks_internal_theme*=Gray] .bg-green.border-silver,
+html[__ibooks_internal_theme*=Night] .bg-green.border-silver,
+.scheme-dark .bg-green .border-silver,
+html[data-color-scheme=dark] .bg-green .border-silver,
+html[__ibooks_internal_theme*=Gray] .bg-green .border-silver,
+html[__ibooks_internal_theme*=Night] .bg-green .border-silver {
+    border-color: #d2d3d3;
+}
+
+.scheme-dark .bg-green.gray,
+html[data-color-scheme=dark] .bg-green.gray,
+html[__ibooks_internal_theme*=Gray] .bg-green.gray,
+html[__ibooks_internal_theme*=Night] .bg-green.gray,
+.scheme-dark .bg-green .gray,
+html[data-color-scheme=dark] .bg-green .gray,
+html[__ibooks_internal_theme*=Gray] .bg-green .gray,
+html[__ibooks_internal_theme*=Night] .bg-green .gray {
+    color: #969698;
+    -webkit-text-fill-color: #969698;
+}
+
+.scheme-dark .bg-green.border-gray,
+html[data-color-scheme=dark] .bg-green.border-gray,
+html[__ibooks_internal_theme*=Gray] .bg-green.border-gray,
+html[__ibooks_internal_theme*=Night] .bg-green.border-gray,
+.scheme-dark .bg-green .border-gray,
+html[data-color-scheme=dark] .bg-green .border-gray,
+html[__ibooks_internal_theme*=Gray] .bg-green .border-gray,
+html[__ibooks_internal_theme*=Night] .bg-green .border-gray {
+    border-color: #969698;
+}
+
+.scheme-dark .bg-green.red,
+html[data-color-scheme=dark] .bg-green.red,
+html[__ibooks_internal_theme*=Gray] .bg-green.red,
+html[__ibooks_internal_theme*=Night] .bg-green.red,
+.scheme-dark .bg-green .red,
+html[data-color-scheme=dark] .bg-green .red,
+html[__ibooks_internal_theme*=Gray] .bg-green .red,
+html[__ibooks_internal_theme*=Night] .bg-green .red {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.scheme-dark .bg-green.border-red,
+html[data-color-scheme=dark] .bg-green.border-red,
+html[__ibooks_internal_theme*=Gray] .bg-green.border-red,
+html[__ibooks_internal_theme*=Night] .bg-green.border-red,
+.scheme-dark .bg-green .border-red,
+html[data-color-scheme=dark] .bg-green .border-red,
+html[__ibooks_internal_theme*=Gray] .bg-green .border-red,
+html[__ibooks_internal_theme*=Night] .bg-green .border-red {
+    border-color: #ef6f6f;
+}
+
+.scheme-dark .bg-green.yellow,
+html[data-color-scheme=dark] .bg-green.yellow,
+html[__ibooks_internal_theme*=Gray] .bg-green.yellow,
+html[__ibooks_internal_theme*=Night] .bg-green.yellow,
+.scheme-dark .bg-green .yellow,
+html[data-color-scheme=dark] .bg-green .yellow,
+html[__ibooks_internal_theme*=Gray] .bg-green .yellow,
+html[__ibooks_internal_theme*=Night] .bg-green .yellow {
+    color: #b98e39;
+    -webkit-text-fill-color: #b98e39;
+}
+
+.scheme-dark .bg-green.border-yellow,
+html[data-color-scheme=dark] .bg-green.border-yellow,
+html[__ibooks_internal_theme*=Gray] .bg-green.border-yellow,
+html[__ibooks_internal_theme*=Night] .bg-green.border-yellow,
+.scheme-dark .bg-green .border-yellow,
+html[data-color-scheme=dark] .bg-green .border-yellow,
+html[__ibooks_internal_theme*=Gray] .bg-green .border-yellow,
+html[__ibooks_internal_theme*=Night] .bg-green .border-yellow {
+    border-color: #b98e39;
+}
+
+.scheme-dark .bg-green.green,
+html[data-color-scheme=dark] .bg-green.green,
+html[__ibooks_internal_theme*=Gray] .bg-green.green,
+html[__ibooks_internal_theme*=Night] .bg-green.green,
+.scheme-dark .bg-green .green,
+html[data-color-scheme=dark] .bg-green .green,
+html[__ibooks_internal_theme*=Gray] .bg-green .green,
+html[__ibooks_internal_theme*=Night] .bg-green .green {
+    color: #2dad2d;
+    -webkit-text-fill-color: #2dad2d;
+}
+
+.scheme-dark .bg-green.border-green,
+html[data-color-scheme=dark] .bg-green.border-green,
+html[__ibooks_internal_theme*=Gray] .bg-green.border-green,
+html[__ibooks_internal_theme*=Night] .bg-green.border-green,
+.scheme-dark .bg-green .border-green,
+html[data-color-scheme=dark] .bg-green .border-green,
+html[__ibooks_internal_theme*=Gray] .bg-green .border-green,
+html[__ibooks_internal_theme*=Night] .bg-green .border-green {
+    border-color: #2dad2d;
+}
+
+.scheme-dark .bg-green.blue,
+html[data-color-scheme=dark] .bg-green.blue,
+html[__ibooks_internal_theme*=Gray] .bg-green.blue,
+html[__ibooks_internal_theme*=Night] .bg-green.blue,
+.scheme-dark .bg-green .blue,
+html[data-color-scheme=dark] .bg-green .blue,
+html[__ibooks_internal_theme*=Gray] .bg-green .blue,
+html[__ibooks_internal_theme*=Night] .bg-green .blue {
+    color: #6c96ec;
+    -webkit-text-fill-color: #6c96ec;
+}
+
+.scheme-dark .bg-green.border-blue,
+html[data-color-scheme=dark] .bg-green.border-blue,
+html[__ibooks_internal_theme*=Gray] .bg-green.border-blue,
+html[__ibooks_internal_theme*=Night] .bg-green.border-blue,
+.scheme-dark .bg-green .border-blue,
+html[data-color-scheme=dark] .bg-green .border-blue,
+html[__ibooks_internal_theme*=Gray] .bg-green .border-blue,
+html[__ibooks_internal_theme*=Night] .bg-green .border-blue {
+    border-color: #6c96ec;
+}
+
+.scheme-dark .bg-green.black,
+html[data-color-scheme=dark] .bg-green.black,
+html[__ibooks_internal_theme*=Gray] .bg-green.black,
+html[__ibooks_internal_theme*=Night] .bg-green.black,
+.scheme-dark .bg-green .black,
+html[data-color-scheme=dark] .bg-green .black,
+html[__ibooks_internal_theme*=Gray] .bg-green .black,
+html[__ibooks_internal_theme*=Night] .bg-green .black {
+    color: #969696;
+    -webkit-text-fill-color: #969696;
+}
+
+.scheme-dark .bg-green.border-black,
+html[data-color-scheme=dark] .bg-green.border-black,
+html[__ibooks_internal_theme*=Gray] .bg-green.border-black,
+html[__ibooks_internal_theme*=Night] .bg-green.border-black,
+.scheme-dark .bg-green .border-black,
+html[data-color-scheme=dark] .bg-green .border-black,
+html[__ibooks_internal_theme*=Gray] .bg-green .border-black,
+html[__ibooks_internal_theme*=Night] .bg-green .border-black {
+    border-color: #969696;
+}
+
+.scheme-dark .bg-green a,
+html[data-color-scheme=dark] .bg-green a,
+html[__ibooks_internal_theme*=Gray] .bg-green a,
+html[__ibooks_internal_theme*=Night] .bg-green a {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-lightgreen {
+    background-color: #a8d2a8;
+}
+
+.bg-lightgreen.white,
+.bg-lightgreen .white {
+    color: #444444;
+    -webkit-text-fill-color: #444444;
+}
+
+.bg-lightgreen.border-white,
+.bg-lightgreen .border-white {
+    border-color: #444444;
+}
+
+.bg-lightgreen.silver,
+.bg-lightgreen .silver {
+    color: #424343;
+    -webkit-text-fill-color: #424343;
+}
+
+.bg-lightgreen.border-silver,
+.bg-lightgreen .border-silver {
+    border-color: #424343;
+}
+
+.bg-lightgreen.gray,
+.bg-lightgreen .gray {
+    color: #454547;
+    -webkit-text-fill-color: #454547;
+}
+
+.bg-lightgreen.border-gray,
+.bg-lightgreen .border-gray {
+    border-color: #454547;
+}
+
+.bg-lightgreen.red,
+.bg-lightgreen .red {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-lightgreen.border-red,
+.bg-lightgreen .border-red {
+    border-color: #800000;
+}
+
+.bg-lightgreen.yellow,
+.bg-lightgreen .yellow {
+    color: #653a00;
+    -webkit-text-fill-color: #653a00;
+}
+
+.bg-lightgreen.border-yellow,
+.bg-lightgreen .border-yellow {
+    border-color: #653a00;
+}
+
+.bg-lightgreen.green,
+.bg-lightgreen .green {
+    color: #005000;
+    -webkit-text-fill-color: #005000;
+}
+
+.bg-lightgreen.border-green,
+.bg-lightgreen .border-green {
+    border-color: #005000;
+}
+
+.bg-lightgreen.blue,
+.bg-lightgreen .blue {
+    color: #002a80;
+    -webkit-text-fill-color: #002a80;
+}
+
+.bg-lightgreen.border-blue,
+.bg-lightgreen .border-blue {
+    border-color: #002a80;
+}
+
+.bg-lightgreen.black,
+.bg-lightgreen .black {
+    color: #121212;
+    -webkit-text-fill-color: #121212;
+}
+
+.bg-lightgreen.border-black,
+.bg-lightgreen .border-black {
+    border-color: #121212;
+}
+
+.bg-lightgreen a {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-darkgreen {
+    background-color: #0c360c;
+}
+
+.bg-darkgreen.white,
+.bg-darkgreen .white {
+    color: #fbfbfb;
+    -webkit-text-fill-color: #fbfbfb;
+}
+
+.bg-darkgreen.border-white,
+.bg-darkgreen .border-white {
+    border-color: #fbfbfb;
+}
+
+.bg-darkgreen.silver,
+.bg-darkgreen .silver {
+    color: #d2d3d3;
+    -webkit-text-fill-color: #d2d3d3;
+}
+
+.bg-darkgreen.border-silver,
+.bg-darkgreen .border-silver {
+    border-color: #d2d3d3;
+}
+
+.bg-darkgreen.gray,
+.bg-darkgreen .gray {
+    color: #969698;
+    -webkit-text-fill-color: #969698;
+}
+
+.bg-darkgreen.border-gray,
+.bg-darkgreen .border-gray {
+    border-color: #969698;
+}
+
+.bg-darkgreen.red,
+.bg-darkgreen .red {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-darkgreen.border-red,
+.bg-darkgreen .border-red {
+    border-color: #ef6f6f;
+}
+
+.bg-darkgreen.yellow,
+.bg-darkgreen .yellow {
+    color: #b98e39;
+    -webkit-text-fill-color: #b98e39;
+}
+
+.bg-darkgreen.border-yellow,
+.bg-darkgreen .border-yellow {
+    border-color: #b98e39;
+}
+
+.bg-darkgreen.green,
+.bg-darkgreen .green {
+    color: #2dad2d;
+    -webkit-text-fill-color: #2dad2d;
+}
+
+.bg-darkgreen.border-green,
+.bg-darkgreen .border-green {
+    border-color: #2dad2d;
+}
+
+.bg-darkgreen.blue,
+.bg-darkgreen .blue {
+    color: #6c96ec;
+    -webkit-text-fill-color: #6c96ec;
+}
+
+.bg-darkgreen.border-blue,
+.bg-darkgreen .border-blue {
+    border-color: #6c96ec;
+}
+
+.bg-darkgreen.black,
+.bg-darkgreen .black {
+    color: #969696;
+    -webkit-text-fill-color: #969696;
+}
+
+.bg-darkgreen.border-black,
+.bg-darkgreen .border-black {
+    border-color: #969696;
+}
+
+.bg-darkgreen a {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-blue {
+    background-color: #a8b6d2;
+}
+
+.bg-blue.white,
+.bg-blue .white {
+    color: #444444;
+    -webkit-text-fill-color: #444444;
+}
+
+.bg-blue.border-white,
+.bg-blue .border-white {
+    border-color: #444444;
+}
+
+.bg-blue.silver,
+.bg-blue .silver {
+    color: #424343;
+    -webkit-text-fill-color: #424343;
+}
+
+.bg-blue.border-silver,
+.bg-blue .border-silver {
+    border-color: #424343;
+}
+
+.bg-blue.gray,
+.bg-blue .gray {
+    color: #454547;
+    -webkit-text-fill-color: #454547;
+}
+
+.bg-blue.border-gray,
+.bg-blue .border-gray {
+    border-color: #454547;
+}
+
+.bg-blue.red,
+.bg-blue .red {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-blue.border-red,
+.bg-blue .border-red {
+    border-color: #800000;
+}
+
+.bg-blue.yellow,
+.bg-blue .yellow {
+    color: #653a00;
+    -webkit-text-fill-color: #653a00;
+}
+
+.bg-blue.border-yellow,
+.bg-blue .border-yellow {
+    border-color: #653a00;
+}
+
+.bg-blue.green,
+.bg-blue .green {
+    color: #005000;
+    -webkit-text-fill-color: #005000;
+}
+
+.bg-blue.border-green,
+.bg-blue .border-green {
+    border-color: #005000;
+}
+
+.bg-blue.blue,
+.bg-blue .blue {
+    color: #002a80;
+    -webkit-text-fill-color: #002a80;
+}
+
+.bg-blue.border-blue,
+.bg-blue .border-blue {
+    border-color: #002a80;
+}
+
+.bg-blue.black,
+.bg-blue .black {
+    color: #121212;
+    -webkit-text-fill-color: #121212;
+}
+
+.bg-blue.border-black,
+.bg-blue .border-black {
+    border-color: #121212;
+}
+
+.bg-blue a {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.scheme-dark .bg-blue,
+html[data-color-scheme=dark] .bg-blue,
+html[__ibooks_internal_theme*=Gray] .bg-blue,
+html[__ibooks_internal_theme*=Night] .bg-blue {
+    background-color: #0c1a36;
+}
+
+.scheme-dark .bg-blue.white,
+html[data-color-scheme=dark] .bg-blue.white,
+html[__ibooks_internal_theme*=Gray] .bg-blue.white,
+html[__ibooks_internal_theme*=Night] .bg-blue.white,
+.scheme-dark .bg-blue .white,
+html[data-color-scheme=dark] .bg-blue .white,
+html[__ibooks_internal_theme*=Gray] .bg-blue .white,
+html[__ibooks_internal_theme*=Night] .bg-blue .white {
+    color: #fbfbfb;
+    -webkit-text-fill-color: #fbfbfb;
+}
+
+.scheme-dark .bg-blue.border-white,
+html[data-color-scheme=dark] .bg-blue.border-white,
+html[__ibooks_internal_theme*=Gray] .bg-blue.border-white,
+html[__ibooks_internal_theme*=Night] .bg-blue.border-white,
+.scheme-dark .bg-blue .border-white,
+html[data-color-scheme=dark] .bg-blue .border-white,
+html[__ibooks_internal_theme*=Gray] .bg-blue .border-white,
+html[__ibooks_internal_theme*=Night] .bg-blue .border-white {
+    border-color: #fbfbfb;
+}
+
+.scheme-dark .bg-blue.silver,
+html[data-color-scheme=dark] .bg-blue.silver,
+html[__ibooks_internal_theme*=Gray] .bg-blue.silver,
+html[__ibooks_internal_theme*=Night] .bg-blue.silver,
+.scheme-dark .bg-blue .silver,
+html[data-color-scheme=dark] .bg-blue .silver,
+html[__ibooks_internal_theme*=Gray] .bg-blue .silver,
+html[__ibooks_internal_theme*=Night] .bg-blue .silver {
+    color: #d2d3d3;
+    -webkit-text-fill-color: #d2d3d3;
+}
+
+.scheme-dark .bg-blue.border-silver,
+html[data-color-scheme=dark] .bg-blue.border-silver,
+html[__ibooks_internal_theme*=Gray] .bg-blue.border-silver,
+html[__ibooks_internal_theme*=Night] .bg-blue.border-silver,
+.scheme-dark .bg-blue .border-silver,
+html[data-color-scheme=dark] .bg-blue .border-silver,
+html[__ibooks_internal_theme*=Gray] .bg-blue .border-silver,
+html[__ibooks_internal_theme*=Night] .bg-blue .border-silver {
+    border-color: #d2d3d3;
+}
+
+.scheme-dark .bg-blue.gray,
+html[data-color-scheme=dark] .bg-blue.gray,
+html[__ibooks_internal_theme*=Gray] .bg-blue.gray,
+html[__ibooks_internal_theme*=Night] .bg-blue.gray,
+.scheme-dark .bg-blue .gray,
+html[data-color-scheme=dark] .bg-blue .gray,
+html[__ibooks_internal_theme*=Gray] .bg-blue .gray,
+html[__ibooks_internal_theme*=Night] .bg-blue .gray {
+    color: #969698;
+    -webkit-text-fill-color: #969698;
+}
+
+.scheme-dark .bg-blue.border-gray,
+html[data-color-scheme=dark] .bg-blue.border-gray,
+html[__ibooks_internal_theme*=Gray] .bg-blue.border-gray,
+html[__ibooks_internal_theme*=Night] .bg-blue.border-gray,
+.scheme-dark .bg-blue .border-gray,
+html[data-color-scheme=dark] .bg-blue .border-gray,
+html[__ibooks_internal_theme*=Gray] .bg-blue .border-gray,
+html[__ibooks_internal_theme*=Night] .bg-blue .border-gray {
+    border-color: #969698;
+}
+
+.scheme-dark .bg-blue.red,
+html[data-color-scheme=dark] .bg-blue.red,
+html[__ibooks_internal_theme*=Gray] .bg-blue.red,
+html[__ibooks_internal_theme*=Night] .bg-blue.red,
+.scheme-dark .bg-blue .red,
+html[data-color-scheme=dark] .bg-blue .red,
+html[__ibooks_internal_theme*=Gray] .bg-blue .red,
+html[__ibooks_internal_theme*=Night] .bg-blue .red {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.scheme-dark .bg-blue.border-red,
+html[data-color-scheme=dark] .bg-blue.border-red,
+html[__ibooks_internal_theme*=Gray] .bg-blue.border-red,
+html[__ibooks_internal_theme*=Night] .bg-blue.border-red,
+.scheme-dark .bg-blue .border-red,
+html[data-color-scheme=dark] .bg-blue .border-red,
+html[__ibooks_internal_theme*=Gray] .bg-blue .border-red,
+html[__ibooks_internal_theme*=Night] .bg-blue .border-red {
+    border-color: #ef6f6f;
+}
+
+.scheme-dark .bg-blue.yellow,
+html[data-color-scheme=dark] .bg-blue.yellow,
+html[__ibooks_internal_theme*=Gray] .bg-blue.yellow,
+html[__ibooks_internal_theme*=Night] .bg-blue.yellow,
+.scheme-dark .bg-blue .yellow,
+html[data-color-scheme=dark] .bg-blue .yellow,
+html[__ibooks_internal_theme*=Gray] .bg-blue .yellow,
+html[__ibooks_internal_theme*=Night] .bg-blue .yellow {
+    color: #b98e39;
+    -webkit-text-fill-color: #b98e39;
+}
+
+.scheme-dark .bg-blue.border-yellow,
+html[data-color-scheme=dark] .bg-blue.border-yellow,
+html[__ibooks_internal_theme*=Gray] .bg-blue.border-yellow,
+html[__ibooks_internal_theme*=Night] .bg-blue.border-yellow,
+.scheme-dark .bg-blue .border-yellow,
+html[data-color-scheme=dark] .bg-blue .border-yellow,
+html[__ibooks_internal_theme*=Gray] .bg-blue .border-yellow,
+html[__ibooks_internal_theme*=Night] .bg-blue .border-yellow {
+    border-color: #b98e39;
+}
+
+.scheme-dark .bg-blue.green,
+html[data-color-scheme=dark] .bg-blue.green,
+html[__ibooks_internal_theme*=Gray] .bg-blue.green,
+html[__ibooks_internal_theme*=Night] .bg-blue.green,
+.scheme-dark .bg-blue .green,
+html[data-color-scheme=dark] .bg-blue .green,
+html[__ibooks_internal_theme*=Gray] .bg-blue .green,
+html[__ibooks_internal_theme*=Night] .bg-blue .green {
+    color: #2dad2d;
+    -webkit-text-fill-color: #2dad2d;
+}
+
+.scheme-dark .bg-blue.border-green,
+html[data-color-scheme=dark] .bg-blue.border-green,
+html[__ibooks_internal_theme*=Gray] .bg-blue.border-green,
+html[__ibooks_internal_theme*=Night] .bg-blue.border-green,
+.scheme-dark .bg-blue .border-green,
+html[data-color-scheme=dark] .bg-blue .border-green,
+html[__ibooks_internal_theme*=Gray] .bg-blue .border-green,
+html[__ibooks_internal_theme*=Night] .bg-blue .border-green {
+    border-color: #2dad2d;
+}
+
+.scheme-dark .bg-blue.blue,
+html[data-color-scheme=dark] .bg-blue.blue,
+html[__ibooks_internal_theme*=Gray] .bg-blue.blue,
+html[__ibooks_internal_theme*=Night] .bg-blue.blue,
+.scheme-dark .bg-blue .blue,
+html[data-color-scheme=dark] .bg-blue .blue,
+html[__ibooks_internal_theme*=Gray] .bg-blue .blue,
+html[__ibooks_internal_theme*=Night] .bg-blue .blue {
+    color: #6c96ec;
+    -webkit-text-fill-color: #6c96ec;
+}
+
+.scheme-dark .bg-blue.border-blue,
+html[data-color-scheme=dark] .bg-blue.border-blue,
+html[__ibooks_internal_theme*=Gray] .bg-blue.border-blue,
+html[__ibooks_internal_theme*=Night] .bg-blue.border-blue,
+.scheme-dark .bg-blue .border-blue,
+html[data-color-scheme=dark] .bg-blue .border-blue,
+html[__ibooks_internal_theme*=Gray] .bg-blue .border-blue,
+html[__ibooks_internal_theme*=Night] .bg-blue .border-blue {
+    border-color: #6c96ec;
+}
+
+.scheme-dark .bg-blue.black,
+html[data-color-scheme=dark] .bg-blue.black,
+html[__ibooks_internal_theme*=Gray] .bg-blue.black,
+html[__ibooks_internal_theme*=Night] .bg-blue.black,
+.scheme-dark .bg-blue .black,
+html[data-color-scheme=dark] .bg-blue .black,
+html[__ibooks_internal_theme*=Gray] .bg-blue .black,
+html[__ibooks_internal_theme*=Night] .bg-blue .black {
+    color: #969696;
+    -webkit-text-fill-color: #969696;
+}
+
+.scheme-dark .bg-blue.border-black,
+html[data-color-scheme=dark] .bg-blue.border-black,
+html[__ibooks_internal_theme*=Gray] .bg-blue.border-black,
+html[__ibooks_internal_theme*=Night] .bg-blue.border-black,
+.scheme-dark .bg-blue .border-black,
+html[data-color-scheme=dark] .bg-blue .border-black,
+html[__ibooks_internal_theme*=Gray] .bg-blue .border-black,
+html[__ibooks_internal_theme*=Night] .bg-blue .border-black {
+    border-color: #969696;
+}
+
+.scheme-dark .bg-blue a,
+html[data-color-scheme=dark] .bg-blue a,
+html[__ibooks_internal_theme*=Gray] .bg-blue a,
+html[__ibooks_internal_theme*=Night] .bg-blue a {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-lightblue {
+    background-color: #a8b6d2;
+}
+
+.bg-lightblue.white,
+.bg-lightblue .white {
+    color: #444444;
+    -webkit-text-fill-color: #444444;
+}
+
+.bg-lightblue.border-white,
+.bg-lightblue .border-white {
+    border-color: #444444;
+}
+
+.bg-lightblue.silver,
+.bg-lightblue .silver {
+    color: #424343;
+    -webkit-text-fill-color: #424343;
+}
+
+.bg-lightblue.border-silver,
+.bg-lightblue .border-silver {
+    border-color: #424343;
+}
+
+.bg-lightblue.gray,
+.bg-lightblue .gray {
+    color: #454547;
+    -webkit-text-fill-color: #454547;
+}
+
+.bg-lightblue.border-gray,
+.bg-lightblue .border-gray {
+    border-color: #454547;
+}
+
+.bg-lightblue.red,
+.bg-lightblue .red {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-lightblue.border-red,
+.bg-lightblue .border-red {
+    border-color: #800000;
+}
+
+.bg-lightblue.yellow,
+.bg-lightblue .yellow {
+    color: #653a00;
+    -webkit-text-fill-color: #653a00;
+}
+
+.bg-lightblue.border-yellow,
+.bg-lightblue .border-yellow {
+    border-color: #653a00;
+}
+
+.bg-lightblue.green,
+.bg-lightblue .green {
+    color: #005000;
+    -webkit-text-fill-color: #005000;
+}
+
+.bg-lightblue.border-green,
+.bg-lightblue .border-green {
+    border-color: #005000;
+}
+
+.bg-lightblue.blue,
+.bg-lightblue .blue {
+    color: #002a80;
+    -webkit-text-fill-color: #002a80;
+}
+
+.bg-lightblue.border-blue,
+.bg-lightblue .border-blue {
+    border-color: #002a80;
+}
+
+.bg-lightblue.black,
+.bg-lightblue .black {
+    color: #121212;
+    -webkit-text-fill-color: #121212;
+}
+
+.bg-lightblue.border-black,
+.bg-lightblue .border-black {
+    border-color: #121212;
+}
+
+.bg-lightblue a {
+    color: #800000;
+    -webkit-text-fill-color: #800000;
+}
+
+.bg-darkblue {
+    background-color: #0c1a36;
+}
+
+.bg-darkblue.white,
+.bg-darkblue .white {
+    color: #fbfbfb;
+    -webkit-text-fill-color: #fbfbfb;
+}
+
+.bg-darkblue.border-white,
+.bg-darkblue .border-white {
+    border-color: #fbfbfb;
+}
+
+.bg-darkblue.silver,
+.bg-darkblue .silver {
+    color: #d2d3d3;
+    -webkit-text-fill-color: #d2d3d3;
+}
+
+.bg-darkblue.border-silver,
+.bg-darkblue .border-silver {
+    border-color: #d2d3d3;
+}
+
+.bg-darkblue.gray,
+.bg-darkblue .gray {
+    color: #969698;
+    -webkit-text-fill-color: #969698;
+}
+
+.bg-darkblue.border-gray,
+.bg-darkblue .border-gray {
+    border-color: #969698;
+}
+
+.bg-darkblue.red,
+.bg-darkblue .red {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.bg-darkblue.border-red,
+.bg-darkblue .border-red {
+    border-color: #ef6f6f;
+}
+
+.bg-darkblue.yellow,
+.bg-darkblue .yellow {
+    color: #b98e39;
+    -webkit-text-fill-color: #b98e39;
+}
+
+.bg-darkblue.border-yellow,
+.bg-darkblue .border-yellow {
+    border-color: #b98e39;
+}
+
+.bg-darkblue.green,
+.bg-darkblue .green {
+    color: #2dad2d;
+    -webkit-text-fill-color: #2dad2d;
+}
+
+.bg-darkblue.border-green,
+.bg-darkblue .border-green {
+    border-color: #2dad2d;
+}
+
+.bg-darkblue.blue,
+.bg-darkblue .blue {
+    color: #6c96ec;
+    -webkit-text-fill-color: #6c96ec;
+}
+
+.bg-darkblue.border-blue,
+.bg-darkblue .border-blue {
+    border-color: #6c96ec;
+}
+
+.bg-darkblue.black,
+.bg-darkblue .black {
+    color: #969696;
+    -webkit-text-fill-color: #969696;
+}
+
+.bg-darkblue.border-black,
+.bg-darkblue .border-black {
+    border-color: #969696;
+}
+
+.bg-darkblue a {
+    color: #ef6f6f;
+    -webkit-text-fill-color: #ef6f6f;
+}
+
+.scheme-light {
+    color: #000000;
+    background-color: #fbfbfb;
+}
+
+.scheme-light.scheme-sepia,
+.scheme-sepia {
+    color: #000000;
+    background-color: #f8f1e3;
+}
+
+.scheme-dark.scheme-gray,
+.scheme-gray {
+    color: #c9caca;
+    background-color: #5a5a5c;
+}
+
+.scheme-dark,
+.scheme-night {
+    color: #b0b0b0;
+    background-color: #121212;
+}
