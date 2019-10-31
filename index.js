@@ -86,8 +86,10 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 			default: path.join(__dirname, './output')
 		})
 		.option('keepTempFiles', {
-			describe: 'Keep temporary folder, instead of deleting',
-			type: 'boolean'
+			alias: ['keep'],
+			describe: 'Keep temporary folder, instead of deleting. Use --no-keep to delete',
+			type: 'boolean',
+			default: true
 		})
 		.option('debug', {
 			describe: 'Enable debug mode',

@@ -297,7 +297,7 @@ class Book {
 
 		const archive = archiver('zip', {zlib: {level: 9}});
 		const output = fs.createWriteStream(destination);
-		console.log('Zipping temp dir to', destination);
+		console.log(`Zipping temp dir ${source} to ${destination}`);
 		// write the all important mimetype in first
 		// @ts-ignore
 		archive.file(path.join(source, 'mimetype'), {name: 'mimetype', store: true });
