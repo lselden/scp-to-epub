@@ -20,6 +20,10 @@ const rmdir = promisify(rimraf);
 const {uuid} = require('./utils');
 
 class Book {
+	/**
+	 *
+	 * @param {import('../..').BookConfig} opts
+	 */
 	constructor(opts = {}) {
 		/** @type {string} */
 		this.title;
@@ -59,8 +63,6 @@ class Book {
 			appendixPath: 'appendix.xhtml'
 		};
 
-		this.stylesheets = ['css/base.css', 'css/style.css', 'css/fonts.css'];
-
 		this.creator = 'scp-epub-gen';
 
 		// TODO DEPRECATED REMOVE
@@ -85,12 +87,14 @@ class Book {
 		};
 
 		this.localAssetsPath = path.join(__dirname, '../../assets');
-
+		// list of folders under "assets" to be included
+		this.assetFolders = ['css', 'fonts', 'images', 'docs'];
+		// TODO just pull this from assetFolders...will need to grab before starting to generate various files...maybe at beginning of process
+		this.stylesheets = ['css/base.css', 'css/style.css', 'css/fonts.css'];
 
 		this._written = new Set();
 
 		this.concurrency = 1;
-
 	}
 	get author() {
 		return this._author.join(', ');
@@ -216,24 +220,29 @@ class Book {
 		}
 	}
 	async addLocalResources(localPath = this.localAssetsPath) {
+		const {concurrency} = this;
 		// HACK direct file copy would be a better option than reading into memory
 		/**
 		 * @type {string[]}
 		 */
 		let localFiles;
 
-		if (Array.isArray(localPath)) {
-			localFiles = localPath;
-		} else {
-			try {
-				const dirListing = await fs.promises.readdir(localPath);
-				localFiles = dirListing.map(f => path.join(localPath, f));
-				// HACK limit to specific files
-				localFiles = localFiles.filter(f => /(base|style|fonts)\.css/.test(f));
-			} catch (err) {
-				console.error(`Failed loading local assets listing at ${localPath}`, err);
-				return;
-			}
+		try {
+			const dirListing = await fs.promises.readdir(localPath, { withFileTypes: true });
+			const subFolders = dirListing
+				.filter(dir => {
+					return dir.isDirectory && this.assetFolders.includes(dir.name);
+				});
+			localFiles = [];
+			await pMap(subFolders, async dirent => {
+				const dir = path.join(localPath, dirent.name);
+				// NOTE no try/catch...?...
+				const files = await fs.promises.readdir(dir);
+				localFiles.push(...files.map(f => path.join(dir, f)));
+			}, {concurrency});
+		} catch (err) {
+			console.error(`Failed loading local assets listing at ${localPath}`, err);
+			return;
 		}
 		await pMap(localFiles, async file => {
 			try {
@@ -247,7 +256,7 @@ class Book {
 				});
 				this.resources.push(r);
 			} catch (err) {
-				console.error('failed reading local file', file);
+				console.error('failed reading local file', file, err);
 			}
 		}, { concurrency: this.concurrency });
 	}

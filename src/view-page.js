@@ -40,9 +40,9 @@ module.exports = async function testPage (urls, cfg = {}) {
 		// TODO get from book.stylesheets
 		await Promise.all(
 			[
-				'assets/base.css',
-				'assets/style.css',
-				'assets/fonts.css',
+				'assets/css/base.css',
+				'assets/css/style.css',
+				'assets/css/fonts.css',
 				'client/ibooks.css'
 			].map(style => page.addStyleTag({
 				path: path.join(__dirname, '..', style)

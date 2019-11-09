@@ -93,7 +93,7 @@ async function registerRemote(doc, originalUrl) {
 
 }
 
-function addExtras (doc, extras) {
+function addExtras (doc, extras, originalUrl) {
 	if (
 		!extras ||
 		(typeof extras !== 'object') ||
@@ -109,8 +109,12 @@ function addExtras (doc, extras) {
 	if (origHead) {
 		origHead.remove();
 	}
-	main.insertAdjacentHTML('afterbegin', extras.header);
-	main.insertAdjacentHTML('beforeend', extras.footer);
+	if (main) {
+		main.insertAdjacentHTML('afterbegin', extras.header);
+		main.insertAdjacentHTML('beforeend', extras.footer);
+	} else {
+		console.error(`FAILED TO ADD HEADER/FOOTER - NOT PROPERLY FORMATTED PAGE ${originalUrl}`);
+	}
 }
 
 // somehow some spam iframes made it in
@@ -192,7 +196,7 @@ window.processChapter = async function (content, extras, config = {}) {
 		{name: 'update links', fn() { return updateLinks(doc, originalUrl); }},
 		{name: 'register remote links', fn() { return registerRemote(doc, originalUrl); }},
 		{name: 'add depth data', fn() { return addDepthData(doc, config); }},
-		{name: 'add header/footer', fn() { addExtras(doc, extras); }}
+		{name: 'add header/footer', fn() { addExtras(doc, extras, originalUrl); }}
 	];
 	for(let {name, fn} of steps) {
 		try {

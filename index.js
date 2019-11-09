@@ -111,6 +111,11 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 			describe: 'Maximum depth of crawler',
 			default: 2
 		})
+		.option('ratings', {
+			describe: 'Include ratings. Use --no-ratings to hide this data',
+			type: 'boolean',
+			default: true
+		})
 		.option('onlyZip', {
 			type: 'boolean',
 			describe: 'Only zip up temp directory contents into epub'

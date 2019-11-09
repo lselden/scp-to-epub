@@ -19,7 +19,7 @@ import {
 	annotateRedacted,
 	annotateBlackbox,
 	fixImages,
-	removeSpanHrefs
+	revealHiddenText
 } from './fix-inline.js';
 import removeHidden from './remove-hidden.js';
 import {uncollapse, uncollapseColmod} from './uncollapse.js';
@@ -156,13 +156,14 @@ function addNamespaces() {
 		{name: 'footnotes', fn: handleFootnotes},
 		{name: 'images', fn: handleFigures},
 		{name: 'fix-obsolete-refs', fn: fixHtml4Anchors},
-		{name: 'remove-hidden', fn: removeHidden},
-		{name: 'cleanup-whitespace', fn: cleanupWhitespace},
+		{name: 'reveal-hidden-text', fn: revealHiddenText},
 		{name: 'fix-redacted', fn: annotateRedacted},
 		{name: 'fix-blackbox', fn: annotateBlackbox},
 		{name: 'fix-inline', fn: fixInlineSemanticTags},
-		{name: 'fix-width-styles', fn: fixWidth},
 		{name: 'fix-tt', fn: fixTT},
+		{name: 'remove-hidden', fn: removeHidden},
+		{name: 'cleanup-whitespace', fn: cleanupWhitespace},
+		{name: 'fix-width-styles', fn: fixWidth},
 		{name: 'fix-image-sizes', fn: fixImages},
 		{name: 'safe-colors', fn: fixColors},
 		{name: 'fix-voiceover', fn: fixVoiceover},

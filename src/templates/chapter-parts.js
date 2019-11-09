@@ -10,6 +10,12 @@ function genSystemChapterHeader(chapter, config = {}) {
 	</header>`;
 }
 
+/**
+ *
+ * @param {import('../lib/chapter')} chapter
+ * @param {{url: string, title: string}[]} audioAdaptations
+ * @param {import('../..').BookOptions} config
+ */
 function genChapterHeader(chapter, audioAdaptations = [], config = {}) {
 	const {
 		stats,
@@ -21,15 +27,12 @@ function genChapterHeader(chapter, audioAdaptations = [], config = {}) {
 		return genSystemChapterHeader(chapter, config);
 	}
 
-	let date = stats.date;
+	/** @type {Date | undefined} */
+	let date = new Date(stats.date);
 
-	if (stats.date instanceof Date) {
-		try {
-			date = stats.date.toDateString();
-		} catch (err) {
-			console.warn(`Failed processing posted date for ${chapter.title} - value is ${JSON.stringify(stats.date)}`);
-			date = undefined;
-		}
+	if (isNaN(date.getTime())) {
+		console.warn(`Failed processing posted date for ${chapter.title} - value is ${JSON.stringify(stats.date)}`);
+		date = undefined;
 	}
 
 	const {
@@ -44,7 +47,7 @@ function genChapterHeader(chapter, audioAdaptations = [], config = {}) {
 		rows.push(['By', escape(stats.author)]);
 	}
 	if (date) {
-		rows.push(['Posted', escape(date)]);
+		rows.push(['Posted', `<time datetime="${date.toISOString()}">${date.toDateString()}</time>`]);
 	}
 
 	if (stats.rating && showRating) {

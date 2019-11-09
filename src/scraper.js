@@ -13,6 +13,11 @@ const {safeFilename, filenameForUrl} = require('./lib/utils');
 /** @typedef {import("puppeteer").Response} Response */
 
 class Scraper {
+	/**
+	 *
+	 * @param {import('./book-maker')} app
+	 * @param {import('..').BookMakerConfig} opts
+	 */
 	constructor(app, opts = {}) {
 		const {
 			browser, cache, wikiLookup
@@ -543,7 +548,7 @@ class Scraper {
 		if (defaultOrigin && !/\/\/(www\.|)scp-wiki(\.net|\.wikidot\.com)$/.test(defaultOrigin)) {
 			defaultSite = (urlLib.parse(defaultOrigin).hostname || '').replace(/www\.|\.com|\.wikidot|\.net|\.org)/g, '');
 		}
-		const {pageName, pageId, siteName} = await page.evaluate(() => {
+		const {pageName, pageId, siteName} = await page.evaluate(defaultSite => {
 			// @ts-ignore
 			const info = window.WIKIREQUEST && window.WIKIREQUEST.info;
 			let pageName = info && info.pageUnixName;
@@ -554,7 +559,7 @@ class Scraper {
 			const pageId = info && info.pageId;
 			const siteName = (info && info.siteUnixName) || defaultSite;
 			return { pageName, pageId, siteName };
-		});
+		}, defaultSite);
 		// handle tags separately
 		if (/^system:page-tags/.test(pageName)) {
 			const tag = page.url().split('/').slice(-1)[0];

@@ -7,6 +7,11 @@ const Resource = require('./lib/resource');
 const {genChapterFooter, genChapterHeader} = require('./templates/chapter-parts');
 
 class PostProcessor {
+	/**
+	 *
+	 * @param {import('./book-maker')} app
+	 * @param {import('..').BookMakerConfig} options
+	 */
 	constructor(app, options = {}) {
 		const {
 			browser, cache, wikiLookup
@@ -15,7 +20,8 @@ class PostProcessor {
 		const {
 			concurrency = 3,
 			appendixDepthCutoff = 3,
-			stylesheets = ['css/fonts.css', 'css/style.css', 'css/base.css']
+			stylesheets = ['css/fonts.css', 'css/style.css', 'css/base.css'],
+			bookOptions
 		} = {
 			...options,
 			...(app.options.postProcess || {}),
@@ -25,7 +31,8 @@ class PostProcessor {
 		this.options = {
 			concurrency,
 			stylesheets,
-			appendixDepthCutoff
+			appendixDepthCutoff,
+			bookOptions
 		};
 
 		/** @type {import("puppeteer").Browser} */
@@ -170,9 +177,9 @@ class PostProcessor {
 			.join('');
 
 		return {
-			header: genChapterHeader(chapter, audioAdaptations),
+			header: genChapterHeader(chapter, audioAdaptations, this.options.bookOptions),
 			stylesheets,
-			footer: genChapterFooter(bookLinks, externalLinks)
+			footer: genChapterFooter(bookLinks, externalLinks, this.options.bookOptions)
 		};
 	}
 }

@@ -12,26 +12,33 @@ function isEmpty(arr) {
 }
 
 class WikiDataLookup {
+	/**
+	 *
+	 * @param {import('./book-maker')} app
+	 * @param {import('..').BookMakerConfig} opts
+	 */
 	constructor(app, opts = {}) {
 		/** @type {import("puppeteer").Browser} */
 		this.browser = app.browser;
 
 		const cacheOpts = {
 			stats: true,
-			path: 'cache',
+			path: path.join(__dirname, '../cache'),
 			// one month default cache time
 			maxAge: 30 * 24 * 60 * 60 * 1000,
 			...(opts.cache)
 		};
 
+		const defaultOrigin = opts.defaultOrigin || 'http://www.scp-wiki.net';
+
 		this.options = {
 			headless: false,
 			debug: true,
-			audioAdaptationsUrl: 'http://scp-wiki.wikidot.com/printer--friendly/audio-adaptations',
-			hubsUrl: 'http://www.scp-wiki.net/system:page-tags/tag/hub#pages',
-			authorsUrl: 'http://scp-wiki.wikidot.com/system:page-tags/tag/author',
-			artworkUrl: 'http://scp-wiki.wikidot.com/system:page-tags/tag/artwork',
-			ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Googlebot Chrome/76.0.3809.132 Safari/537.36',
+			audioAdaptationsUrl: `${new URL('printer--friendly/audio-adaptations', defaultOrigin)}`,
+			hubsUrl: `${new URL('system:page-tags/tag/hub', defaultOrigin)}`,
+			authorsUrl: `${new URL('system:page-tags/tag/author', defaultOrigin)}`,
+			artworkUrl: `${new URL('system:page-tags/tag/artwork', defaultOrigin)}`,
+			ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36',
 			...opts,
 			cache: cacheOpts
 		};
@@ -116,6 +123,12 @@ class WikiDataLookup {
 			const result = await (
 				pageId ? scpperDB.getByPageId(pageId) : scpperDB.getByTitle(pageName)
 			);
+			if (!result) {
+				console.warn(`No response for page ${pageId} ${pageName}`);
+				return {
+					pageName
+				};
+			}
 			result.pageName = pageName;
 
 			if (cacheEnabled) {

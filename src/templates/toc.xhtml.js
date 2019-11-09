@@ -1,7 +1,7 @@
 const {escape} = require('../lib/utils');
 const DocPart = require('../lib/doc-part');
 
-function formatDocPart(docPart) {
+function formatDocPart(docPart, config) {
 	const {
 		bookPath,
 		title = 'Section',
@@ -16,14 +16,16 @@ function formatDocPart(docPart) {
 					.map((chapter, j) => {
 						// NOTE not trying to use book chapter numbers because docparts messes that up
 						//const chapterIndex = index + j;
-						return formatChapter(chapter);
+						return formatChapter(chapter, '', config);
 					})
 					.join('\n')
 		}</ol></li>`;
 }
-function formatChapter(chapter, chapterIndex) {
+function formatChapter(chapter, chapterIndex, config = {}) {
+	const {includeRating = true} = config;
+
 	if (chapter instanceof DocPart) {
-		return formatDocPart(chapter);
+		return formatDocPart(chapter, config);
 	}
 	const {
 		bookPath,
@@ -34,7 +36,7 @@ function formatChapter(chapter, chapterIndex) {
 	const author = Array.isArray(chapter.author) ? chapter.author.join(', ') : chapter.author;
 	const authorEl = author ? ` — <small class="toc-author">${ escape(author) }</small>` : '';
 
-	const meta = rating ? `(Rating: ${escape(chapter.stats.rating)})` : '';
+	const meta = (includeRating && rating) ? `(Rating: ${escape(rating)})` : '';
 
 	return `<li class="toc-chapter"><a href="${bookPath}">${escape(title)}${authorEl} <small class="toc-meta">${meta}</small></a></li>`;
 }
@@ -62,6 +64,11 @@ function genPage(data, title, html) {
 	</html>`;
 }
 
+/**
+ *
+ * @param {*} data
+ * @param {import('../..').BookOptions} options
+ */
 function genToc(data, options = {}) {
 	const {
 		toc: {
@@ -76,22 +83,18 @@ function genToc(data, options = {}) {
 		}
 	} = data;
 
-	// const {
-	// 	appendixDepthCutoff = 1
-	// } = options;
-
 	const firstChapter = chapters.length > 0 ? chapters[0] : {};
 
 	let chapterIndex = 1;
 
-	const html = `<div class="toc-body" style="white-space:pre-wrap;line-break:strict;">
+	const html = `<div class="toc-body">
 	<nav id="toc" epub:type="toc">
 		<h1>Contents</h1>
 		<ol class="toc-list">${
 				chapters
 					.map((chapter, index) => {
 						// NOTE TODO doc parts will mess up this count
-						const result = formatChapter(chapter, chapterIndex);
+						const result = formatChapter(chapter, chapterIndex, options);
 						if (!(chapter instanceof DocPart)) {
 							chapterIndex += 1;
 						}
@@ -133,7 +136,7 @@ function genAppendix(data, options) {
 	const html = `<h1>Appendix</h1>
 <ol class="toc-list">${
 	supplemental
-		.map(formatChapter)
+		.map((c, i) => formatChapter(c, i, options))
 		.join('\n')
 }</ol>`
 

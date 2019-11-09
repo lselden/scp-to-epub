@@ -95,6 +95,7 @@ export function fixInlineSemanticTags() {
 
 		if (el.matches('img')) {
 			el.setAttribute('style', '');
+			// TODO this will miss some images
 			if (!el.getAttribute('alt')) {
 				const imgurl = new URL(el.src || '', document.location.href);
 				el.setAttribute('alt', imgurl.pathname.replace(/^.*\//, ''));
@@ -123,6 +124,27 @@ export function fixImages() {
 export function fixTT() {
 	helpers.$$('tt').forEach(el => {
 		helpers.switchTag(el, 'samp');
+	});
+}
+
+export function revealHiddenText() {
+	helpers.$$('[style*=font-size]').forEach(el => {
+console.log('hi fontsize', el.style.fontSize);
+		const [_, raw, unit] = (el.style.fontSize.match(/([\d.]+)(.+)/) || []);
+		if (raw === undefined) {
+			return;
+		}
+		let num = parseFloat(raw);
+		const isHidden = (
+			(unit.includes('%') && num < 66) ||
+			(/px|pt/.test(unit) && num < 15) ||
+			(/em|ex|rem/.test(unit) && num < 0.66)
+		);
+console.log('hi hidden', num, isHidden);
+		if (isHidden) {
+			el.style.fontSize = '';
+			el.classList.add('hidden-text');
+		}
 	});
 }
 

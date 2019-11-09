@@ -1,3 +1,5 @@
+/// <reference types=".." />
+
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 const path = require('path');
@@ -22,6 +24,11 @@ const makeCover = require('./make-cover');
 /** @typedef {import("puppeteer").Response} Response */
 
 class BookMaker {
+	/**
+	 *
+	 * @param {import('..').Book | import('..').BookOptions} book
+	 * @param {import('..').BookMakerConfig} opts
+	 */
 	constructor(book, opts = {}) {
 		/** @type {Browser} */
 		this.browser = (opts.browser && typeof opts.browser === 'object') ? opts.browser : undefined ;
@@ -30,12 +37,20 @@ class BookMaker {
 			static: staticOpts = {},
 			hooks: hookOpts = {},
 			cover: coverOpts = {},
+			bookOptions = {},
 			...inOpts
 		} = opts;
 
+		/** @type {import('..').BookMakerConfig} */
 		this.options = {
-			/** @type {object} */
-			bookOptions: book instanceof Book ? undefined : book,
+			bookOptions: {
+				...bookOptions,
+				...(
+					(book instanceof Book || typeof book !== 'object') ?
+					{} :
+					book
+				)
+			},
 			defaultOrigin: 'http://www.scp-wiki.net',
 			/* probably need a smaller limit by default...*/
 			maxChapters: 500,
@@ -54,8 +69,8 @@ class BookMaker {
 			useWikiDotUrls: true,
 			// whether to make supplemental (appendix) content "non-linear"
 			hideSupplemental: true,
-			headless: false,
-			debug: true,
+			headless: true,
+			debug: false,
 			// width: 640,
 			// height: 960,
 			width: 768,
@@ -80,11 +95,12 @@ class BookMaker {
 			ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'
 		};
 
+		// TODO FIXME this isn't getting used when loading a book or main list of links it seems.
 		this.options.exclude = this.options.exclude
 			.filter(x => x)
 			.map(link => Resource.asCanononical(link, this.options.defaultOrigin));
 
-		this.wikiLookup = new WikiDataLookup(this.options);
+		this.wikiLookup = new WikiDataLookup(this, this.options);
 		this.cache = new ResourceCache();
 		this.scraper = new Scraper(this, opts);
 		this.postProcessor = new PostProcessor(this, opts);
@@ -281,6 +297,11 @@ class BookMaker {
 				return true;
 			});
 	}
+	/**
+	 *
+	 * @param {number} depth
+	 * @param {{maxChapters?: number, limit?: number, maxDepth?: number, exclude?: string[]}} opts
+	 */
 	async includePending(depth = 1, opts = {}) {
 		const {
 			maxChapters,
@@ -327,6 +348,13 @@ class BookMaker {
 		this.book.chapters.push(...chapters);
 	}
 	async finalize() {
+		// apply settings over to book if not already there
+		for (let [key, val] of Object.entries(this.options.bookOptions || {})) {
+			if (!(key in this.book.options)) {
+				this.book.options[key] = val;
+			}
+		}
+
 		console.log('post processing');
 		await this.postProcessor.processBook(this.book.chapters);
 		this.book.resources = this.getResources();

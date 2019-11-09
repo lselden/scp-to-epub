@@ -2,6 +2,14 @@
 @namespace epub "http://www.idpf.org/2007/ops";
 @namespace svg "http://www.w3.org/2000/svg";
 
+/**
+ * preserve whitespace in toc
+ */
+.toc-body {
+    white-space:pre-wrap;
+    line-break: strict;
+}
+
 .toc-list {
     padding-left: 0em;
     margin-left: 0em;
@@ -104,7 +112,7 @@ section:after, article:after {
 mark {
     background: none;
     background-color: transparent;
-    background: linear-gradient(rgba(127, 127, 127, 127, 0), rgba(127, 127, 127, 127, 0));
+    /* background-image: linear-gradient(rgba(127, 127, 127, 127, 0), rgba(127, 127, 127, 127, 0)); */
     /* text-decoration: underline;
     text-decoration: underline double;
     text-decoration-style: dotted;
@@ -196,6 +204,11 @@ figcaption {
 .right-padding {
     padding-right: 2%;
     box-sizing: border-box;
+}
+
+/* text that was made tiny, intended to be hidden from view */
+.hidden-text {
+    font-size: x-small;
 }
 
 /* ibooks opens appendix pages in a popup - this let syou target that situation */
@@ -327,12 +340,12 @@ blockquote {
 }
 
 .red {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .border-red {
-    border-color: #800000;
+    border-color: #850005;
 }
 
 .yellow {
@@ -372,14 +385,14 @@ blockquote {
 }
 
 a {
-    color: #800000;
+    color: #850005;
     /* for kybooks support */
     color: accentColor;
 }
 
 /* ibooks only */
 [__ibooks_internal_theme] a {
-    -webkit-text-fill-color: #800000;
+    -webkit-text-fill-color: #850005;
 }
 
 .scheme-dark .white,
@@ -549,13 +562,13 @@ html[__ibooks_internal_theme*=Night] a {
 
 .bg-white.red,
 .bg-white .red {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-white.border-red,
 .bg-white .border-red {
-    border-color: #800000;
+    border-color: #850005;
 }
 
 .bg-white.yellow,
@@ -603,8 +616,8 @@ html[__ibooks_internal_theme*=Night] a {
 }
 
 .bg-white a {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 html[__ibooks_internal_theme*=Sepia] .bg-white,
@@ -851,13 +864,13 @@ html[__ibooks_internal_theme*=Night] .bg-white a {
 
 .bg-silver.red,
 .bg-silver .red {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-silver.border-red,
 .bg-silver .border-red {
-    border-color: #800000;
+    border-color: #850005;
 }
 
 .bg-silver.yellow,
@@ -905,8 +918,8 @@ html[__ibooks_internal_theme*=Night] .bg-white a {
 }
 
 .bg-silver a {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .scheme-dark .bg-silver,
@@ -1148,13 +1161,13 @@ html[__ibooks_internal_theme*=Night] .bg-silver a {
 
 .bg-lightgray.red,
 .bg-lightgray .red {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-lightgray.border-red,
 .bg-lightgray .border-red {
-    border-color: #800000;
+    border-color: #850005;
 }
 
 .bg-lightgray.yellow,
@@ -1202,8 +1215,8 @@ html[__ibooks_internal_theme*=Night] .bg-silver a {
 }
 
 .bg-lightgray a {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-gray {
@@ -1452,13 +1465,13 @@ html[__ibooks_internal_theme*=Night] .bg-gray {
 
 .bg-red.red,
 .bg-red .red {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-red.border-red,
 .bg-red .border-red {
-    border-color: #800000;
+    border-color: #850005;
 }
 
 .bg-red.yellow,
@@ -1506,8 +1519,8 @@ html[__ibooks_internal_theme*=Night] .bg-gray {
 }
 
 .bg-red a {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .scheme-dark .bg-red,
@@ -1748,13 +1761,13 @@ html[__ibooks_internal_theme*=Night] .bg-red a {
 
 .bg-lightred.red,
 .bg-lightred .red {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-lightred.border-red,
 .bg-lightred .border-red {
-    border-color: #800000;
+    border-color: #850005;
 }
 
 .bg-lightred.yellow,
@@ -1802,8 +1815,8 @@ html[__ibooks_internal_theme*=Night] .bg-red a {
 }
 
 .bg-lightred a {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-darkred {
@@ -1942,13 +1955,13 @@ html[__ibooks_internal_theme*=Night] .bg-red a {
 
 .bg-yellow.red,
 .bg-yellow .red {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-yellow.border-red,
 .bg-yellow .border-red {
-    border-color: #800000;
+    border-color: #850005;
 }
 
 .bg-yellow.yellow,
@@ -1996,8 +2009,8 @@ html[__ibooks_internal_theme*=Night] .bg-red a {
 }
 
 .bg-yellow a {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .scheme-dark .bg-yellow,
@@ -2238,13 +2251,13 @@ html[__ibooks_internal_theme*=Night] .bg-yellow a {
 
 .bg-lightyellow.red,
 .bg-lightyellow .red {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-lightyellow.border-red,
 .bg-lightyellow .border-red {
-    border-color: #800000;
+    border-color: #850005;
 }
 
 .bg-lightyellow.yellow,
@@ -2292,8 +2305,8 @@ html[__ibooks_internal_theme*=Night] .bg-yellow a {
 }
 
 .bg-lightyellow a {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-brown {
@@ -2432,13 +2445,13 @@ html[__ibooks_internal_theme*=Night] .bg-yellow a {
 
 .bg-green.red,
 .bg-green .red {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-green.border-red,
 .bg-green .border-red {
-    border-color: #800000;
+    border-color: #850005;
 }
 
 .bg-green.yellow,
@@ -2486,8 +2499,8 @@ html[__ibooks_internal_theme*=Night] .bg-yellow a {
 }
 
 .bg-green a {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .scheme-dark .bg-green,
@@ -2728,13 +2741,13 @@ html[__ibooks_internal_theme*=Night] .bg-green a {
 
 .bg-lightgreen.red,
 .bg-lightgreen .red {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-lightgreen.border-red,
 .bg-lightgreen .border-red {
-    border-color: #800000;
+    border-color: #850005;
 }
 
 .bg-lightgreen.yellow,
@@ -2782,8 +2795,8 @@ html[__ibooks_internal_theme*=Night] .bg-green a {
 }
 
 .bg-lightgreen a {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-darkgreen {
@@ -2922,13 +2935,13 @@ html[__ibooks_internal_theme*=Night] .bg-green a {
 
 .bg-blue.red,
 .bg-blue .red {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-blue.border-red,
 .bg-blue .border-red {
-    border-color: #800000;
+    border-color: #850005;
 }
 
 .bg-blue.yellow,
@@ -2976,8 +2989,8 @@ html[__ibooks_internal_theme*=Night] .bg-green a {
 }
 
 .bg-blue a {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .scheme-dark .bg-blue,
@@ -3218,13 +3231,13 @@ html[__ibooks_internal_theme*=Night] .bg-blue a {
 
 .bg-lightblue.red,
 .bg-lightblue .red {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-lightblue.border-red,
 .bg-lightblue .border-red {
-    border-color: #800000;
+    border-color: #850005;
 }
 
 .bg-lightblue.yellow,
@@ -3272,8 +3285,8 @@ html[__ibooks_internal_theme*=Night] .bg-blue a {
 }
 
 .bg-lightblue a {
-    color: #800000;
-    -webkit-text-fill-color: #800000;
+    color: #850005;
+    -webkit-text-fill-color: #850005;
 }
 
 .bg-darkblue {
