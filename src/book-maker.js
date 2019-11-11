@@ -79,6 +79,12 @@ class BookMaker {
 			folder: 'EPUB',
 			timeout: 10 * 60 * 1000,
 			...inOpts,
+			hooks: {
+				newDocument() {},
+				beforeFormat() {},
+				afterFormat() {},
+				...hookOpts
+			},
 			cover: {
 				path: '',
 				width: 1600,

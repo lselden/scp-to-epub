@@ -56,6 +56,12 @@ class Scraper {
 			},
 			// basically just a placeholder to allow for more advanced overrides in the future?
 			hooks: {
+				// run on new tab opened
+				newDocument() {},
+				// run before page is formatted
+				beforeFormat() {},
+				// run after page is formatted
+				afterFormat() {},
 				request: req => {
 					const requestUrl = req.url();
 					this.totalRequests += 1;
@@ -324,6 +330,14 @@ class Scraper {
 			});
 		}
 
+		if (this.options.hooks.newDocument) {
+			try {
+				await page.evaluateOnNewDocument(this.options.hooks.newDocument);
+			} catch (err) {
+				console.error('Failed to add newDocument hook', err);
+			}
+		}
+
 		const response = await page.goto(url, {
 			waitUntil: ['load', 'domcontentloaded', 'networkidle2'],
 			timeout: this.options.timeout
@@ -442,6 +456,14 @@ class Scraper {
 			timeout: this.options.timeout || 60 * 1000
 		});
 
+		if (this.options.hooks.beforeFormat) {
+			try {
+				await page.evaluate(this.options.hooks.beforeFormat);
+			} catch (err) {
+				console.error('beforeFormat hook failed', err);
+			}
+		}
+
 		// actually run the processing
 		await page.addScriptTag({
 			url: await this.server.getUrlForFile('/client/epub-formatter.js', urlLib.parse(page.url())),
@@ -449,6 +471,14 @@ class Scraper {
 		});
 
 		await whenFormatted;
+
+		if (this.options.hooks.afterFormat) {
+			try {
+				await page.evaluate(this.options.hooks.afterFormat);
+			} catch (err) {
+				console.error('afterFormat hook failed', err);
+			}
+		}
 	}
 	async switchImagesToLocal(page) {
 		if (!page._pageBindings || !page._pageBindings.has('keepThisImage')) {
