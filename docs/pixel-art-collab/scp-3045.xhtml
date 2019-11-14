@@ -1,0 +1,619 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="en"><head><title>SCP-3045 - SCP Foundation</title><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="stylesheet" href="css/base.css" /><link rel="stylesheet" href="css/style.css" /><link rel="stylesheet" href="css/fonts.css" /><style>@font-face {
+  font-family: 'Fairfax Serif';
+  src: url('fonts/FairfaxSerif.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+    font-family: 'Fairfax Serif';
+    src: url('fonts/FairfaxItalic.ttf') format('truetype');
+    font-weight: 500;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Fairfax';
+    src: url('fonts/Fairfax.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Fairfax';
+    src: url('fonts/FairfaxBold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Fairfax';
+    src: url('fonts/FairfaxItalic.ttf') format('truetype');
+    font-weight: 500;
+    font-style: italic;
+}
+
+body, p, strong, section, div {
+    font-family: 'Fairfax', monospace !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Fairfax', monospace !important;
+    font-weight: bold;
+}
+
+mark, .redacted, s, ins, del {
+    font-family: 'Fairfax', monospace !important;
+}
+
+pre, code, samp, kbd, var, .monospace {
+    font-family: 'Fairfax Serif', monospace !important;
+}
+blockquote p, .epub-collapse-header {
+    font-family: 'Fairfax', monospace !important;
+}
+
+img {
+    image-rendering: pixelated !important;
+}
+
+.pixel-art-figure {
+
+}
+
+.pixel-art-list {
+    text-align: center;
+}
+
+.pixel-art-link {
+    width: 25%;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+}
+.pixel-art-link img {
+    width: 100%;
+}
+
+@supports (display: grid) {
+    .pixel-art-list {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+    }
+    .pixel-art-link {
+        width: 100%;
+        display: block;
+        grid-column: span 2;
+    }
+    .pixel-art-link:nth-last-child(1):nth-child(odd) {
+        grid-column: 2 / span 2;
+    }
+}
+</style></head>
+<body id="html-body" class="epub-depth0" data-page="scp-3045"><section id="main-content" role="doc-chapter" aria-labelledby="page-title"><figure class="epub-figure scp-image-block pixel-art-figure">
+        <img src="images/xc5731bfb9ac333900aaf9f6f034fd664.png" alt="pixel art image of scp-3045" class="image pixel-art-image" width="480" height="480" style="image-rendering: pixelated" />
+        <figcaption class="scp-image-caption">-- Pixel art by <a href="https://twitter.com/@SnugBoat11" rel="nofollow">@SnugBoat11</a></figcaption>
+    </figure><header class="chapter-header chapter-meta">
+		<p><br /></p>
+		<h1 id="page-title">SCP-3045</h1>
+		<p role="doc-subtitle">bzzip.exe</p>
+		<aside>
+			<ul><li><b>By:</b> The Great Hippo </li><li><b>Posted:</b> <time datetime="2017-06-15T18:00:23.000Z">Thu Jun 15 2017</time> </li><li><b>Rating:</b> 436 </li><li><b>Wilson Score:</b> 0.97 </li><li><cite><a href="http://scp-wiki.net/scp-3045" data-external="true">Original Version</a></cite></li>
+			</ul>
+		</aside>
+	</header><div id="page-content">
+                        
+
+
+
+
+
+<div style="clear:both;"></div>
+
+
+
+
+
+
+
+<figure class="epub-figure scp-image-block epub-figure-right"><img src="images/xf8127d681ef72eac250b9997709dcf60.png" alt="bee_big-nose.png" class="image" /><figcaption class="scp-image-caption">
+<p>Logo for SCP-3045.</p>
+</figcaption></figure>
+<p><strong style="speak: literal-punctuation;">Item #:</strong><span style="speak: spell-out;"> SCP-3045</span></p>
+<p><strong>Object Class:</strong> Safe</p>
+<p><strong>Special Containment Procedures:</strong> SCP-3045's installation package is to be stored on a flash-drive, which is to be kept in a secured locker on-site. Researchers may install SCP-3045 on an isolated computer for testing purposes. Once testing is concluded, this computer is to be destroyed (along with all of its peripheral components). Any computers, buildings, or facilities containing SCP-3045 must be TEMPEST-certified<a id="footnoteref-7c83-1" href="scp-3045.xhtml#footnote-7c83-1" role="doc-noteref" epub:type="noteref">[1]</a>.</p>
+				    <aside id="footnote-7c83-1" role="doc-footnote" epub:type="footnote" class="inline-footnote">
+						<p>
+							<a href="scp-3045.xhtml#footnoteref-7c83-1" role="doc-backlink" title="Go to note reference">1</a>.  A certification indicating that equipment and/or structures are insulated from 'leakage' of data via electromagnetic or acoustic emissions. For more information, personnel with appropriate clearance may consult documentation for <a href="http://scp-wiki.net/scp-2639">SCP-2639</a>.</p>
+				    </aside>
+				
+<p>Under no circumstances should SCP-3045 be used on any media file that directly references bees.</p>
+<p><strong>Description:</strong> SCP-3045 is an anomalous application ('bzzip.exe') that reduces the size of certain types of media (plain text, rich text, MOV, AVI, and MP4). It accomplishes this by producing a new file with trimmed, 'simplified' content. This file can then be reduced further; however, after a certain number of iterations, the result will be a file that contains little to no data. Additional attempts at reduction will only reproduce this final file.</p>
+<p><strong>Addendum 3045.1:</strong> Test Logs</p>
+<section class="epub-collapse">
+		<h2 id="collapse-5665e6c099d5f" class="epub-collapse-header epub-has-unfolded">
+			<s class="epub-collapse-folded-text">ACCESS SCP:/3045/files/test1.log</s>
+		<ins role="doc-subtitle">Close File</ins>
+		</h2>
+	<div class="collapsible-block-content">
+<blockquote>
+<p><strong>DESCRIPTION:</strong> A rich text file containing Shakespeare's <em>Hamlet</em>.</p>
+<p><strong>FOREWORD:</strong> To save space, only Act 1 is provided during the first 3 iterations. The entire play is provided at the 4th iteration and every iteration thereafter.</p>
+</blockquote>
+
+<div class="epub-tabs">
+		<section class="epub-tabs">
+			<section id="tab-6f101279c822f" role="tabpanel" aria-labelledby="tab-6f101279c822f-head">
+					<h3 id="tab-6f101279c822f-head"><span class="epub-tab-head">Iteration 1</span></h3>
+					
+<h1 id="toc0"><span>ACT 1</span></h1>
+<p><em><strong>SCENE:</strong> Platform in front of castle.</em></p>
+<blockquote>
+<p><em>Enter GUARDS and HORATIO.</em></p>
+<p><strong>GUARDS:</strong> Horatio! There is a ghost.</p>
+<p><strong>HORATIO:</strong> I do not believe you.</p>
+<p><em>Enter GHOST.</em></p>
+<p><strong>HORATIO:</strong> I believe you.</p>
+<p><strong>GUARDS</strong>: You are smart. Address it.</p>
+<p><strong>HORATIO:</strong> Speak, ghost.</p>
+<p><em>Exit GHOST.</em></p>
+<p><strong>HORATIO:</strong> That ghost wore the dead king's things.</p>
+<p><em>Enter GHOST.</em></p>
+<p><strong>GUARDS and HORATIO:</strong> It returns.</p>
+<p><em>Exit GHOST.</em></p>
+<p><strong>HORATIO:</strong> We must tell Hamlet a ghost wears his father's things.</p>
+</blockquote>
+<p><em><strong>SCENE:</strong> Room inside the castle.</em></p>
+<blockquote>
+<p><em>Enter KING CLAUDIUS, QUEEN GERTRUDE, HAMLET, POLONIUS, LAERTES, and MEN.</em></p>
+<p><strong>KING CLAUDIUS:</strong> My brother was king, but he died and I married his wife. I am a very wise and competent king. Men, I order you to go do wise and competent things.</p>
+<p><strong>MEN:</strong> Yes, sir.</p>
+<p><em>Exit MEN.</em></p>
+<p><strong>LAERTES:</strong> I wish to go to France.</p>
+<p><strong>KING CLAUDIUS:</strong> Does your father permit it?</p>
+<p><strong>POLONIUS:</strong> I do.</p>
+<p><strong>KING CLAUDIUS:</strong> Then go.</p>
+<p><strong>HAMLET:</strong> I am moody.</p>
+<p><strong>QUEEN GERTRUDE:</strong> Cease being moody.</p>
+<p><strong>KING CLAUDIUS:</strong> Listen to your mother.</p>
+<p><strong>HAMLET:</strong> I am no longer moody.</p>
+<p><strong>KING CLAUDIUS:</strong> All is well.</p>
+<p><em>Exit all but HAMLET.</em></p>
+<p><strong>HAMLET:</strong> All is not well. For I am secretly still moody.</p>
+<p><em>Enter HORATIO, GUARDS.</em></p>
+<p><strong>HORATIO:</strong> A ghost wears your father's things. Shall we go see it?</p>
+<p><strong>HAMLET:</strong> Yes.</p>
+</blockquote>
+<p><em><strong>SCENE:</strong> A room in Polonius' house.</em></p>
+<blockquote>
+<p><em>Enter LAERTES and OPHELIA.</em></p>
+<p><strong>LAERTES:</strong> Do not have sex with Hamlet.</p>
+<p><strong>OPHELIA:</strong> Alright.</p>
+<p><em>Enter POLONIUS.</em></p>
+<p><strong>POLONIUS:</strong> Laertes, act only to your own benefit.</p>
+<p><strong>LAERTES:</strong> Alright.</p>
+<p><em>Exit LAERTES.</em></p>
+<p><strong>POLONIUS:</strong> Do not have sex with Hamlet. Do not talk to Hamlet.</p>
+<p><strong>OPHELIA:</strong> Alright.</p>
+</blockquote>
+<p><em><strong>SCENE:</strong> Platform in front of castle.</em></p>
+<blockquote>
+<p><em>Enter HAMLET, GUARDS, and HORATIO.</em></p>
+<p><strong>HAMLET:</strong> Things are occurring.</p>
+<p><em>Enter GHOST.</em></p>
+<p><strong>HAMLET:</strong> That is my father's ghost.</p>
+<p><em>Ghost beckons to HAMLET.</em></p>
+<p><strong>HAMLET:</strong> I will see what he wants.</p>
+<p><strong>GUARDS and HORATIO:</strong> Do not go.</p>
+<p><strong>HAMLET:</strong> I am going.</p>
+<p><em>Exit GHOST and HAMLET.</em></p>
+<p><strong>GUARDS:</strong> Something is rotten.</p>
+</blockquote>
+<p><em><strong>SCENE:</strong> Other part of platform.</em></p>
+<blockquote>
+<p><strong>GHOST:</strong> Claudius killed me and married your mother.</p>
+<p><strong>HAMLET:</strong> I will avenge you.</p>
+<p><strong>GHOST:</strong> Alright.</p>
+<p><em>Exit GHOST.</em></p>
+<p><strong>HAMLET:</strong> I was moody but now I am angry.</p>
+<p><em>Enter GUARDS and HORATIO.</em></p>
+<p><strong>HAMLET:</strong> Tell no one what you saw.</p>
+<p><strong>GHOST:</strong> <em>(off-stage)</em> Swear.</p>
+<p><strong>HAMLET:</strong> I will pose as a madman. Swear to ignorance.</p>
+<p><strong>GHOST:</strong> <em>(off-stage)</em> Swear.</p>
+<p><em>They swear.</em></p>
+</blockquote>
+
+				</section>
+<section id="tab-d4d267285718" role="tabpanel" aria-labelledby="tab-d4d267285718-head">
+					<h3 id="tab-d4d267285718-head"><span class="epub-tab-head">Iteration 2</span></h3>
+					
+<h1 id="toc1"><span>ACT 1</span></h1>
+<p><em><strong>SCENE:</strong> Castle platform.</em></p>
+<blockquote>
+<p><em>Enter GUARDS.</em></p>
+<p><strong>GUARDS:</strong> Ghost?</p>
+<p><em>Enter GHOST.</em></p>
+<p><strong>GUARDS:</strong> Ghost.</p>
+<p><em>Exit GHOST.</em></p>
+<p><strong>GUARDS:</strong> We must tell Hamlet.</p>
+</blockquote>
+<p><em><strong>SCENE:</strong> Inside castle.</em></p>
+<blockquote>
+<p><em>Enter CLAUDIUS, GERTRUDE, HAMLET, LAERTES, and POLONIUS.</em></p>
+<p><strong>CLAUDIUS:</strong> My brother died. I married his wife. Now I am a wise king.</p>
+<p><strong>LAERTES:</strong> I wish to go to France.</p>
+<p><strong>POLONIUS and CLAUDIUS:</strong> Alright.</p>
+<p><strong>HAMLET:</strong> I am moody.</p>
+<p><strong>CLAUDIUS AND GERTRUDE:</strong> Do not be moody.</p>
+<p><strong>HAMLET:</strong> I am no longer moody.</p>
+<p><em>Exit all but HAMLET.</em></p>
+<p><strong>HAMLET:</strong> I am (secretly) moody.</p>
+<p><em>Enter GUARDS.</em></p>
+<p><strong>GUARDS:</strong> Ghost.</p>
+<p><strong>HAMLET:</strong> Show me.</p>
+</blockquote>
+<p><em><strong>SCENE:</strong> POLONIUS' house.</em></p>
+<blockquote>
+<p><em>Enter LAERTES and OPHELIA.</em></p>
+<p><strong>LAERTES:</strong> No sex.</p>
+<p><strong>OPHELIA:</strong> Alright.</p>
+<p><em>Enter POLONIUS.</em></p>
+<p><strong>POLONIUS:</strong> Laertes, be selfish.</p>
+<p><strong>LAERTES:</strong> Alright.</p>
+<p><em>Exit LAERTES.</em></p>
+<p><strong>POLONIUS:</strong> Stay away from Hamlet. No sex.</p>
+<p><strong>OPHELIA:</strong> Alright.</p>
+</blockquote>
+<p><em><strong>SCENE:</strong> Castle platform.</em></p>
+<blockquote>
+<p><em>Enter HAMLET, GUARDS, and GHOST.</em></p>
+<p><strong>HAMLET:</strong> The ghost is my father.</p>
+<p><em>Exit HAMLET and GHOST.</em></p>
+</blockquote>
+<p><em><strong>SCENE:</strong> Different platform.</em></p>
+<blockquote>
+<p><em>Enter HAMLET and GHOST.</em></p>
+<p><strong>GHOST:</strong> CLAUDIUS killed me.</p>
+<p><strong>HAMLET:</strong> I will avenge.</p>
+<p><em>Enter GUARDS.</em></p>
+<p><strong>HAMLET:</strong> Swear not to tell.</p>
+<p><strong>GUARDS:</strong> We swear.</p>
+</blockquote>
+
+				</section>
+<section id="tab-80f6587668e1e" role="tabpanel" aria-labelledby="tab-80f6587668e1e-head">
+					<h3 id="tab-80f6587668e1e-head"><span class="epub-tab-head">Iteration 3</span></h3>
+					
+<h1 id="toc2"><span>ACT 1</span></h1>
+<p><em><strong>SCENE:</strong> Outside.</em></p>
+<blockquote>
+<p><em>GHOST.</em></p>
+<p><strong>GUARDS:</strong> Hamlet must know.</p>
+</blockquote>
+<p><em><strong>SCENE:</strong> Room.</em></p>
+<blockquote>
+<p><strong>NEW KING:</strong> Old king died. I married his wife.</p>
+<p><strong>HAMLET:</strong> Unhappy.</p>
+<p><strong>NEW KING and QUEEN:</strong> Be happy.</p>
+<p><strong>HAMLET:</strong> Yes (but secretly no).</p>
+<p><strong>GUARDS:</strong> Ghost?</p>
+<p><strong>HAMLET:</strong> Show.</p>
+</blockquote>
+<p><em><strong>SCENE:</strong> Other room.</em></p>
+<blockquote>
+<p><strong>LAERTES:</strong> No sex.</p>
+<p><strong>OPHELIA:</strong> Yes.</p>
+<p><strong>POLONIUS</strong>: Be selfish.</p>
+<p><strong>LAERTES:</strong> Yes.</p>
+<p><strong>POLONIUS:</strong> No Hamlet. No sex.</p>
+<p><strong>OPHELIA:</strong> Yes.</p>
+</blockquote>
+<p><em><strong>SCENE:</strong> Outside.</em></p>
+<blockquote>
+<p><strong>GHOST:</strong> I am your father. NEW KING killed me.</p>
+<p><strong>HAMLET:</strong> Vengeance.</p>
+<p><strong>HAMLET:</strong> Guards, don't tell.</p>
+<p><strong>GUARDS:</strong> We won't.</p>
+</blockquote>
+
+				</section>
+<section id="tab-9cb179912ad9f" role="tabpanel" aria-labelledby="tab-9cb179912ad9f-head">
+					<h3 id="tab-9cb179912ad9f-head"><span class="epub-tab-head">Iteration 4</span></h3>
+					
+<h1 id="toc3"><span>ACT 1</span></h1>
+<blockquote>
+<p><strong>KING:</strong> Cheer up.</p>
+<p><strong>HAMLET:</strong> No.</p>
+<p><strong>GHOST:</strong> Vengeance!</p>
+<p><strong>HAMLET:</strong> Yes.</p>
+</blockquote>
+<h1 id="toc4"><span>ACT 2</span></h1>
+<blockquote>
+<p><strong>KING:</strong> Find out what he knows.</p>
+<p><strong>HAMLET'S FRIENDS:</strong> What do you know?</p>
+<p><strong>HAMLET:</strong> Not telling.</p>
+</blockquote>
+<h1 id="toc5"><span>ACT 3</span></h1>
+<blockquote>
+<p><em>HAMLET frightens QUEEN.</em></p>
+<p><strong>QUEEN:</strong> You frighten me!</p>
+<p><strong>VOICE BEHIND CURTAIN:</strong> Guards!</p>
+<p><strong>HAMLET:</strong> Vengeance!</p>
+<p><em>HAMLET stabs curtain. It was Polonius.</em></p>
+<p><strong>HAMLET:</strong> Wish it was KING.</p>
+</blockquote>
+<h1 id="toc6"><span>ACT 4</span></h1>
+<blockquote>
+<p><strong>KING:</strong> Go away.</p>
+<p><strong>HAMLET:</strong> Yes.</p>
+<p><em>OPHELIA drowns herself.</em></p>
+<p><strong>LAERTES:</strong> Vengeance!</p>
+<p><strong>KING:</strong> Let's work together.</p>
+</blockquote>
+<h1 id="toc7"><span>ACT 5</span></h1>
+<blockquote>
+<p><em>KING poisons sword, wine.</em></p>
+<p><em>LAERTES poisons HAMLET with sword. HAMLET stabs LAERTES.</em></p>
+<p><strong>LAERTES:</strong> This was KING's idea.</p>
+<p><em>LAERTES dies.</em></p>
+<p><em>QUEEN drank poisoned wine. QUEEN dies.</em></p>
+<p><strong>HAMLET:</strong> Vengeance!</p>
+<p><em>HAMLET kills KING. HAMLET dies.</em></p>
+<p><strong>FORTINBRAS:</strong> What happened?</p>
+<p><strong>GUARDS:</strong> You are KING now.</p>
+</blockquote>
+
+				</section>
+<section id="tab-0ce124214c178" role="tabpanel" aria-labelledby="tab-0ce124214c178-head">
+					<h3 id="tab-0ce124214c178-head"><span class="epub-tab-head">Iteration 5</span></h3>
+					
+<blockquote>
+<p><strong>HAMLET:</strong> Vengeance!</p>
+<p><em>HAMLET kills POLONIUS. OPHELIA drowns. HAMLET kills LAERTES. QUEEN dies of poison. HAMLET kills KING.</em></p>
+<p><em>HAMLET dies.</em></p>
+</blockquote>
+
+				</section>
+<section id="tab-eaac70f5f8cad" role="tabpanel" aria-labelledby="tab-eaac70f5f8cad-head">
+					<h3 id="tab-eaac70f5f8cad-head"><span class="epub-tab-head">Iteration 6</span></h3>
+					
+<blockquote>
+<p><em>People die.</em></p>
+</blockquote>
+
+				</section>
+<section id="tab-4adcb55923252" role="tabpanel" aria-labelledby="tab-4adcb55923252-head">
+					<h3 id="tab-4adcb55923252-head"><span class="epub-tab-head">Iteration 7</span></h3>
+					
+<blockquote>
+<p><em>bzzz</em></p>
+</blockquote>
+
+				</section>
+<section id="tab-0db0555b8181b" role="tabpanel" aria-labelledby="tab-0db0555b8181b-head">
+					<h3 id="tab-0db0555b8181b-head"><span class="epub-tab-head">Iteration 8</span></h3>
+					
+<blockquote>
+<p><em>bzzz</em></p>
+</blockquote>
+
+				</section>
+		</section>
+		</div>
+</div></section>
+<section class="epub-collapse">
+		<h2 id="collapse-c9a4259083e34" class="epub-collapse-header epub-has-unfolded">
+			<s class="epub-collapse-folded-text">ACCESS SCP:/3045/files/test2.log</s>
+		<ins role="doc-subtitle">Close File</ins>
+		</h2>
+	<div class="collapsible-block-content">
+<blockquote>
+<p><strong>DESCRIPTION:</strong> An MP4 file containing the entirety of <u style="text-decoration: underline;">Indiana Jones and the Last Crusade</u> (the original theatrical release).</p>
+<p><strong>FOREWORD:</strong> Researcher Rogers was tasked to watch each iteration and provide a summary of notable differences.</p>
+</blockquote>
+
+<div class="epub-tabs">
+		<section class="epub-tabs">
+			<section id="tab-1aea76bb0d6a1" role="tabpanel" aria-labelledby="tab-1aea76bb0d6a1-head">
+					<h3 id="tab-1aea76bb0d6a1-head"><span class="epub-tab-head">Iteration 1</span></h3>
+					
+<p><strong>MAIN CHARACTERS:</strong> Indiana Jones, Henry Jones, Elsa Schneider, Sallah, Walter Donovan, Colonel Vogel, Grail Knight</p>
+<p><strong>SUMMARY:</strong> The movie opens with Walter Donovan asking Indiana to find the grail; he mentions that his father (Henry) was asked before him, but has since disappeared. Jones departs to Venice; there, he meets Elsa. Together, they discover the hidden knight's tomb that refers them to Alexandretta. Elsa and Indiana manage to rescue Indy's father at Castle Brunwald, only to be captured by Colonel Vogel. Elsa reveals herself to be a traitor. Indy and Henry escape, then — after meeting up with Sallah — fight against Nazi forces (defeating Colonel Vogel) on their way to Alexandretta. At the grail temple, Donovan reveals himself to have been a traitor and shoots Indy's father, forcing Indy to confront the three trials to save him. Once Indy passes these trials, Elsa and Donovan follow him. Confronted by the Grail Knight, Indy is told he must select the right grail — and that the grail cannot leave the temple. Donovan appears, and Elsa goads him into choosing the wrong grail (resulting in his death). Indy selects the right grail and uses it to heal his father. Elsa attempts to leave the temple with the grail, resulting in the temple's collapse (and her death). Indy, his father, and Sallah all ride off into the sunset.</p>
+<p><strong>NOTABLE DIFFERENCES:</strong> Marcus Brody and Kazim are gone, as is the sub-plot with the Brotherhood of the Cruciform Sword. There is no mention of Henry's journal at any point in the story — they never go to Berlin to retrieve it, and never board a zeppelin to escape Germany. The entire opening sequence (with Indy pursuing the Cross of Coronado both as a teenager and as an adult) has been cut. The dialogue has been significantly simplified in many places, with extraneous dialogue mostly removed.</p>
+<p><strong>RUN-TIME:</strong> 85 minutes</p>
+
+				</section>
+<section id="tab-d5b34185d2d39" role="tabpanel" aria-labelledby="tab-d5b34185d2d39-head">
+					<h3 id="tab-d5b34185d2d39-head"><span class="epub-tab-head">Iteration 2</span></h3>
+					
+<p><strong>MAIN CHARACTERS:</strong> Indiana Jones, Henry Jones, Elsa Schneider, Colonel Vogel, Grail Knight</p>
+<p><strong>SUMMARY:</strong> The movie opens with Indiana meeting Elsa in Venice, where they discover the hidden knight's tomb and learn the grail is in Alexandretta. They decide to save Indy's father at Castle Brunwald, but Elsa betrays them to Colonel Vogel; they flee to Alexandretta. When Indy reaches the temple, Colonel Vogel takes the place of Walter Donovan — shooting Indy's father, then following him into the grail room (and being goaded by Elsa into choosing the wrong grail). Elsa once again attempts to leave the temple with the grail, resulting in its collapse; the movie ends with Indy and his father riding off into the sunset.</p>
+<p><strong>NOTABLE DIFFERENCES:</strong> Walter Donovan and Sallah are gone, along with the tank battle. The three trials are now two trials (the 'Name of God' trial has been cut).</p>
+<p><strong>RUN-TIME:</strong> 52 minutes</p>
+
+				</section>
+<section id="tab-06c7cd933d3a6" role="tabpanel" aria-labelledby="tab-06c7cd933d3a6-head">
+					<h3 id="tab-06c7cd933d3a6-head"><span class="epub-tab-head">Iteration 3</span></h3>
+					
+<p><strong>MAIN CHARACTERS:</strong> Indiana Jones, Elsa Schneider, Colonel Vogel, Grail Knight</p>
+<p><strong>SUMMARY:</strong> The movie opens with Indiana meeting Elsa in Venice, where he tells her he knows the grail's location: Alexandretta. Colonel Vogel suddenly steps out of Elsa's closet, revealing Elsa as a traitor. Indiana escapes, fleeing to Alexandretta; there, he's confronted by Elsa and Vogel again. Vogel shoots Elsa, forcing Indy to retrieve the grail. Indy retrieves two grails, giving the wrong one to Vogel (leading to Vogel's death). Indy uses the real grail to restore Elsa's life. Elsa attempts to leave with the grail; the temple collapses, and she dies. The movie ends with Indiana riding off alone into the sunset.</p>
+<p><strong>NOTABLE DIFFERENCES:</strong> Henry Jones is gone; there is only one trial ("Leap of Faith"). The ending has a much more somber tone at the end, with Indiana saying nothing after Elsa's death.</p>
+<p><strong>RUN-TIME:</strong> 17 minutes</p>
+
+				</section>
+<section id="tab-042383aeaecc" role="tabpanel" aria-labelledby="tab-042383aeaecc-head">
+					<h3 id="tab-042383aeaecc-head"><span class="epub-tab-head">Iteration 4</span></h3>
+					
+<p><strong>MAIN CHARACTERS:</strong> Indiana Jones, Elsa Schneider, Grail Knight</p>
+<p><strong>SUMMARY:</strong> The movie opens with Indiana meeting Elsa in Venice, where he tells her he knows the grail's location: Alexandretta. They leave for Alexandretta, where Indy and Elsa enter the temple and retrieve the grail from the Grail Knight. Elsa attempts to leave with the grail, causing the temple to collapse (and leading to her death). Indiana rides off alone into the sunset.</p>
+<p><strong>NOTABLE DIFFERENCES:</strong> Colonel Vogel is gone. There are no trials, and only one grail in the final room. The Grail Knight has only one line, where he warns them they cannot leave the temple with the grail.</p>
+<p><strong>RUN-TIME:</strong> 6 minutes</p>
+
+				</section>
+<section id="tab-d314d7a3e131d" role="tabpanel" aria-labelledby="tab-d314d7a3e131d-head">
+					<h3 id="tab-d314d7a3e131d-head"><span class="epub-tab-head">Iteration 5</span></h3>
+					
+<p><strong>MAIN CHARACTERS:</strong> Indiana Jones, Grail Knight</p>
+<p><strong>SUMMARY:</strong> The movie opens with Indiana entering the temple in Alexandretta. He encounters the Grail Knight, who informs him that the grail cannot be taken from the temple. Indiana thanks the Grail Knight for telling him this, then rides off into the sunset.</p>
+<p><strong>NOTABLE DIFFERENCES:</strong> Elsa is gone. Indy has two lines ("I'm here for the grail", and "Thank you for telling me about the grail"); the Grail Knight has one ("The grail cannot leave this temple").</p>
+<p><strong>RUN-TIME:</strong> 1 minute</p>
+
+				</section>
+<section id="tab-49cf733df0993" role="tabpanel" aria-labelledby="tab-49cf733df0993-head">
+					<h3 id="tab-49cf733df0993-head"><span class="epub-tab-head">Iteration 6</span></h3>
+					
+<p><strong>MAIN CHARACTERS:</strong> Indiana Jones</p>
+<p><strong>SUMMARY:</strong> The movie opens with Indiana riding on a horse in the desert, reading from a book. He reads: "The Holy Grail cannot be removed from the temple in Alexandretta." He closes the book, looks at the temple in front of him, nods solemnly — then turns around and rides off into the sunset.</p>
+<p><strong>RUN-TIME:</strong> Less than 1 minute</p>
+
+				</section>
+<section id="tab-52432b913184e" role="tabpanel" aria-labelledby="tab-52432b913184e-head">
+					<h3 id="tab-52432b913184e-head"><span class="epub-tab-head">Iteration 7</span></h3>
+					
+<p><strong>MAIN CHARACTERS:</strong> Indiana Jones</p>
+<p><strong>SUMMARY:</strong> The movie opens (and ends) with Indiana riding off into the sunset.</p>
+<p><strong>RUN-TIME:</strong> Less than 15 seconds</p>
+
+				</section>
+<section id="tab-a56ea17dc5e8" role="tabpanel" aria-labelledby="tab-a56ea17dc5e8-head">
+					<h3 id="tab-a56ea17dc5e8-head"><span class="epub-tab-head">Iteration 8</span></h3>
+					
+<p><strong>MAIN CHARACTERS:</strong> None</p>
+<p><strong>SUMMARY:</strong> The movie consists of a black screen with a soft buzzing sound.</p>
+<p><strong>RUN-TIME:</strong> 3 seconds</p>
+
+				</section>
+		</section>
+		</div>
+</div></section>
+<section class="epub-collapse">
+		<h2 id="collapse-7c1df3c7b8fe8" class="epub-collapse-header epub-has-unfolded">
+			<s class="epub-collapse-folded-text">ACCESS SCP:/3045/files/test3.log</s>
+		<ins role="doc-subtitle">Close File</ins>
+		</h2>
+	<div class="collapsible-block-content">
+<blockquote>
+<p><strong>DESCRIPTION:</strong> A plain text file containing the entirety of Samuel Becket's tragicomedy, <em>Waiting for Godot</em>.</p>
+</blockquote>
+
+<div class="epub-tabs">
+		<section class="epub-tabs">
+			<section id="tab-1a3b47da2d6d1" role="tabpanel" aria-labelledby="tab-1a3b47da2d6d1-head">
+					<h3 id="tab-1a3b47da2d6d1-head"><span class="epub-tab-head">Iteration 1</span></h3>
+					
+<blockquote>
+<p><em>Enter CHARACTERS.</em></p>
+<p><strong>CHARACTERS:</strong> We are waiting for GODOT.</p>
+<p><em>GODOT does not arrive.</em></p>
+</blockquote>
+
+				</section>
+<section id="tab-751251948fd13" role="tabpanel" aria-labelledby="tab-751251948fd13-head">
+					<h3 id="tab-751251948fd13-head"><span class="epub-tab-head">Iteration 2</span></h3>
+					
+<blockquote>
+<p><em>Still waiting.</em></p>
+</blockquote>
+
+				</section>
+<section id="tab-7024443e1acbf" role="tabpanel" aria-labelledby="tab-7024443e1acbf-head">
+					<h3 id="tab-7024443e1acbf-head"><span class="epub-tab-head">Iteration 3</span></h3>
+					
+<blockquote>
+<p><em>bzzz</em></p>
+</blockquote>
+
+				</section>
+		</section>
+		</div>
+</div></section>
+<section class="epub-collapse">
+		<h2 id="collapse-2fe9d934a0ab4" class="epub-collapse-header epub-has-unfolded">
+			<s class="epub-collapse-folded-text">ACCESS SCP:/3045/files/test4.log</s>
+		<ins role="doc-subtitle">Close File</ins>
+		</h2>
+	<div class="collapsible-block-content">
+<blockquote>
+<p><strong>DESCRIPTION:</strong> A MOV file containing the entirety of <u style="text-decoration: underline;">Bee Movie</u>, an animated film by DreamWorks Animation.</p>
+<p><strong>FOREWORD:</strong> Researcher Xiao-jin was tasked to watch each iteration and provide a summary of notable differences.</p>
+</blockquote>
+
+<div class="epub-tabs">
+		<section class="epub-tabs">
+			<section id="tab-d1c359a9ea9d" role="tabpanel" aria-labelledby="tab-d1c359a9ea9d-head">
+					<h3 id="tab-d1c359a9ea9d-head"><span class="epub-tab-head">Iteration 1</span></h3>
+					
+<p><strong>MAIN CHARACTERS:</strong> Barry B. Benson, Vanessa Bloome, Ken, Pollen Jocks</p>
+<p><strong>SUMMARY:</strong> Barry B. Benson (a bee) is a non-conformist who has just graduated college. Spurning the job assigned to him by bee-society, he goes out with a group of 'Pollen Jocks' (also bees), where he encounters Vanessa (a human florist) and Ken (her boyfriend). Ken attempts to kill him, but Vanessa saves his life. Barry later returns and expresses his thanks to Vanessa; the two begin a relationship. After Barry discovers that humans harvest honey from bees, he sues the human race — and, after a series of mishaps, wins the trial. However, as a result of having too much honey (?), bees all lose their jobs — resulting in flowers all over the world dying out. Barry and Vanessa travel to a city in California where the only remaining flowers survive, and steal a parade float full of flowers (??) so bees can use them to re-pollinate the world. Barry and the other bees use the flowers to reverse the damage, and the movie ends with all the bees working together with the humans.</p>
+<p><strong>NOTABLE DIFFERENCES:</strong> None.</p>
+<p><strong>RUN-TIME:</strong> 97 minutes</p>
+
+				</section>
+<section id="tab-2927591180288" role="tabpanel" aria-labelledby="tab-2927591180288-head">
+					<h3 id="tab-2927591180288-head"><span class="epub-tab-head">Iteration 2</span></h3>
+					
+<p><strong>MAIN CHARACTERS:</strong> (see previous)</p>
+<p><strong>SUMMARY:</strong> Barry B. Benson works with the 'Pollen Jocks' to gather pollen for Vanessa (who is now a human-sized bee). Ken (still a human) is in a relationship with Vanessa, and becomes jealous of the attention Barry receives for being so good at fetching pollen. Ken attacks Barry, but Barry and the Pollen Jocks swarm him and sting him to death. They all die afterward, but a new group of bees (with identical faces and names) quickly arrive to take their place. Vanessa appears alright with this; she shows New!Barry the same attention she gave Dead!Barry. The movie goes on with New!Barry suing the humans for stealing their honey — but near the end, the jury and judge are revealed to now all be Ken. The trial ends with New!Barry and a swarm of bees swooping up and stinging the jury and judge to death. A New!New!Barry arrives, and — together with Vanessa — they travel to California to steal the parade boat of flowers and use it to expand their hive all over the world. The movie ends like the previous iteration, except all the humans are now human-sized bees too (for some reason?).</p>
+<p><strong>NOTABLE DIFFERENCES:</strong> This is almost a completely different movie. It's <em>definitely</em> not for kids anymore. The deaths are cartoonish, but still kind of gruesome.</p>
+<p><strong>RUN-TIME:</strong> 98 minutes</p>
+
+				</section>
+<section id="tab-68bf3d20b683c" role="tabpanel" aria-labelledby="tab-68bf3d20b683c-head">
+					<h3 id="tab-68bf3d20b683c-head"><span class="epub-tab-head">Iteration 3</span></h3>
+					
+<p><strong>MAIN CHARACTERS:</strong> (see previous)</p>
+<p><strong>SUMMARY:</strong> Effectively the same plot, except Ken's death (both early on and in the court scene) is more extensive, more gruesome, and takes more time.</p>
+<p><strong>NOTABLE DIFFERENCES:</strong> Everyone except for Ken is now a bee. All scenes where Ken is stung to death now involve multiple human-sized bees stinging him (and dying in the process). All the dialogue in the movie (except for Ken's, which mostly consists of screaming) has been replaced with buzzing noises.</p>
+<p><strong>RUN-TIME:</strong> 107 minutes</p>
+
+				</section>
+<section id="tab-d7ea8f2ce5979" role="tabpanel" aria-labelledby="tab-d7ea8f2ce5979-head">
+					<h3 id="tab-d7ea8f2ce5979-head"><span class="epub-tab-head">Iteration 4</span></h3>
+					
+<p><strong>MAIN CHARACTERS:</strong> Ken, bees (?)</p>
+<p><strong>SUMMARY:</strong> The movie consists of an above-view image of Ken writhing in an ocean of bees. Every time he opens his mouth, hundreds of bees pour into it. By the end of the film, his body has become swollen with venom from thousands of stingers; his facial features have all but vanished beneath a dozen fist-sized pustules oozing with pus. Blind and helpless, his screams are now just muffled, gurgling sobs. He appears to spend the last few minutes of the movie suffocating as his throat finally swells shut — only to finally sink out of sight.</p>
+<p><strong>NOTABLE DIFFERENCES:</strong> The film has become live-action; the bees are just normal honey-bees, and Ken is now portrayed by the actor who voiced him (Patrick Warburton).</p>
+<p><strong>RUN-TIME:</strong> 278 minutes</p>
+
+				</section>
+<section id="tab-fa61528a697e3" role="tabpanel" aria-labelledby="tab-fa61528a697e3-head">
+					<h3 id="tab-fa61528a697e3-head"><span class="epub-tab-head">Iteration 5</span></h3>
+					
+<p><em>NOTE: At this point, further testing was discontinued on account of Researcher Xiao-jin's computer inexplicably filling with <a href="http://scp-wiki.net/bees">bees</a>.</em></p>
+<p><em>Special containment procedures updated to prohibit any tests on media containing direct references to bees.</em></p>
+
+				</section>
+		</section>
+		</div>
+</div></section>
+<p><strong>Addendum 3045.2:</strong> Recovery</p>
+<p>On 16-02-2010, a Foundation-operated web-analysis bot (I/O-SAURON) flagged several large-scale online purchases made by a California startup company ("HiveFind") as suspicious. The company's website claimed it provided "next generation algorithms, client-centric solutions, and cutting edge compression software".</p>
+<p>Three days later, MTF Mu-4 ("Debuggers") performed a raid on the offices of HiveFind. Although the building had been recently abandoned, they found several pieces of equipment: 14 large-scale QR scanners, 15 desktop computers, and over 900 gallons of stored honey. After detailed analysis, Mu-4 determined that each QR scanner had been wired to provide control over one computer. SCP-3045 was found on one of the computer's hard-drives.</p>
+<p>A later search uncovered over 50 dead (non-anomalous) instances of <em>Apis mellifera</em> (American honey-bee) spread throughout the office.</p>
+<p>Investigations into HiveFind are ongoing.</p>
+
+
+                    </div>
+	<section role="doc-endnotes" epub:type="endnotes" aria-labelledby="endnotes-7c83">
+		<h2 id="endnotes-7c83">Footnotes</h2>
+		<ol><li id="footnote-7c83-1-end" role="doc-endnote" epub:type="endnote">
+					<p> A certification indicating that equipment and/or structures are insulated from 'leakage' of data via electromagnetic or acoustic emissions. For more information, personnel with appropriate clearance may consult documentation for <a href="http://scp-wiki.net/scp-2639">SCP-2639</a>. <a href="scp-3045.xhtml#footnoteref-7c83-1" role="doc-backlink" title="Go back to note reference" aria-label="Go back to note reference">↖</a></p>
+				</li></ol>
+	</section><footer class="chapter-footer chapter-meta"></footer></section>
+
+
+    <!-- Google Analytics load -->
+    
+
+    <!-- Quantcast -->
+    
+    
+
+
+
+
+
+
+
+</body></html>
