@@ -192,6 +192,7 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 	}));
 
 	if (viewUrl) {
+		config.set('browser.headless', false);
 		const pageUrls = viewUrl.split(',');
 		await viewPage(pageUrls, {
 			...cfg,
