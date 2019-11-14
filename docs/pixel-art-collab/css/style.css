@@ -490,15 +490,15 @@ html[__ibooks_internal_theme*=Night] .border-gray {
 html[data-color-scheme=dark] .red,
 html[__ibooks_internal_theme*=Gray] .red,
 html[__ibooks_internal_theme*=Night] .red {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .scheme-dark .border-red,
 html[data-color-scheme=dark] .border-red,
 html[__ibooks_internal_theme*=Gray] .border-red,
 html[__ibooks_internal_theme*=Night] .border-red {
-    border-color: #ef6f6f;
+    border-color: #c30c00;
 }
 
 .scheme-dark .yellow,
@@ -565,8 +565,8 @@ html[__ibooks_internal_theme*=Night] .border-black {
 html[data-color-scheme=dark] a,
 html[__ibooks_internal_theme*=Gray] a,
 html[__ibooks_internal_theme*=Night] a {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-white {
@@ -756,8 +756,8 @@ html[__ibooks_internal_theme*=Night] .bg-white.red,
 html[data-color-scheme=dark] .bg-white .red,
 html[__ibooks_internal_theme*=Gray] .bg-white .red,
 html[__ibooks_internal_theme*=Night] .bg-white .red {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .scheme-dark .bg-white.border-red,
@@ -768,7 +768,7 @@ html[__ibooks_internal_theme*=Night] .bg-white.border-red,
 html[data-color-scheme=dark] .bg-white .border-red,
 html[__ibooks_internal_theme*=Gray] .bg-white .border-red,
 html[__ibooks_internal_theme*=Night] .bg-white .border-red {
-    border-color: #ef6f6f;
+    border-color: #c30c00;
 }
 
 .scheme-dark .bg-white.yellow,
@@ -867,8 +867,8 @@ html[__ibooks_internal_theme*=Night] .bg-white .border-black {
 html[data-color-scheme=dark] .bg-white a,
 html[__ibooks_internal_theme*=Gray] .bg-white a,
 html[__ibooks_internal_theme*=Night] .bg-white a {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-silver {
@@ -1053,8 +1053,8 @@ html[__ibooks_internal_theme*=Night] .bg-silver.red,
 html[data-color-scheme=dark] .bg-silver .red,
 html[__ibooks_internal_theme*=Gray] .bg-silver .red,
 html[__ibooks_internal_theme*=Night] .bg-silver .red {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .scheme-dark .bg-silver.border-red,
@@ -1065,7 +1065,7 @@ html[__ibooks_internal_theme*=Night] .bg-silver.border-red,
 html[data-color-scheme=dark] .bg-silver .border-red,
 html[__ibooks_internal_theme*=Gray] .bg-silver .border-red,
 html[__ibooks_internal_theme*=Night] .bg-silver .border-red {
-    border-color: #ef6f6f;
+    border-color: #c30c00;
 }
 
 .scheme-dark .bg-silver.yellow,
@@ -1164,8 +1164,8 @@ html[__ibooks_internal_theme*=Night] .bg-silver .border-black {
 html[data-color-scheme=dark] .bg-silver a,
 html[__ibooks_internal_theme*=Gray] .bg-silver a,
 html[__ibooks_internal_theme*=Night] .bg-silver a {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-lightgray {
@@ -1409,13 +1409,13 @@ html[__ibooks_internal_theme*=Night] .bg-gray {
 
 .bg-black.red,
 .bg-black .red {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-black.border-red,
 .bg-black .border-red {
-    border-color: #ef6f6f;
+    border-color: #c30c00;
 }
 
 .bg-black.yellow,
@@ -1463,13 +1463,13 @@ html[__ibooks_internal_theme*=Night] .bg-gray {
 }
 
 .bg-black a {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-black a {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-red {
@@ -1653,8 +1653,8 @@ html[__ibooks_internal_theme*=Night] .bg-red.red,
 html[data-color-scheme=dark] .bg-red .red,
 html[__ibooks_internal_theme*=Gray] .bg-red .red,
 html[__ibooks_internal_theme*=Night] .bg-red .red {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .scheme-dark .bg-red.border-red,
@@ -1665,7 +1665,7 @@ html[__ibooks_internal_theme*=Night] .bg-red.border-red,
 html[data-color-scheme=dark] .bg-red .border-red,
 html[__ibooks_internal_theme*=Gray] .bg-red .border-red,
 html[__ibooks_internal_theme*=Night] .bg-red .border-red {
-    border-color: #ef6f6f;
+    border-color: #c30c00;
 }
 
 .scheme-dark .bg-red.yellow,
@@ -1764,8 +1764,8 @@ html[__ibooks_internal_theme*=Night] .bg-red .border-black {
 html[data-color-scheme=dark] .bg-red a,
 html[__ibooks_internal_theme*=Gray] .bg-red a,
 html[__ibooks_internal_theme*=Night] .bg-red a {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-lightred {
@@ -1904,13 +1904,13 @@ html[__ibooks_internal_theme*=Night] .bg-red a {
 
 .bg-darkred.red,
 .bg-darkred .red {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-darkred.border-red,
 .bg-darkred .border-red {
-    border-color: #ef6f6f;
+    border-color: #c30c00;
 }
 
 .bg-darkred.yellow,
@@ -1958,8 +1958,8 @@ html[__ibooks_internal_theme*=Night] .bg-red a {
 }
 
 .bg-darkred a {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-yellow {
@@ -2143,8 +2143,8 @@ html[__ibooks_internal_theme*=Night] .bg-yellow.red,
 html[data-color-scheme=dark] .bg-yellow .red,
 html[__ibooks_internal_theme*=Gray] .bg-yellow .red,
 html[__ibooks_internal_theme*=Night] .bg-yellow .red {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .scheme-dark .bg-yellow.border-red,
@@ -2155,7 +2155,7 @@ html[__ibooks_internal_theme*=Night] .bg-yellow.border-red,
 html[data-color-scheme=dark] .bg-yellow .border-red,
 html[__ibooks_internal_theme*=Gray] .bg-yellow .border-red,
 html[__ibooks_internal_theme*=Night] .bg-yellow .border-red {
-    border-color: #ef6f6f;
+    border-color: #c30c00;
 }
 
 .scheme-dark .bg-yellow.yellow,
@@ -2254,8 +2254,8 @@ html[__ibooks_internal_theme*=Night] .bg-yellow .border-black {
 html[data-color-scheme=dark] .bg-yellow a,
 html[__ibooks_internal_theme*=Gray] .bg-yellow a,
 html[__ibooks_internal_theme*=Night] .bg-yellow a {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-lightyellow {
@@ -2394,13 +2394,13 @@ html[__ibooks_internal_theme*=Night] .bg-yellow a {
 
 .bg-brown.red,
 .bg-brown .red {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-brown.border-red,
 .bg-brown .border-red {
-    border-color: #ef6f6f;
+    border-color: #c30c00;
 }
 
 .bg-brown.yellow,
@@ -2448,8 +2448,8 @@ html[__ibooks_internal_theme*=Night] .bg-yellow a {
 }
 
 .bg-brown a {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-green {
@@ -2633,8 +2633,8 @@ html[__ibooks_internal_theme*=Night] .bg-green.red,
 html[data-color-scheme=dark] .bg-green .red,
 html[__ibooks_internal_theme*=Gray] .bg-green .red,
 html[__ibooks_internal_theme*=Night] .bg-green .red {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .scheme-dark .bg-green.border-red,
@@ -2645,7 +2645,7 @@ html[__ibooks_internal_theme*=Night] .bg-green.border-red,
 html[data-color-scheme=dark] .bg-green .border-red,
 html[__ibooks_internal_theme*=Gray] .bg-green .border-red,
 html[__ibooks_internal_theme*=Night] .bg-green .border-red {
-    border-color: #ef6f6f;
+    border-color: #c30c00;
 }
 
 .scheme-dark .bg-green.yellow,
@@ -2744,8 +2744,8 @@ html[__ibooks_internal_theme*=Night] .bg-green .border-black {
 html[data-color-scheme=dark] .bg-green a,
 html[__ibooks_internal_theme*=Gray] .bg-green a,
 html[__ibooks_internal_theme*=Night] .bg-green a {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-lightgreen {
@@ -2884,13 +2884,13 @@ html[__ibooks_internal_theme*=Night] .bg-green a {
 
 .bg-darkgreen.red,
 .bg-darkgreen .red {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-darkgreen.border-red,
 .bg-darkgreen .border-red {
-    border-color: #ef6f6f;
+    border-color: #c30c00;
 }
 
 .bg-darkgreen.yellow,
@@ -2938,8 +2938,8 @@ html[__ibooks_internal_theme*=Night] .bg-green a {
 }
 
 .bg-darkgreen a {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-blue {
@@ -3123,8 +3123,8 @@ html[__ibooks_internal_theme*=Night] .bg-blue.red,
 html[data-color-scheme=dark] .bg-blue .red,
 html[__ibooks_internal_theme*=Gray] .bg-blue .red,
 html[__ibooks_internal_theme*=Night] .bg-blue .red {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .scheme-dark .bg-blue.border-red,
@@ -3135,7 +3135,7 @@ html[__ibooks_internal_theme*=Night] .bg-blue.border-red,
 html[data-color-scheme=dark] .bg-blue .border-red,
 html[__ibooks_internal_theme*=Gray] .bg-blue .border-red,
 html[__ibooks_internal_theme*=Night] .bg-blue .border-red {
-    border-color: #ef6f6f;
+    border-color: #c30c00;
 }
 
 .scheme-dark .bg-blue.yellow,
@@ -3234,8 +3234,8 @@ html[__ibooks_internal_theme*=Night] .bg-blue .border-black {
 html[data-color-scheme=dark] .bg-blue a,
 html[__ibooks_internal_theme*=Gray] .bg-blue a,
 html[__ibooks_internal_theme*=Night] .bg-blue a {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-lightblue {
@@ -3374,13 +3374,13 @@ html[__ibooks_internal_theme*=Night] .bg-blue a {
 
 .bg-darkblue.red,
 .bg-darkblue .red {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .bg-darkblue.border-red,
 .bg-darkblue .border-red {
-    border-color: #ef6f6f;
+    border-color: #c30c00;
 }
 
 .bg-darkblue.yellow,
@@ -3428,8 +3428,8 @@ html[__ibooks_internal_theme*=Night] .bg-blue a {
 }
 
 .bg-darkblue a {
-    color: #ef6f6f;
-    -webkit-text-fill-color: #ef6f6f;
+    color: #c30c00;
+    -webkit-text-fill-color: #c30c00;
 }
 
 .scheme-light {
