@@ -1,6 +1,7 @@
 const urlLib = require('url');
 const path = require('path');
 const pMap = require('p-map');
+const config = require('./book-config');
 const {filenameForUrl} = require('./lib/utils');
 const DocPart = require('./lib/doc-part');
 const Resource = require('./lib/resource');
@@ -17,23 +18,7 @@ class PostProcessor {
 			browser, cache, wikiLookup
 		} = app;
 
-		const {
-			concurrency = 3,
-			appendixDepthCutoff = 3,
-			stylesheets = ['css/fonts.css', 'css/style.css', 'css/base.css'],
-			bookOptions
-		} = {
-			...options,
-			...(app.options.postProcess || {}),
-			...(options.postProcess || {})
-		};
-
-		this.options = {
-			concurrency,
-			stylesheets,
-			appendixDepthCutoff,
-			bookOptions
-		};
+		this.setOptions(options);
 
 		/** @type {import("puppeteer").Browser} */
 		this.browser = browser;
@@ -43,6 +28,27 @@ class PostProcessor {
 
 		/** @type {import("./info-database")} */
 		this.wikiLookup = wikiLookup;
+	}
+	setOptions(opts) {
+		const bookOptions = config.util.extendDeep({},
+			config.get('bookOptions'),
+			config.get('postProcess'),
+			opts
+		);
+
+		const {
+			concurrency = 3,
+			appendixDepthCutoff = 3,
+			stylesheets = ['css/fonts.css', 'css/style.css', 'css/base.css']
+		} = bookOptions;
+
+		this.options = {
+			customCSS: config.get('input.customCSS'),
+			concurrency,
+			stylesheets,
+			appendixDepthCutoff,
+			bookOptions
+		};
 	}
 	async initialize() {
 		this.page = await this.browser.newPage();
@@ -74,6 +80,7 @@ class PostProcessor {
 				resource.remote = true;
 			}
 			resource.addBacklinks(originalUrl);
+			return resource.url;
 		});
 		// QUESTION REVIEW should this just be for debug mode?
 		this.page.on('console', msg => {
@@ -81,7 +88,7 @@ class PostProcessor {
 		})
 		await this.page.addScriptTag({
 			path: path.join(__dirname, '../client/post-process.js')
-		})
+		});
 	}
 	async processBook(chapters) {
 		if (!this.page) {
@@ -143,6 +150,11 @@ class PostProcessor {
 			return;
 		}
 
+		const bookOptions = {
+			...config.get('bookOptions'),
+			...this.options.bookOptions
+		};
+
 		// make sure hubs are loaded
 		await this.wikiLookup.loadHubsList();
 
@@ -172,14 +184,19 @@ class PostProcessor {
 			});
 		});
 
-		const stylesheets = this.options.stylesheets
+		let stylesheets = this.options.stylesheets
 			.map(src => `<link rel="stylesheet" href="${src}" />`)
 			.join('');
 
+		if (this.options.customCSS) {
+			// REVIEW does this need escaping? shouldn't....
+			stylesheets += `<style>${this.options.customCSS}</style>`;
+		}
+
 		return {
-			header: genChapterHeader(chapter, audioAdaptations, this.options.bookOptions),
+			header: genChapterHeader(chapter, audioAdaptations, bookOptions),
 			stylesheets,
-			footer: genChapterFooter(bookLinks, externalLinks, this.options.bookOptions)
+			footer: genChapterFooter(bookLinks, externalLinks, bookOptions)
 		};
 	}
 }

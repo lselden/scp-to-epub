@@ -1,5 +1,6 @@
 const Chapter = require('./chapter');
 const {safeFilename} = require('./utils');
+const config = require('../book-config');
 
 class DocPart extends Chapter {
 	constructor(opts = {}) {
@@ -9,7 +10,7 @@ class DocPart extends Chapter {
 			index,
 			html,
 			// HACK!!! this is to make relative paths go the rigth place, but isn't the best way to deal with it
-			origin = 'http://www.scp-wiki.net',
+			origin = config.get('discovery.defaultOrigin'),
 			// content will go into resourceOpts
 			...resourceOpts
 		} = opts;
@@ -31,11 +32,11 @@ class DocPart extends Chapter {
 		super(resourceOpts);
 
 		// HACK TODO COMBAK this won't match behavior of Chapter links, which use cananonical URL.
-		this.links = (opts.links || [])
-			.map(link => {
-				// make links absolute
-				return (new URL(link.url, origin)).toString();
-			});
+		// this.links = (opts.links || [])
+		// 	.map(link => {
+		// 		// make links absolute
+		// 		return (new URL(link.url, origin)).toString();
+		// 	});
 
 		this.titleHTML = titleHTML;
 		this.index = index;

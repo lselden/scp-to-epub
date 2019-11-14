@@ -1,7 +1,8 @@
+const config = require('../book-config');
 const {escape} = require('../lib/utils');
 const DocPart = require('../lib/doc-part');
 
-function formatDocPart(docPart, config) {
+function formatDocPart(docPart, options) {
 	const {
 		bookPath,
 		title = 'Section',
@@ -16,16 +17,16 @@ function formatDocPart(docPart, config) {
 					.map((chapter, j) => {
 						// NOTE not trying to use book chapter numbers because docparts messes that up
 						//const chapterIndex = index + j;
-						return formatChapter(chapter, '', config);
+						return formatChapter(chapter, '', options);
 					})
 					.join('\n')
 		}</ol></li>`;
 }
-function formatChapter(chapter, chapterIndex, config = {}) {
-	const {includeRating = true} = config;
+function formatChapter(chapter, chapterIndex, options = {}) {
+	const {includeRating = true} = options;
 
 	if (chapter instanceof DocPart) {
-		return formatDocPart(chapter, config);
+		return formatDocPart(chapter, options);
 	}
 	const {
 		bookPath,
@@ -48,14 +49,20 @@ function genPage(data, title, html) {
 		stylesheets = ['css/base.css', 'css/style.css', 'css/fonts.css']
 	} = data;
 
+	let stylesheetHTML = stylesheets
+		.map(path => `<link rel="stylesheet" type="text/css" href="${path}" />`)
+		.join('');
+
+	if (config.has('input.customCSS')) {
+		stylesheetHTML += `<style>${config.get('input.customCSS')}</style>`;
+	}
+
 	return `<?xml version="1.0" encoding="UTF-8"?>
 	<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="${ lang }" lang="${ lang }">
 	<head>
 		<title>${ escape(title) }</title>
 		<meta charset="UTF-8" />${
-			stylesheets.map(path => {
-			return `<link rel="stylesheet" type="text/css" href="${path}" />`
-		}).join('')
+			stylesheetHTML
 		}<meta name="EPB-UUID" content="${ id }" />
 	</head>
 	<body dir="ltr">${

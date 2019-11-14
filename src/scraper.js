@@ -1,6 +1,7 @@
 const path = require('path');
 const mime = require('mime');
 const urlLib = require('url');
+const config = require('./book-config');
 const StaticServer = require('./lib/serve-file');
 const Resource = require('./lib/resource');
 const Chapter = require('./lib/chapter');
@@ -23,36 +24,42 @@ class Scraper {
 			browser, cache, wikiLookup
 		} = app;
 
-		const {
-			static: staticOpts = {},
-			hooks: hookOpts = {},
-			preProcess: preProcessOps = {},
-			...inOpts
-		} = opts;
+		this.totalRequests = 0;
 
-		this.options = {
-			headless: false,
-			debug: false,
-			// width: 640,
-			// height: 960,
-			width: 768,
-			height: 1024,
-			folder: 'EPUB',
-			timeout: 10 * 60 * 1000,
-			...inOpts,
+		this.initialize(opts);
+
+		this.server = new StaticServer();
+
+		/** @type {import("puppeteer").Browser} */
+		this.browser = browser;
+
+		/** @type {import("./lib/resource-cache")} */
+		this.cache = cache;
+
+		/** @type {import("./info-database")} */
+		this.wikiLookup = wikiLookup;
+
+		this._frontPromise = Promise.resolve();
+	}
+	initialize(opts = {}) {
+		this.options = config.util.extendDeep({
+			browser: {
+				headless: false,
+				debug: false,
+				timeout: 10 * 60 * 1000,
+				ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Googlebot Chrome/76.0.3809.132 Safari/537.36'
+			},
 			static: {
 				prefix: '__epub__',
 				root: path.join(__dirname, '..'),
-				cache: true,
-				...staticOpts
+				cache: true
 			},
 			preProcess: {
 				concurrency: 1,
 				useWikiDotUrls: false,
 				backlinks: false,
 				tags: true,
-				closeTabs: inOpts.debug,
-				...preProcessOps
+				closeTabs: true
 			},
 			// basically just a placeholder to allow for more advanced overrides in the future?
 			hooks: {
@@ -91,29 +98,17 @@ class Scraper {
 				},
 				response() {
 
-				},
-				...hookOpts
-			},
-			ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Googlebot Chrome/76.0.3809.132 Safari/537.36'
-		};
-
-		this.totalRequests = 0;
-
-		this.server = new StaticServer();
-
-		/** @type {import("puppeteer").Browser} */
-		this.browser = browser;
-
-		/** @type {import("./lib/resource-cache")} */
-		this.cache = cache;
-
-		/** @type {import("./info-database")} */
-		this.wikiLookup = wikiLookup;
-
-		this._frontPromise = Promise.resolve();
-	}
-	async initialize() {
-
+				}
+			}
+		},
+		this.options,
+		{
+			browser: config.get('browser'),
+			preProcess: config.get('preProcess'),
+			static: config.get('static'),
+			hooks: config.get('hooks')
+		},
+		opts);
 	}
 	/**
 	 *
@@ -231,7 +226,7 @@ class Scraper {
 			const existing = this.cache.get(payload.url);
 			if (existing) {
 				existing.addBacklinks(url);
-				forwardLinks.set(payload.url, existing);
+				forwardLinks.set(Resource.asCanononical(payload.url), payload.title);
 				return;
 			}
 			const mimeType = mime.getType(payload.url) || mime.getType('xhtml');
@@ -255,7 +250,7 @@ class Scraper {
 				save: false
 			});
 			this.cache.set(linkResource);
-			forwardLinks.set(payload.url, linkResource);
+			forwardLinks.set(Resource.asCanononical(payload.url), payload.title);
 		});
 
 		// get backlinks before formatting page
@@ -285,7 +280,7 @@ class Scraper {
 			url,
 			save: true,
 			content,
-			links: forwardLinks.keys(),
+			links: forwardLinks,
 			from: backlinks,
 			filename: safeFilename(`${stats.pageName}`, 'xhtml'),
 			mimeType: mime.getType('xhtml')
@@ -295,18 +290,18 @@ class Scraper {
 		this.cache.set(chapter);
 
 		// close window
-		if (closeTabs && !this.options.headless) {
+		if (closeTabs && !this.options.browser.headless) {
 			await page.close();
 		}
 		return chapter;
 	}
 	async createPage(url) {
 		const page = await this.browser.newPage();
-		page.setUserAgent(this.options.ua);
+		page.setUserAgent(this.options.browser.ua);
 		await page.setRequestInterception(true);
 		page.on('request', request => this.interceptRequest(request));
 		page.on('response', response => this.interceptResponse(response));
-		if (this.options.debug) {
+		if (this.options.browser.debug) {
 			page.on('console', msg => {
 				let type = `${msg.type()}`;
 				if (type === 'warning') {
@@ -340,7 +335,7 @@ class Scraper {
 
 		const response = await page.goto(url, {
 			waitUntil: ['load', 'domcontentloaded', 'networkidle2'],
-			timeout: this.options.timeout
+			timeout: this.options.browser.timeout
 		});
 
 		const out = {
@@ -453,7 +448,7 @@ class Scraper {
 		// TODO this may timeout becaues the page is waiting for an animation frame
 		// @ts-ignore
 		const whenFormatted = page.waitForFunction(() => window.__epubFormattingComplete === true, {
-			timeout: this.options.timeout || 60 * 1000
+			timeout: this.options.browser.timeout || 60 * 1000
 		});
 
 		if (this.options.hooks.beforeFormat) {
@@ -708,7 +703,7 @@ class Scraper {
 	// TODO remove in favor of wiki lookup
 	async getLinksFromUrl(url, selector = 'body', sameDomain = true) {
 		const page = await this.browser.newPage();
-		await page.goto(url, { waitUntil: 'load', timeout: this.options.timeout });
+		await page.goto(url, { waitUntil: 'load', timeout: this.options.browser.timeout });
 		const result = await this.getLinksFromPage(page, selector);
 		await page.close();
 		return result;

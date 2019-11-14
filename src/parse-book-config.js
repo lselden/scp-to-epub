@@ -195,7 +195,8 @@ async function extractDocParts(html, app) {
 						// }
 
 						block.links.push({
-							title: serialize(link.innerHTML),
+							titleHTML: serialize(link.innerHTML),
+							title: link.textContent,
 							url: urlObj.toString()
 						});
 					});

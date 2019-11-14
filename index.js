@@ -1,5 +1,6 @@
 const yargs = require('yargs');
 const path = require('path');
+const config = require('./src/book-config');
 const Book = require('./src/lib/book');
 const BookMaker = require('./src/book-maker');
 const viewPage = require('./src/view-page');
@@ -56,11 +57,13 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 	const cmd = yargs
 		.option('title', {
 			alias: 't',
-			describe: 'Title of book'
+			type: 'string',
+			describe: 'Title of book',
+			default: config.get('metadata.title')
 		})
 		.option('author', {
 			describe: 'Author(s) of book',
-			default: 'SCP Foundation'
+			default: config.get('metadata.author')
 		})
 		.option('book', {
 			describe: 'Path to book config. Can be relative/absolute path or http url'
@@ -75,7 +78,8 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		.option('output', {
 			alias: 'o',
 			type: 'string',
-			describe: 'output file path (if ends in .epub filename, otherwise directory to put file)'
+			describe: 'output file path (if ends in .epub filename, otherwise directory to put file)',
+			default: config.get('output.path')
 		})
 		.implies('book', 'output')
 		.implies('page', 'output')
@@ -83,13 +87,13 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 			alias: ['d', 'dir'],
 			describe: 'Temporary working directory',
 			// FIXME
-			default: path.join(__dirname, './output')
+			default: config.get('output.tempDir')
 		})
 		.option('keepTempFiles', {
 			alias: ['keep'],
 			describe: 'Keep temporary folder, instead of deleting. Use --no-keep to delete',
 			type: 'boolean',
-			default: true
+			default: config.get('output.keepTempFiles')
 		})
 		.option('debug', {
 			describe: 'Enable debug mode',
@@ -101,20 +105,20 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		})
 		.option('maxChapters', {
 			describe: 'Maximum number of articles to include',
-			default: 50
+			default: config.get('discovery.maxChapters')
 		})
 		.option('maxDepth', {
 			describe: 'Maximum depth of crawler',
-			default: 2
+			default: config.get('discovery.maxDepth')
 		})
 		.option('appendixDepthCutoff', {
-			describe: 'Maximum depth of crawler',
-			default: 2
+			describe: 'At this depth articles will go into appendix instead of TOC',
+			default: config.get('options.appendixDepthCutoff')
 		})
 		.option('ratings', {
 			describe: 'Include ratings. Use --no-ratings to hide this data',
 			type: 'boolean',
-			default: true
+			default: config.get('options.showRating')
 		})
 		.option('onlyZip', {
 			type: 'boolean',
@@ -123,12 +127,12 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		.option('width', {
 			number: true,
 			hidden: true,
-			default: 1080
+			default: config.get('browser.width')
 		})
 		.option('height', {
 			number: true,
 			hidden: true,
-			default: 900
+			default: config.get('browser.height')
 		});
 
 	const {argv} = cmd;
@@ -169,6 +173,24 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		maxDepth
 	};
 
+	config.assign(config.util.compact({
+		metadata: {
+			title,
+			author
+		},
+		discovery: {
+			maxChapters,
+			maxDepth
+		},
+		output: {
+			keepTempFiles
+		},
+		browser: {
+			headless: !showBrowser,
+			debug
+		}
+	}));
+
 	if (viewUrl) {
 		const pageUrls = viewUrl.split(',');
 		await viewPage(pageUrls, {
@@ -178,9 +200,15 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		return;
 	}
 
-
 	const tempDir = path.join(argv.tempDir, pageName);
 	const destination = output.endsWith('.epub') ? output : path.join(output, `${pageName}.epub`);
+
+	config.assign({
+		output: {
+			path: destination,
+			tempDir
+		}
+	});
 
 	let builder;
 

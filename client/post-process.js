@@ -87,7 +87,11 @@ async function registerRemote(doc, originalUrl) {
 		// @ts-ignore
 		if (typeof window.registerRemoteResource === 'function') {
 			// @ts-ignore
-			await window.registerRemoteResource(href, originalUrl);
+			const canononicalUrl = await window.registerRemoteResource(href, originalUrl);
+			// make sure redirected content use the same url
+			if (canononicalUrl !== href) {
+				el.src = canononicalUrl;
+			}
 		}
 	}
 
@@ -107,10 +111,12 @@ function addExtras (doc, extras, originalUrl) {
 	const main = doc.querySelector('[role="doc-chapter"]');
 	const origHead = doc.querySelector('#page-title');
 	if (origHead) {
+		origHead.insertAdjacentHTML('afterend', extras.header);
 		origHead.remove();
+	} else {
+		main.insertAdjacentHTML('afterbegin', extras.header);
 	}
 	if (main) {
-		main.insertAdjacentHTML('afterbegin', extras.header);
 		main.insertAdjacentHTML('beforeend', extras.footer);
 	} else {
 		console.error(`FAILED TO ADD HEADER/FOOTER - NOT PROPERLY FORMATTED PAGE ${originalUrl}`);

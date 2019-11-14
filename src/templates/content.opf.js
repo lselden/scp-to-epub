@@ -1,4 +1,5 @@
 const {EOL} = require('os');
+const config = require('../book-config');
 const {escape} = require('../lib/utils');
 const DocPart = require('../lib/doc-part');
 
@@ -9,7 +10,7 @@ const DocPart = require('../lib/doc-part');
  */
 function genContent(data, options = {}) {
 	const {
-		id: uniqueId = `scp.foundation.${Math.random().toString(16).slice(2)}`,
+		id: uniqueId = config.get('metadata.id', `scp.foundation.${Math.random().toString(16).slice(2)}`),
 		title,
 		lang = 'en',
 		publisher,
@@ -18,7 +19,7 @@ function genContent(data, options = {}) {
 			path: tocPath = 'toc.xhtml',
 			ncxPath = 'epb.ncx',
 			prefacePath = 'preface.xhtml',
-			appendixPath
+			appendixPath = 'appendix.xhtml'
 		},
 		resources = [],
 		layout: {
@@ -28,7 +29,6 @@ function genContent(data, options = {}) {
 		},
 		author = 'SCP Foundation',
 		publishDate,
-		stylesheets = ['css/base.css', 'css/style.css', 'css/fonts.css'],
 		creator,
 		appendixDepthCutoff = 1,
 		// cover: {

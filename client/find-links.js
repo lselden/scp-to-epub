@@ -87,6 +87,7 @@ export default async function () {
 			try {
 				await window.registerLink({
 					type: 'link',
+					title: el.textContent,
 					url
 				});
 				// not doing here anymore

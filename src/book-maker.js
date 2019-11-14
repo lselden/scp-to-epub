@@ -5,6 +5,7 @@ const puppeteer = require('puppeteer');
 const path = require('path');
 const urlLib = require('url');
 const pMap = require('p-map');
+const config = require('./book-config');
 const Book = require('./lib/book');
 // for loading page and converting to chapter etc.
 const Scraper = require('./scraper');
@@ -29,82 +30,11 @@ class BookMaker {
 	 * @param {import('..').Book | import('..').BookOptions} book
 	 * @param {import('..').BookMakerConfig} opts
 	 */
-	constructor(book, opts = {}) {
+	constructor(book, opts = {}, browser) {
 		/** @type {Browser} */
-		this.browser = (opts.browser && typeof opts.browser === 'object') ? opts.browser : undefined ;
+		this.browser = (browser && typeof browser === 'object') ? browser : undefined ;
 
-		const {
-			static: staticOpts = {},
-			hooks: hookOpts = {},
-			cover: coverOpts = {},
-			bookOptions = {},
-			...inOpts
-		} = opts;
-
-		/** @type {import('..').BookMakerConfig} */
-		this.options = {
-			bookOptions: {
-				...bookOptions,
-				...(
-					(book instanceof Book || typeof book !== 'object') ?
-					{} :
-					book
-				)
-			},
-			defaultOrigin: 'http://www.scp-wiki.net',
-			/* probably need a smaller limit by default...*/
-			maxChapters: 500,
-			maxDepth: 1,
-			include: [],
-			exclude: [],
-			preProcess: {
-				concurrency: 1,
-				closeTabs: inOpts.debug,
-				skipMetaDepth: 1
-			},
-			postProcess: {
-				concurrency: 3
-			},
-			// not currently used?
-			useWikiDotUrls: true,
-			// whether to make supplemental (appendix) content "non-linear"
-			hideSupplemental: true,
-			headless: true,
-			debug: false,
-			// width: 640,
-			// height: 960,
-			width: 768,
-			height: 1024,
-			// QUESTION why is this here?
-			folder: 'EPUB',
-			timeout: 10 * 60 * 1000,
-			...inOpts,
-			hooks: {
-				newDocument() {},
-				beforeFormat() {},
-				afterFormat() {},
-				...hookOpts
-			},
-			cover: {
-				path: '',
-				width: 1600,
-				height: 2560,
-				templateHtml: path.join(__dirname, '../client/cover.html'),
-				...coverOpts
-			},
-			static: {
-				prefix: '__epub__',
-				root: path.join(__dirname, '..'),
-				cache: true,
-				...staticOpts
-			},
-			ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'
-		};
-
-		// TODO FIXME this isn't getting used when loading a book or main list of links it seems.
-		this.options.exclude = this.options.exclude
-			.filter(x => x)
-			.map(link => Resource.asCanononical(link, this.options.defaultOrigin));
+		this._setOptions(opts);
 
 		this.wikiLookup = new WikiDataLookup(this, this.options);
 		this.cache = new ResourceCache();
@@ -130,8 +60,57 @@ class BookMaker {
 		}
 
 	}
+	_setOptions(opts) {
+		// const {
+		// 	static: staticOpts = {},
+		// 	hooks: hookOpts = {},
+		// 	cover: coverOpts = {},
+		// 	bookOptions = {},
+		// 	...inOpts
+		// } = opts;
+
+		/** @type {import('..').BookMakerConfig} */
+		this.options = config.util.extendDeep({
+			bookOptions: {
+				...config.get('bookOptions'),
+				// ...bookOptions
+			},
+			...config.get('discovery'),
+			preProcess: {
+				concurrency: 1,
+				skipMetaDepth: 1
+			},
+			postProcess: {
+				concurrency: 3
+			},
+			// not currently used?
+			useWikiDotUrls: true,
+			hooks: {
+				newDocument() {},
+				beforeFormat() {},
+				afterFormat() {}
+			},
+			cover: {
+				path: '',
+				width: 1600,
+				height: 2560,
+				templateHtml: path.join(__dirname, '../client/cover.html')
+			},
+			static: {
+				prefix: '__epub__',
+				root: path.join(__dirname, '..'),
+				cache: true,
+			},
+			ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'
+		}, config.toObject(), opts);
+
+		// TODO FIXME this isn't getting used when loading a book or main list of links it seems.
+		// this.options.exclude = this.options.discovery.exclude
+		// 	.filter(x => x)
+		// 	.map(link => Resource.asCanononical(link, this.options.defaultOrigin));
+	}
 	async initialize() {
-		const {width, height, debug, headless} = this.options;
+		const {width, height, debug, headless} = config.toObject('browser');
 		if (!this.browser) {
 			this.browser = await puppeteer.launch({
 				defaultViewport: {
@@ -147,8 +126,10 @@ class BookMaker {
 		this.wikiLookup.browser = this.browser;
 		this.postProcessor.browser = this.browser;
 
+		const shouldLoad = config.get('input.autoLoad');
+
 		// TODO REVIEW
-		if (this.options.bookOptions && this.options.bookOptions.shouldLoad) {
+		if (this.options.bookOptions && shouldLoad) {
 			await this.loadBook(this.options.bookOptions);
 		}
 		// await this.wikiLookup.initialize();
@@ -185,11 +166,22 @@ class BookMaker {
 			await this.cache.cleanCacheForPage(bookUrl, { forceClearSaved: true });
 		}
 
-		if (!bookSettings.appendixDepthCutoff) {
-			bookSettings.appendixDepthCutoff = (bookSettings.maxDepth || this.options.maxDepth);
+		// HACK
+		if (!bookSettings.appendixDepthCutoff && bookSettings.maxDepth > 1) {
+			bookSettings.appendixDepthCutoff = bookSettings.maxDepth;
 		}
 
+		// aliases should take care of setting in correct places
+		config.assign(bookSettings);
+		// pull updated settings from config
+		this._setOptions();
+		this.scraper.initialize();
+		this.postProcessor.setOptions();
+
+
 		this.book = new Book(bookSettings);
+
+		// FIXME
 		[
 			'maxChapters',
 			'maxDepth',

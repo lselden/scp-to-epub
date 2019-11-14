@@ -78,8 +78,9 @@ body {
   line-height: 1.2;
   margin: 0;
   padding: 0;
-  widows: 2;
-  orphans: 2;
+  widows: 0;
+  orphans: 0;
+  text-align: justify;
 }
 /* TYPOGRAPHY */
 h1, h2, h3, h4, h5, h6, blockquote p cite, dt, pre, address, table, caption,
@@ -175,7 +176,7 @@ figure {
   display: table;
   page-break-inside: avoid;
   break-inside: avoid;
-  margin: 1.2em 0;
+  margin: 1.2em auto;
   min-width: 50%;
 }
 

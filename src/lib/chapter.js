@@ -20,9 +20,6 @@ class Chapter extends Resource {
 		/** @type {string[]} */
 		this._author;
 
-		/** @type {string[]} */
-		this.links = [];
-
 		/** @type {import("../scpper-db").SCPStats} */
 		// @ts-ignore
 		this.stats = {};
@@ -34,9 +31,16 @@ class Chapter extends Resource {
 		this.hasRemoteResources = !!opts.hasRemoteResources;
 
 		Object.assign(this, {title, author, stats, tags});
-		if (links) {
-			this.addLinks(links);
+
+		/**
+		 * @type {Map<string, {title: string, titleHTML?: string}>}
+		 */
+		this.forwardLinks = links instanceof Map ? links : new Map();
+
+		if (Array.isArray(links)) {
+			links.forEach(link => this.addLink(link));
 		}
+
 		if (backlinks) {
 			this.addBacklinks(backlinks);
 		}
@@ -83,16 +87,37 @@ class Chapter extends Resource {
 	get isSupplemental() {
 		return this.from.length > 0 && this.from.every(u => /system:page-tags/.test(u));
 	}
-	addLinks(...urls) {
-		if (Array.isArray(urls[0]) && urls.length === 1) {
-			urls = urls[0];
+	get links() {
+		return [...this.forwardLinks.keys()];
+	}
+	addLink(item) {
+		if (!item) {
+			return;
 		}
-		// inefficient but who cares
-		this.links.push(...urls
-			.filter(url => url)
-			.map(url => Resource.asCanononical(url))
-			.filter(url => !this.links.includes(url))
-		);
+		let key;
+		let value;
+
+		if (Array.isArray(item)) {
+			[key, value] = item;
+		} else if (typeof item === 'string') {
+			key = item;
+			value = {
+				title: item.replace(/.*\//, '')
+			};
+		} else if (typeof item === 'object') {
+			const {
+				url,
+				...data
+			} = item;
+			key = url;
+			value = data;
+		} else {
+			// this should never happen
+			console.debug('Invalid forward link', item);
+			return;
+		}
+		const canononical = Resource.asCanononical(key);
+		this.forwardLinks.set(canononical, value);
 	}
 	get properties() {
 		return this.hasRemoteResources ? ['remote-resources'] : [];

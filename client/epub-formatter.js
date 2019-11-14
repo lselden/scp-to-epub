@@ -40,13 +40,20 @@ function moveMain() {
 	newEl.append(...origEl.children);
 	document.body.insertAdjacentElement('afterbegin', newEl);
 
-
 	// if (helpers.$('#license-area')) {
 	// 	newEl.append(helpers.switchTag(helpers.$('#license-area'), 'aside'));
 	// }
 	helpers.$$(document.body, `:scope > *:not(#${config.mainContentId})`).forEach(el => el.remove());
 	//document.body.insertAdjacentElement('afterbegin', document.querySelector('#main-content'));
 	// document.querySelector('#container').remove();
+}
+
+function moveBreadcrumbs() {
+	const breadCrumbs = document.querySelector('#breadcrumbs');
+	const main = document.querySelector('page-content');
+	if (breadCrumbs && main) {
+		main.appendChild(breadCrumbs);
+	}
 }
 
 function fixHeader() {
@@ -145,6 +152,7 @@ function addNamespaces() {
 		{name: 'clean-tag-pages', fn: cleanTagPage},
 		{name: 'clean-forum', fn: cleanForumPage},
 		{name: 'move-main', fn: moveMain},
+		{name: 'move-breadcrumbs', fn: moveBreadcrumbs },
 		{name: 'remove-cruft', fn: removeUnnecessary},
 		{name: 'append-offset-pages', fn: appendOffsets},
 		{name: 'fix-anom-bar', fn: anomBar},

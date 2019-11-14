@@ -1,15 +1,15 @@
 const path = require('path');
 const fs = require('fs');
-const mime = require('mime');
-const urlLib = require('url');
 const {promisify} = require('util');
-const stream = require('stream');
 const archiver = require('archiver');
 const rimraf = require('rimraf');
 const pMap = require('p-map');
+const junk = require('junk');
+const got = require('got');
+const getStream = require('get-stream');
 const Resource = require('./resource');
-const Chapter = require('./chapter');
 const DocPart = require('./doc-part');
+const config = require('../book-config');
 const genManifest = require('../templates/content.opf');
 const {genToc, genAppendix} = require('../templates/toc.xhtml');
 const genNcx = require('../templates/epb.ncx');
@@ -29,16 +29,16 @@ class Book {
 		this.title;
 
 		/** @type {string} */
-		this.lang = 'en';
+		this.lang = config.get('metadata.lang', 'en');
 
 		/** @type {string} */
-		this.publisher = 'SCP Foundation';
+		this.publisher = config.get('metadata.publisher');
 
 		/** @type {Date} */
 		this.publishDate = new Date();
 
 		/** @type {string[]} */
-		this._author = ['SCP Foundation'];
+		this._author = [].concat(config.get('metadata.author', 'SCP Foundation'));
 
 		/** @type {import("./chapter")[]} */
 		this.chapters = [];
@@ -46,61 +46,60 @@ class Book {
 		/** @type {import("./resource")[]} */
 		this.resources = [];
 
+		this.layout = {
+			nested: [],
+			chapters: [],
+			appendix: []
+		};
+
 		let {
 			title = '',
+			lang,
+			author,
+			publisher,
+			publishDate,
 			...otherOpts
 		} = opts;
 
-		Object.assign(this, {title});
+		Object.assign(this, config.util.compact({title, author, publisher, publishDate}));
 
-		this.id = `scp.foundation.${Math.random().toString(16).slice(2)}`;
+		this.id = config.get('metadata.bookId', `scp.to.epub.${Math.random().toString(16).slice(2)}`);
 
 		this.toc = {
-			title: 'Table Of Contents',
+			title: config.get('bookOptions.tocTitle', 'Table Of Contents'),
 			path: 'toc.xhtml',
 			ncxPath: 'epb.ncx',
 			prefacePath: 'preface.xhtml',
 			appendixPath: 'appendix.xhtml'
 		};
 
-		this.creator = 'scp-epub-gen';
-
-		// TODO DEPRECATED REMOVE
-		this.cover = {
-			image: '',
-			width: 768,
-			height: 1024
-			// font: 'monospace',
-			// path: 'cover.xhtml'
-		};
+		this.creator = config.get('metadata.creator', 'scp-epub-gen');
 
 		this.options = {
-			appendixDepthCutoff: otherOpts.maxDepth ? otherOpts.maxDepth : 2,
-			keepTempFiles: false,
-			cleanTempFolder: true,
+			appendixDepthCutoff: config.get('bookOptions.appendixDepthCutoff', config.get('discovery.maxDepth', 2)),
+			keepTempFiles: config.get('output.keepTempFiles', false),
+			cleanTempFolder: config.get('output.cleanTempFolder', true),
+			additionalResources: config.get('input.additionalResources', []),
 			...otherOpts
 		};
 
-		this.targets = {
-			docParts: [],
-			include: []
-		};
+		this.localAssetsPath = config.get('output.localResources', path.join(__dirname, '../../assets'));
 
-		this.localAssetsPath = path.join(__dirname, '../../assets');
-		// list of folders under "assets" to be included
-		this.assetFolders = ['css', 'fonts', 'images', 'docs'];
 		// TODO just pull this from assetFolders...will need to grab before starting to generate various files...maybe at beginning of process
-		this.stylesheets = ['css/base.css', 'css/style.css', 'css/fonts.css'];
+		this.stylesheets = config.get('bookOptions.stylesheets', ['css/base.css', 'css/style.css', 'css/fonts.css']);
 
 		this._written = new Set();
 
-		this.concurrency = 1;
+		this.concurrency = config.get('output.diskConcurrency', 1);
 	}
 	get author() {
 		return this._author.join(', ');
 	}
 	get authors() {
 		return this._author || [''];
+	}
+	set author(val) {
+		this.authors = [].concat(val);
 	}
 	set authors(val) {
 		if (!val) {
@@ -219,6 +218,49 @@ class Book {
 			console.warn(`unable to create dir ${outDir}`);
 		}
 	}
+	/**
+	 *
+	 * @param {{url: string, id?: string, remote?: boolean, filename?: string, requestOptions?: any }[]} list
+	 */
+	async addRemoteResources(list = this.options.additionalResources) {
+		const {concurrency} = this;
+		await pMap(list, async item => {
+			try {
+				const {
+					url,
+					id,
+					remote,
+					requestOptions = {}
+				} = item;
+
+				const {
+					filename = path.basename(url || '') || id
+				} = item;
+
+				let content;
+				if (!remote) {
+					// TODO ideally we'd just write straight to disk
+					const resp = await got(url, {
+						encoding: null,
+						...requestOptions
+					});
+					content = resp.body;
+				}
+				const r = new Resource({
+					url,
+					content,
+					id,
+					filename,
+					save: !remote,
+					remote: !!remote
+				});
+				this.resources.push(r);
+				console.log(`REMOTE RESOURCE: ADDED ${r.bookPath}`);
+			} catch (err) {
+				console.warn(`REMOTE RESOURCE: FAILED ${item && item.url}`, err);
+			}
+		}, {concurrency});
+	}
 	async addLocalResources(localPath = this.localAssetsPath) {
 		const {concurrency} = this;
 		// HACK direct file copy would be a better option than reading into memory
@@ -231,13 +273,14 @@ class Book {
 			const dirListing = await fs.promises.readdir(localPath, { withFileTypes: true });
 			const subFolders = dirListing
 				.filter(dir => {
-					return dir.isDirectory && this.assetFolders.includes(dir.name);
+					return dir.isDirectory();
 				});
 			localFiles = [];
 			await pMap(subFolders, async dirent => {
 				const dir = path.join(localPath, dirent.name);
 				// NOTE no try/catch...?...
 				const files = await fs.promises.readdir(dir);
+				// QUESTION do we need to filter out thumbs / ds_config files?
 				localFiles.push(...files.map(f => path.join(dir, f)));
 			}, {concurrency});
 		} catch (err) {
@@ -246,6 +289,10 @@ class Book {
 		}
 		await pMap(localFiles, async file => {
 			try {
+				// skip junk files
+				if (junk.is(file)) {
+					return;
+				}
 				const content = await fs.promises.readFile(file);
 				const basename = path.basename(file);
 				const r = new Resource({
@@ -272,7 +319,10 @@ class Book {
 		}
 
 		// console.log('Reading local resources');
-		await this.addLocalResources();
+		await Promise.all([
+			this.addLocalResources(),
+			this.addRemoteResources()
+		]);
 
 		// console.log('Writing epub skeleton');
 		await this.writeMetaResources(destination);

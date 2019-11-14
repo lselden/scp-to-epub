@@ -1,6 +1,6 @@
 {
   "name": "scp-to-epub",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Generate ebooks from scp foundation wiki articles",
   "main": "index.js",
   "types": "index.d.ts",
@@ -15,8 +15,12 @@
   "dependencies": {
     "archiver": "^3.1.1",
     "color": "^3.1.2",
+    "dot-prop": "^5.2.0",
+    "get-stream": "^5.1.0",
     "got": "^9.6.0",
     "gray-matter": "^4.0.2",
+    "js-yaml": "^3.13.1",
+    "junk": "^3.1.0",
     "markdown-it": "^10.0.0",
     "mime": "^2.4.4",
     "p-map": "^3.0.0",

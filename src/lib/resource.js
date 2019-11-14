@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const urlLib = require('url');
 const mime = require('mime');
 const sharp = require('sharp');
+const config = require('../book-config');
 
 function uuid() {
 	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -19,6 +20,11 @@ function md5(text) {
 function safeName(str) {
 	return str.replace(/[<>:"\/\\|?*\x00-\x1F]/g, '_');
 }
+
+const folders = config.get('output.folders');
+const defaultOrigin = config.get('discovery.defaultOrigin', 'http://www.scp-wiki.net');
+const defaultUrlObj = urlLib.parse(defaultOrigin);
+
 /**
  *
  */
@@ -34,7 +40,6 @@ class Resource {
 	 * @param {string[]} [opts.from]
 	 * @param {boolean} [opts.save]
 	 * @param {boolean} [opts.remote]
-	 * @param {object} [opts.folders]
 	 * @param {boolean} [opts.excludeFromManifest]
 	 * @param {string[]} [opts.aliases]
 	 * @param {number} [opts.depth]
@@ -54,8 +59,6 @@ class Resource {
 		this.from = [];
 		/** @type {boolean} */
 		this.save;
-		/** @type {object} */
-		this.folders;
 		/** @type {string} */
 		this.bookPath;
 		/** @type {string} */
@@ -74,7 +77,6 @@ class Resource {
 			from = [],
 			save = false,
 			remote = false,
-			folders = Resource.folders,
 			excludeFromManifest = false,
 			depth = 0,
 			aliases = []
@@ -90,7 +92,7 @@ class Resource {
 
 		this.mimeType = this.mimeType.replace(/; charset=.*/, '');
 
-		Object.assign(this, {url, content, folders, excludeFromManifest, aliases, depth});
+		Object.assign(this, {url, content, excludeFromManifest, aliases, depth});
 		this.addBacklinks(...from);
 
 		this.save = !!save;
@@ -197,25 +199,40 @@ class Resource {
 			(this.isFont && 'fonts') ||
 			(this.isDoc && 'docs') ||
 			'default';
-		return path.posix.join(this.folders[key], this.filename).replace(/^\//, '');
+		return path.posix.join(folders[key], this.filename).replace(/^\//, '');
 	}
 	async compress(options = {}) {
 		const {
+			compress = true,
+			convertSVG = true,
 			width = 768,
 			height = 1024,
-			fit = 'inside',
 			quality = 70,
-			preventUpscale = true,
 			// 1mb
-			maxSize = 1024 * 1024
-		} = options;
+			maxSize = 1024 * 1024,
+			resizeOptions
+		} = config.util.extendDeep(
+			{
+				resizeOptions: {
+					fit: 'inside',
+					withoutEnlargement: true
+				}
+			},
+			config.get('output.images'),
+			options
+		);
+
+		// skip compression if specified.
+		if (!compress) {
+			return;
+		}
 
 		// ignore non-images
 		if (!this.isImage) {
 			return;
 		}
 		// don't convert svg files
-		if (/svg/.test(this.extension)) {
+		if (!convertSVG && /svg/.test(this.extension)) {
 			return;
 		}
 
@@ -229,11 +246,13 @@ class Resource {
 		// const meta = await sharp(this.content).metadata();
 		// }
 
+		const forcePng = /svg|gif|png|mng|apng/i.test(this.extension);
+
 		await new Promise((resolve, reject) => {
 			sharp(this.content)
-				.resize(width, height, { fit, withoutEnlargement: preventUpscale})
-				.jpeg({ quality, force: false })
-				.png({ force: false })
+				.resize(width, height, resizeOptions)
+				.jpeg({ quality, force: !forcePng })
+				.png({ force: forcePng })
 				.toBuffer((err, data, info) => {
 					if (err) {
 						reject(err);
@@ -269,36 +288,33 @@ class Resource {
 		}
 		return new Resource(opts);
 	}
-	static asCanononical(url, defaultOrigin) {
+	static asCanononical(url) {
+		if (url instanceof Resource) {
+			return url.canononicalUrl;
+		}
+
 		if (url instanceof URL) {
 			url = urlLib.parse(`${url}`);
 		}
 		if (typeof url === 'string') {
 			url = urlLib.parse(url);
 		}
-		if (url instanceof Resource) {
-			return url.canononicalUrl;
-		}
+
+		// assign defaults
+		url = {
+			...defaultUrlObj,
+			...url
+		};
+
 		// TODO FIXME HACK
 		if (url.host === 'scp-wiki.wikidot.com') {
-			url.host = /scp-wiki/.test(defaultOrigin) ? defaultOrigin : 'www.scp-wiki.net';
+			url.host = /scp-wiki/.test(defaultUrlObj.host) ? defaultUrlObj.host : 'www.scp-wiki.net';
 		}
 
-		// TODO need to normalize around using URL vs urlLib.parse
-		if (!url.host && defaultOrigin) {
-			const tmp = urlLib.parse(defaultOrigin);
-			url.host = tmp.host || tmp.path;
-		}
-		return `${url.host || ''}${url.pathname}`;
+		return `${url.protocol || 'http:'}//${url.host || ''}${url.pathname}`;
 	}
-	static get folders() {
-		return {
-			css: 'css',
-			fonts: 'fonts',
-			images: 'images',
-			docs: '',
-			default: ''
-		}
+	get properties() {
+		return this.id === 'cover-image' ? ['cover-image'] : [];
 	}
 }
 

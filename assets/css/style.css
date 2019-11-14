@@ -23,9 +23,12 @@
 /* .toc-chapter {} */
 
 .chapter-header {
-    margin-top: 2.4em;
+    margin-top: 1.8em;
+    margin-bottom: 1.8em;
     text-align: center;
+    page-break-inside: avoid;
     page-break-after: always;
+    break-inside: avoid;
     break-after: always;
 }
 
@@ -37,6 +40,8 @@
 
 .chapter-footer {
     text-align: center;
+    page-break-after: always;
+    break-after: always;
 }
 
 /* for doc parts they should break after the section, not the header */
@@ -53,26 +58,32 @@
 #page-title {
     font-size: 200%;
     font-weight: bold;
-    margin-top: 3.6em;
-    margin-bottom: 0;
 }
-#page-title + [role="doc-subtitle"] {
-    margin-top: 0;
+
+/* .chapter-header > [role="doc-subtitle"] {
     font-size: 150%;
-    margin-bottom: 1.8em;
+} */
+
+.chapter-header #page-title, .chapter-header [role="doc-subtitle"] {
+	margin-bottom: 0;
+	text-align: center;
+}
+
+/* smush header and subheader together */
+.chapter-header #page-title + [role="doc-subtitle"],
+.chapter-header [role="doc-subtitle"] + #page-title {
+    margin-top: 0;
+    margin-bottom: 1.2em;
 }
 
 .chapter-meta ul, .chapter-meta ol {
     list-style-type: none;
     margin: 0;
     padding: 0;
-    /* display: flex;
-    flex-wrap: wrap;
-    flex-direction: row; */
+    font-size: small;
 }
 .chapter-meta li, .chapter-meta li {
     display: block;
-    /* flex: auto; */
     padding: 0 5%;
     width: 24em;
     min-width: 50%;
@@ -82,18 +93,18 @@
     margin: 0 auto;
 }
 
-/* @media (min-width: 48em) {
-    .chapter-meta li:nth-child(2n + 1) {
-        text-align: right;
-    }
-    .chapter-meta li:nth-child(2n) {
-        text-align: left;
-    }
-    .chapter-meta li:nth-child(2n + 1):last-child {
-        text-align: center;
+@supports (display: grid) {
+    .chapter-meta ul {
+        display: grid;
+        grid-template-columns: max-content;
+        justify-content: center;
     }
 
-} */
+    .chapter-meta li {
+        width: 100%;
+        white-space: pre;
+    }
+}
 
 .offset-item {
     clear: both;
@@ -152,6 +163,10 @@ figcaption {
     min-width: 50%;
 }
 
+.cover-image img {
+    max-height: 90vh;
+}
+
 /* .scp-image-block.epub-figure-right { min-width: 50%; }
 .epub-figure.scp-image-block.epub-figure-left { min-width: 50%; } */
 
@@ -178,7 +193,7 @@ figcaption {
 }
 
 .epub-tab-head {
-    border: 2pt solid currentColor;
+    border: 1pt solid currentColor;
     border-bottom: none;
     border-radius: 1ex 1ex 0 0;
     padding: 0.125em 0.5em;
@@ -264,7 +279,7 @@ s::after { content: " [strikeout end] "; }
 
 .epub-collapse-header [role="doc-subtitle"] {
     display: inline-block;
-    font-size: 0.8125em;
+    font-size: small;
     word-break: break-word;
 }
 

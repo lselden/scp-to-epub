@@ -1,4 +1,7 @@
+const config = require('../book-config');
 const {filenameForUrl, escape} = require('../lib/utils');
+
+const defaultOrigin = config.get('discovery.defaultOrigin', 'http://www.scp-wiki.net');
 
 function genSystemChapterHeader(chapter, config = {}) {
 	const {
@@ -14,17 +17,17 @@ function genSystemChapterHeader(chapter, config = {}) {
  *
  * @param {import('../lib/chapter')} chapter
  * @param {{url: string, title: string}[]} audioAdaptations
- * @param {import('../..').BookOptions} config
+ * @param {import('../..').BookOptions} options
  */
-function genChapterHeader(chapter, audioAdaptations = [], config = {}) {
+function genChapterHeader(chapter, audioAdaptations = [], options = {}) {
 	const {
 		stats,
 		url,
-		links = []
+		forwardLinks: links = []
 	} = chapter;
 
 	if (chapter.isSystemPage) {
-		return genSystemChapterHeader(chapter, config);
+		return genSystemChapterHeader(chapter, options);
 	}
 
 	/** @type {Date | undefined} */
@@ -39,7 +42,7 @@ function genChapterHeader(chapter, audioAdaptations = [], config = {}) {
 		showRating = true,
 		includeAudioAdaptations = true,
 		includeReferences = false
-	} = config;
+	} = options;
 
 	const rows = [];
 
@@ -61,27 +64,41 @@ function genChapterHeader(chapter, audioAdaptations = [], config = {}) {
 		rows.push(['', '(Heritage Collection)']);
 	}
 
-	if (links && (links.length > 0) && includeReferences) {
-		rows.push(['Referenced By', `<ul id="internal-references" style="list-style-type: none;">${links.map(link => `<li><a href="${link.url}">Back to ${escape(link.title)}</a></li>`).join('')}</ul>`]);
-	}
+	// TODO fix References ....
+	// if (links && (links.length > 0) && includeReferences) {
+	// 	rows.push(['Referenced By', `<ul id="internal-references" style="list-style-type: none;">${
+	// 		links.map(link => {
+	// 			if (typeof link === 'string') {
+	// 				const u = new URL(link, defaultOrigin);
+	// 				link = {
+	// 					url: u.pathname,
+	// 					title: u.pathname.slice(1)
+	// 				};
+	// 			}
+	// 			return `<li><a href="${link.url}">Back to ${link.titleHTML}</a></li>`
+	// 		})
+	// 		.join('')
+	// 	}</ul>`]);
+	// }
 
 	const {altTitle = ''} = stats;
 
 	return `<header class="chapter-header chapter-meta">
+		<p><br /></p>
 		<h1 id="page-title">${escape(stats.title || stats.pageName)}</h1>
 		<p role="doc-subtitle">${escape(stats.altTitle || '')}</p>
 		<aside>
 			<ul>${
 				rows
-					.map(([key, value]) => `<li>${key ? `<b>${escape(key)}:</b>` : ''} ${value}&#160;</li>`)
+					.map(([key, value]) => `<li>${key ? `<b>${escape(key)}:</b>` : ''} ${value}</li>`)
 					.join('')
-			}</ul>
-			<p><cite><a href="${url}" data-external="true">Original Version</a></cite></p>${
+			}<li><cite><a href="${url}" data-external="true">Original Version</a></cite></li>
+			</ul>${
 				(
 					audioAdaptations &&
 					(audioAdaptations.length > 0) &&
 					includeAudioAdaptations
-				) ? `<h3>Audio Adaptations</h3><ul>${
+				) ? `<h3 class="align-center">Audio Adaptations</h3><ul>${
 					audioAdaptations.map(x => {
 						return `<li><a href="${x.url}">${escape(x.title)}</a>&#160;</li>`;
 					}).join('')
