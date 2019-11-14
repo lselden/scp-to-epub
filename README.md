@@ -1,11 +1,11 @@
 # scp-to-epub
+## THE BOOKS
+If you just want to download some eBooks head to the [releases](https://github.com/lselden/scp-to-epub/releases) page.
 
 ## DESCRIPTION
 This is a web scraper that generates ebooks from pages on the [SCP Foundation Wiki](http://www.scp-wiki.net/). It uses a headless browser ([puppeteer](https://github.com/GoogleChrome/puppeteer/)) to load pages, formats the pages to be e-reader friendly, then compiles them into an EPUB-format ebook.
 
-
 ## INSTRUCTIONS
-If you just want to download some eBooks head to the [releases](https://github.com/lselden/scp-to-epub/releases) page.
 
 * Install [node.js](https://nodejs.org/en/) **tested on node v12 only*
 * Download/fork this repository.
@@ -40,7 +40,7 @@ will reload overrides / styles).
 
 
 ## FEATURES
-* **Hidden Content:** Includes hidden content that's missed using simple text scraping. This tool captures text hidden in collapsible blocks, tab views, iframe content, and *some* interactive content (like list-items/fragments).
+* **Hidden Content:** Includes hidden content that's missed using simple text scraping, like a browser's "reader" mode. This tool captures text hidden in collapsible blocks, tab views, iframe content, and *some* interactive content (like list-items/fragments).
 * **Cross-link friendly:** Automatically includes related content. Will pull linked pages into the Appendix.
 * **Night Mode:** Cleans up text/background colors. In iOS iBooks app it has some additional intelligence about keeping colors while keeping text legible.
 * **TTS friendly** - uses semantic HTML markup, to improve text-to-speech parsing.
@@ -54,6 +54,11 @@ will reload overrides / styles).
 * I've tested with a couple of different eReaders, but not all of them. Created epub files pass [epubcheck](https://github.com/w3c/epubcheck), though they may have some warnings. I doubt Apple or Amazon would accept them for publishing as-is.
 * Some pages might not parse correctly. Add a javascript file to the `overrides` folder with the same name as the article to apply any manual cleanup to get a page to load.
 * This is a side project. It isn't polished.
+
+## CONTRIBUTING
+
+If you see any formatting or other errors in the ebooks then please open a Github [Issue](https://github.com/lselden/scp-to-epub/issues/new). Same for if you have an idea for a new collection of articles that should be included as an ebook.
+
 
 ## CREDITS
 * EPUB generation inspired by [epub-gen](https://github.com/cyrilis/epub-gen)
