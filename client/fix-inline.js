@@ -129,7 +129,6 @@ export function fixTT() {
 
 export function revealHiddenText() {
 	helpers.$$('[style*=font-size]').forEach(el => {
-console.log('hi fontsize', el.style.fontSize);
 		const [_, raw, unit] = (el.style.fontSize.match(/([\d.]+)(.+)/) || []);
 		if (raw === undefined) {
 			return;
@@ -140,7 +139,6 @@ console.log('hi fontsize', el.style.fontSize);
 			(/px|pt/.test(unit) && num < 15) ||
 			(/em|ex|rem/.test(unit) && num < 0.66)
 		);
-console.log('hi hidden', num, isHidden);
 		if (isHidden) {
 			el.style.fontSize = '';
 			el.classList.add('hidden-text');

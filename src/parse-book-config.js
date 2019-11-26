@@ -1,12 +1,19 @@
 const fs = require('fs');
 const matter = require('gray-matter');
 const MarkdownIt = require('markdown-it');
+const markdownItAttrs = require('markdown-it-attrs');
 const genDocPart = require('./templates/doc-part.xhtml');
 const DocPart = require('./lib/doc-part');
 
 const md = new MarkdownIt({
 	html: true,
 	xhtmlOut: true
+});
+
+md.use(markdownItAttrs, {
+	leftDelimiter: '{',
+	rightDelimiter: '}',
+	allowedAttributes: []
 });
 
 function renderMarkdown(raw) {

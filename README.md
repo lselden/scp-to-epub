@@ -23,9 +23,13 @@ node index.js --page scp-049 --max-depth 2 --appendix-depth-cutoff 1 --max-chapt
 ```
 
 ### Create a book from a template file
+Book templates are written in Markdown format with YAML front-matter.
+
 ```sh
 node index.js --book "books/antimemetics-division.md" --output "~/Documents/scp-antimemetics.epub"
 ```
+
+*TIP: Parsing is done with the [MarkdownIt](https://github.com/markdown-it/markdown-it) library, with the [markdown-it-attrs](https://github.com/arve0/markdown-it-attrs) extension*
 
 ### Preview how a page will look when formatted
 ```sh
