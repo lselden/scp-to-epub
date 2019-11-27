@@ -35,9 +35,9 @@ class WikiDataLookup {
 			headless: false,
 			debug: true,
 			audioAdaptationsUrl: `${new URL('printer--friendly/audio-adaptations', defaultOrigin)}`,
-			hubsUrl: `${new URL('system:page-tags/tag/hub', defaultOrigin)}`,
-			authorsUrl: `${new URL('system:page-tags/tag/author', defaultOrigin)}`,
-			artworkUrl: `${new URL('system:page-tags/tag/artwork', defaultOrigin)}`,
+			hubsUrl: `${new URL('/system:page-tags/tag/hub', defaultOrigin)}`,
+			authorsUrl: `${new URL('/system:page-tags/tag/author', defaultOrigin)}`,
+			artworkUrl: `${new URL('/system:page-tags/tag/artwork', defaultOrigin)}`,
 			ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36',
 			...opts,
 			cache: cacheOpts

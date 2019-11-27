@@ -120,6 +120,11 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 			type: 'boolean',
 			default: config.get('options.showRating')
 		})
+		.option('remoteImages', {
+			describe: 'Do not store images in ebook.',
+			type: 'boolean',
+			default: config.get('output.images.remote', false)
+		})
 		.option('onlyZip', {
 			type: 'boolean',
 			describe: 'Only zip up temp directory contents into epub'
@@ -160,6 +165,7 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		maxChapters,
 		maxDepth,
 		keepTempFiles,
+		remoteImages,
 		output
 	} = argv;
 
@@ -183,7 +189,10 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 			maxDepth
 		},
 		output: {
-			keepTempFiles
+			keepTempFiles,
+			images: {
+				remote: remoteImages
+			}
 		},
 		browser: {
 			headless: !showBrowser,

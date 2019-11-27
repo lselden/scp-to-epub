@@ -42,6 +42,10 @@ config.util.defaults({
 		},
 		images: {
 			/**
+			 * set to true to not store images
+			 */
+			remote: false,
+			/**
 			 * skip compression. NOTE: this won't convert webp/other non-compatible types
 			 */
 			compress: true,
@@ -74,9 +78,9 @@ config.util.defaults({
 		exclude: [],
 		defaultOrigin,
 		audioAdaptationsUrl: `${new URL('printer--friendly/audio-adaptations', defaultOrigin)}`,
-		hubsUrl: `${new URL('system:page-tags/tag/hub', defaultOrigin)}`,
-		authorsUrl: `${new URL('system:page-tags/tag/author', defaultOrigin)}`,
-		artworkUrl: `${new URL('system:page-tags/tag/artwork', defaultOrigin)}`
+		hubsUrl: `${new URL('printer--friendly/system:page-tags/tag/hub', defaultOrigin)}`,
+		authorsUrl: `${new URL('printer--friendly/system:page-tags/tag/author', defaultOrigin)}`,
+		artworkUrl: `${new URL('printer--friendly/system:page-tags/tag/artwork', defaultOrigin)}`
 	},
 	browser: {
 		headless: false,

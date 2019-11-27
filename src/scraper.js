@@ -109,6 +109,10 @@ class Scraper {
 			hooks: config.get('hooks')
 		},
 		opts);
+
+		if (this.options.remoteImages === undefined) {
+			this.options.remoteImages = config.get('output.images.remote', false);
+		}
 	}
 	/**
 	 *
@@ -183,7 +187,11 @@ class Scraper {
 			}
 
 			// only downloading images at this time
-			if (resource.isImage || resource.isDataUrl) {
+			if (
+				(resource.isImage || resource.isDataUrl) &&
+				// don't download if explicitly set to not cache images
+				!this.options.remoteImages
+			) {
 				try {
 					resource.content = await res.buffer();
 				} catch (err) {
@@ -266,6 +274,7 @@ class Scraper {
 		// run client-side javascript
 		await this.formatPage(page);
 		// replace remaining images with local paths
+		// if remoteimages is set then will still make sure they're absolute urls
 		await this.switchImagesToLocal(page);
 
 		const stats = await this.getStats(page);
@@ -377,6 +386,9 @@ class Scraper {
 				if (!resource) {
 					return false;
 				}
+				if (this.options.remoteImages) {
+					return false;
+				}
 				resource.save = true;
 
 				// moved compression to here to make sure filetype conversion gets handled
@@ -476,6 +488,8 @@ class Scraper {
 		}
 	}
 	async switchImagesToLocal(page) {
+		const {defaultOrigin} = this.options;
+
 		if (!page._pageBindings || !page._pageBindings.has('keepThisImage')) {
 			await page.exposeFunction('keepThisImage', async url => {
 				let response = this.cache.get(url);
@@ -507,6 +521,12 @@ class Scraper {
 						return url;
 					}
 				}
+				//don't store locally if configured
+				if (this.options.remoteImages) {
+					// url is already absolute
+					return url;
+				}
+
 				response.save = true;
 
 				// moved compression to here to make sure filetype conversion gets handled
