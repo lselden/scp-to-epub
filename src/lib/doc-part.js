@@ -1,6 +1,7 @@
 const Chapter = require('./chapter');
 const {safeFilename} = require('./utils');
 const config = require('../book-config');
+const {CacheEnum} = require('./resource');
 
 class DocPart extends Chapter {
 	constructor(opts = {}) {
@@ -26,7 +27,7 @@ class DocPart extends Chapter {
 			url: `${origin}/__${filename}`,
 			id: basename,
 			mimeType: 'application/xhtml+xml',
-			save: true,
+			cache: CacheEnum.local,
 			depth: 0
 		});
 		super(resourceOpts);

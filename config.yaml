@@ -1,0 +1,83 @@
+### Config file
+### set defaults and overrides here
+### NOTE: config format may change in the future
+metadata:
+    title: ''
+    lang: 'en'
+    publisher: 'SCP Foundation'
+    author: 'SCP Foundation'
+    creator: 'scp-epub-gen'
+input:
+  customCSS: ''
+  additionalResources: []
+  wikidot: true
+  autoLoad: undefined
+output:
+  #path: './output'
+  #tempDir: './output'
+  #localResources: './assets'
+  ### clear temp folder contents before running
+  cleanTempFolder: true
+  ### keep temp folder after converting to ebook
+  keepTempFiles: true
+  images:
+    ### set to true to not store images. Note this isn't very compatible with most ebook readers
+    remote: false
+    ### compress images. NOTE: if disabled this won't convert webp/other non-compatible types
+    compress: true
+    ### max width of images
+    width: 768
+    ### max height of images
+    height: 1024
+    ### JPEG conversion quality
+    quality: 70
+    ### convert SVG to png. Recommended
+    convertSVG: true
+    ### sharp library advanced options
+    resizeOptions:
+      fit: 'inside'
+      withoutEnlargement: true
+  diskConcurrency: 1
+bookOptions:
+  appendixDepthCutoff: 2
+  showRating: true
+  includeAudioAdaptations: true
+  hideSupplemental: true
+  tocTitle: 'Table Of Contents'
+  prefaceTitle: 'Preface'
+discovery:
+  maxChapters: 50
+  maxDepth: 2
+  include: []
+  exclude: []
+  # defaultOrigin: 'http://scp-wiki.net'
+browser:
+  headless: true
+  debug: false
+  width: 768
+  height: 1024
+  timeout: 600000
+  ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'
+cover:
+  path: ''
+  url: ''
+  width: 1600
+  height: 2560
+  templateHTML: ''
+preProcess:
+  concurrency: 1
+  closeTabs: true
+  skipMetaDepth: 1
+postProcess:
+  concurrency: 3
+static:
+  enabled: true
+  prefix: '__epub__'
+  # root: '.'
+  cache: true
+cache:
+  stats: true
+  pages: true
+  # path: './cache'
+  # 30 * 24 * 60 * 60 * 1000
+  maxAge: 2592000000

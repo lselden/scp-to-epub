@@ -82,11 +82,12 @@ function genChapterHeader(chapter, audioAdaptations = [], options = {}) {
 	// }
 
 	const {altTitle = ''} = stats;
+	const title = stats.title || stats.pageName || '';
 
 	return `<header class="chapter-header chapter-meta">
 		<p><br /></p>
-		<h1 id="page-title">${escape(stats.title || stats.pageName)}</h1>
-		<p role="doc-subtitle">${escape(stats.altTitle || '')}</p>
+		<h1 id="page-title">${escape(title)}</h1>
+		<p role="doc-subtitle">${escape(altTitle)}</p>
 		<aside>
 			<ul>${
 				rows

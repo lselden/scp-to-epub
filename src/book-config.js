@@ -113,6 +113,7 @@ config.util.defaults({
 	},
 	cache: {
 		stats: true,
+		pages: true,
 		path: path.join(__dirname, '../cache'),
 		maxAge: 30 * 24 * 60 * 60 * 1000
 	},

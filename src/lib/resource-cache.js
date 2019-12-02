@@ -68,17 +68,17 @@ class ResourceCache {
 		const canononicalUrl = Resource.asCanononical(url);
 		const toRemove = [...this.cache.values()]
 			.filter(r => {
-				if ((r.save || r.isDoc || r.remote) && !forceClearSaved) {
+				if (!r.isDisposable && !forceClearSaved) {
 					return false;
 				}
 				if (onlyWithContent && !r.content) {
 					return false;
 				}
-				return (
-					// r.canononicalUrl === url ||
-					// r.url === url ||
-					r.from.includes(canononicalUrl)
-				);
+				if (!r.from.includes(canononicalUrl)) {
+					return false;
+				}
+
+				return true;
 			});
 		toRemove.forEach(resource => {
 			this.cache.delete(resource.canononicalUrl);

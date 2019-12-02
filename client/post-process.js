@@ -67,31 +67,36 @@ async function registerRemote(doc, originalUrl) {
 	// COMBAK this is not a smart way/place to do this
 	const mediaElements = [...doc.querySelectorAll('audio[src], video[src], object[src], img[src], iframe[src]')];
 	for (let el of mediaElements) {
-		if (!el.src) {
-			continue;
-		}
-
-		const urlObj = new URL(el.src, 'http://__');
-		let href = urlObj.toString();
-
-		// relative path, so ignore
-		if (urlObj.origin === baseUrl) {
-			continue;
-		}
-
-		// REVIEW
-		if (el.dataset.external === 'false' || el.rel === 'nofollow') {
-			continue;
-		}
-
-		// @ts-ignore
-		if (typeof window.registerRemoteResource === 'function') {
-			// @ts-ignore
-			const canononicalUrl = await window.registerRemoteResource(href, originalUrl);
-			// make sure redirected content use the same url
-			if (canononicalUrl !== href) {
-				el.src = canononicalUrl;
+		try {
+			if (!el.src) {
+				continue;
 			}
+
+			const urlObj = new URL(el.src, 'http://__');
+			let href = urlObj.toString();
+
+			// relative path, so ignore
+			// if (urlObj.origin === baseUrl) {
+			// 	continue;
+			// }
+
+			// REVIEW
+			if (el.dataset.external === 'false' || el.rel === 'nofollow') {
+				continue;
+			}
+
+
+			// @ts-ignore
+			if (typeof window.registerRemoteResource === 'function') {
+				// @ts-ignore
+				const canononicalUrl = await window.registerRemoteResource(href, originalUrl);
+				// make sure redirected content use the same url
+				if (canononicalUrl !== href) {
+					el.src = canononicalUrl;
+				}
+			}
+		} catch (err) {
+			console.warn('Failed to process media element', err);
 		}
 	}
 

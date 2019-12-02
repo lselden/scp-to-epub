@@ -8,6 +8,8 @@ const Chapter = require('./lib/chapter');
 const Link = require('./lib/link');
 const {safeFilename, filenameForUrl} = require('./lib/utils');
 
+const {CacheEnum} = Resource;
+
 /** @typedef {import("puppeteer").Browser} Browser */
 /** @typedef {import("puppeteer").Page} Page */
 /** @typedef {import("puppeteer").Request} Request */
@@ -255,7 +257,7 @@ class Scraper {
 				filename: filenameForUrl(payload.url, '.xhtml'),
 				// hardcode as doc link
 				mimeType,
-				save: false
+				cache: CacheEnum.none
 			});
 			this.cache.set(linkResource);
 			forwardLinks.set(Resource.asCanononical(payload.url), payload.title);
@@ -287,7 +289,7 @@ class Scraper {
 			id: safeFilename(stats.pageName),
 			depth,
 			url,
-			save: true,
+			cache: CacheEnum.local,
 			content,
 			links: forwardLinks,
 			from: backlinks,
@@ -386,12 +388,16 @@ class Scraper {
 				if (!resource) {
 					return false;
 				}
+
 				if (this.options.remoteImages) {
-					return false;
+					resource.setRemote();
+					return;
 				}
-				resource.save = true;
+
+				resource.setLocal();
 
 				// moved compression to here to make sure filetype conversion gets handled
+				// REVIEW keeping compression here so possible to register arbitrary resources
 				try {
 					// COMBAK TODO allow for different options
 					await resource.compress();
@@ -488,11 +494,29 @@ class Scraper {
 		}
 	}
 	async switchImagesToLocal(page) {
-		const {defaultOrigin} = this.options;
+		const imageUrls = await page.$$eval('img', images => {
+			return images
+				.map(/** @type {HTMLImageElement} */(el) => {
+					// ignore invalid images
+					if (!el.src) {
+						return;
+					}
+					try {
+						// @ts-ignore
+						const urlObj = new URL(el.src, window.location.href);
+						const absUrl = urlObj.toString();
+						el.src = absUrl;
+						return absUrl;
+					} catch (err) {
+						console.error('Error handling image', err);
+					}
+				})
+				.filter(x => x);
+		});
 
-		if (!page._pageBindings || !page._pageBindings.has('keepThisImage')) {
-			await page.exposeFunction('keepThisImage', async url => {
-				let response = this.cache.get(url);
+		for (let imageUrl of imageUrls) {
+			try {
+				let response = this.cache.get(imageUrl);
 				if (!response) {
 					// force image to download, response handler should catch it and put in cache
 					await page.evaluateHandle(async src => {
@@ -507,63 +531,32 @@ class Scraper {
 							img.onerror = reject;
 							img.src = src;
 						});
-					}, url);
+					}, imageUrl);
 
 					// this is not a good guarantee...maybe use Canvas to directly create new resource?
 					response = (
-						this.cache.get(url) ||
-						this.cache.get(url.replace('www.scp-wiki.net', 'scp-wiki.wdfiles.com'))
+						this.cache.get(imageUrl) ||
+						this.cache.get(imageUrl.replace('www.scp-wiki.net', 'scp-wiki.wdfiles.com'))
 					);
 
 					if (!response) {
 						// throw new Error(`No asset found for ${url}`);
-						console.warn(`No asset found for ${url}`);
-						return url;
+						console.warn(`No asset found for ${imageUrl}`);
+						continue;
 					}
 				}
 				//don't store locally if configured
 				if (this.options.remoteImages) {
-					// url is already absolute
-					return url;
+					// QUESTION: force = true?
+					response.setRemote(true);
+				} else {
+					// setting to Maybe, because post-processing will confirm it should be saved
+					response.cache = CacheEnum.maybe;
 				}
-
-				response.save = true;
-
-				// moved compression to here to make sure filetype conversion gets handled
-				try {
-					// COMBAK TODO allow for different options
-					await response.compress();
-				} catch (err) {
-					console.warn(`Failed to compress response - ${err}`);
-				}
-
-				return response.bookPath;
-			});
+			} catch (err) {
+				console.warn('Error marking images for caching', err);
+			}
 		}
-
-		await page.$$eval('img', async images => {
-			const out = [];
-			await Promise.all(images.map(async el => {
-				// ignore invalid images
-				// @ts-ignore
-				if (!el.src) {
-					return;
-				}
-				try {
-					// @ts-ignore
-					const urlObj = new URL(el.src, window.location.href);
-					const absUrl = urlObj.toString();
-					// tell puppeteer to keep
-					// @ts-ignore
-					const newSrc = await window.keepThisImage(absUrl);
-					// NOTE may cause 404, hope that's okay!
-					// @ts-ignore
-					el.src = newSrc;
-				} catch (err) {
-					console.error('Error handling image', err);
-				}
-			}));
-		});
 	}
 	async getTags(page) {
 		const tags = await page.$$eval('#page-content ~ .page-tags a', anchors => {
@@ -694,81 +687,6 @@ class Scraper {
 			return false;
 		}
 		return this.wikiLookup.hasMetaTag(tags);
-	}
-	// TODO this is crap...remove
-	async coverFromHtml(html, width = 768, height = 1024) {
-		const page = await this.browser.newPage();
-		await page.setViewport({ width, height, deviceScaleFactor: 1});
-		await page.setContent(html, {
-			waitUntil: ['load', 'domcontentloaded', 'networkidle2']
-		});
-		// COMBAK set size? set format as jpeg/png omitBackground?
-		const imageData = await page.screenshot({
-			type: 'png',
-			fullPage: true,
-			omitBackground: true,
-			// clip: { x: 0, y: 0, width, height }
-		});
-
-		const resource = new Resource({
-			id: 'cover-image',
-			url: `http://localhost/cover.png`,
-			content: imageData,
-			filename: 'cover-image.png',
-			save: true
-		});
-		this.cache.set(resource);
-		await page.close();
-	}
-	// TODO remove in favor of wiki lookup
-	async getLinksFromUrl(url, selector = 'body', sameDomain = true) {
-		const page = await this.browser.newPage();
-		await page.goto(url, { waitUntil: 'load', timeout: this.options.browser.timeout });
-		const result = await this.getLinksFromPage(page, selector);
-		await page.close();
-		return result;
-	}
-	// TODO remove in favor of wiki lookup
-	async getLinksFromPage(page, selector = 'body', sameDomain = true) {
-		const results = await page.$eval(selector, (el, sameDomain) => {
-			const base = document.location;
-			const links = el.querySelectorAll('a[href]');
-			return [...links]
-				.map(e => {
-					const href = e.href;
-					console.log('checking link', href);
-					if (/^javascript:/.test(href)) {
-						return false;
-					}
-					try {
-						const u = new URL(href, base.href);
-						// skip invalid
-						if (!/http/.test(u.protocol)) {
-							return false;
-						}
-
-						const isSame = u.origin === base.origin;
-						// go ahead and return local links as local
-						if (isSame) {
-							// why search? why not?
-							//return `${u.pathname}${u.search}${u.hash}`;
-						}
-
-						// don't include if restricting to same domain only
-						if (sameDomain && !isSame) {
-							return false;
-						}
-
-						return href;
-					} catch (err) {
-						console.warn(`Unable to parse URL ${href}`, err);
-						return false;
-					}
-				})
-				// clear out nulls
-				.filter(x => x);
-		}, sameDomain);
-		return results;
 	}
 	getResources() {
 		return this.cache.getSaved();

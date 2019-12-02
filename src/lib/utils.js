@@ -33,7 +33,7 @@ function safeFilename(str, extension = '') {
 			extension = `.${extension}`;
 		}
 		// remove ext from end before fixing
-		str.replace(new RegExp(`\\${extension}$`), '');
+		str = str.replace(new RegExp(`\\${extension}$`), '');
 	}
 
 	str = str
@@ -52,7 +52,7 @@ function safeFilename(str, extension = '') {
 
 function filenameForUrl(url, extension = '') {
 	const pathname = urlLib.parse(url).pathname;
-	const name = safeFilename(pathname.slice(1));
+	const name = safeFilename(pathname.replace(/^\//, ''));
 	if (!extension) {
 		return name;
 	}
@@ -60,9 +60,21 @@ function filenameForUrl(url, extension = '') {
 	return `${path.basename(name, extension)}${extension}`;
 }
 
+function normalizePath(pathname) {
+	const isExtendedLengthPath = /^\\\\\?\\/.test(pathname);
+	const hasNonAscii = /[^\u0000-\u0080]+/.test(pathname);
+
+	if (isExtendedLengthPath || hasNonAscii) {
+		return pathname;
+	}
+
+	return pathname.replace(/\\/g, '/');
+}
+
 module.exports = {
 	uuid,
 	escape,
 	safeFilename,
-	filenameForUrl
+	filenameForUrl,
+	normalizePath
 };

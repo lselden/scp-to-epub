@@ -36,6 +36,8 @@ class PostProcessor {
 			opts
 		);
 
+		const remoteImages = config.get('output.images.remote', false);
+
 		const {
 			concurrency = 3,
 			appendixDepthCutoff = 3,
@@ -43,6 +45,7 @@ class PostProcessor {
 		} = bookOptions;
 
 		this.options = {
+			remoteImages,
 			customCSS: config.get('input.customCSS'),
 			concurrency,
 			stylesheets,
@@ -61,26 +64,37 @@ class PostProcessor {
 			}
 			return href;
 		});
-		this.page.exposeFunction('registerRemoteResource', (resourceUrl, originalUrl) => {
-			const chapter = this.cache.get(originalUrl);
-			if (!chapter) {
-				console.warn(`Unable to find chapter resource for ${originalUrl} when registering ${resourceUrl}`);
-			} else {
-				/** @type {import("./lib/chapter")} */(chapter).hasRemoteResources = true;
-			}
+		this.page.exposeFunction('registerRemoteResource', async (resourceUrl, originalUrl) => {
 			let resource = this.cache.get(resourceUrl);
+			// if no resource already then just mark as remote
 			if (!resource) {
 				resource = new Resource({
-					url: resourceUrl,
-					save: false,
-					remote: true
+					url: resourceUrl
 				});
 				this.cache.set(resource);
-			} else if (!(resource.save && resource.content)) {
-				resource.remote = true;
 			}
+
+			// check if should be stored locally
+			if (resource.isImage && resource.content && !this.options.remoteImages) {
+				resource.setLocal();
+				// COMBAK QUESTION pass configurable options?
+				await resource.compress();
+			}
+
+			if (!resource.shouldWrite) {
+				resource.setRemote();
+			}
+
 			resource.addBacklinks(originalUrl);
-			return resource.url;
+
+			const chapter = /** @type {import("./lib/chapter")} */(this.cache.get(originalUrl));
+			if (!chapter) {
+				console.warn(`Unable to find chapter resource for ${originalUrl} when registering ${resourceUrl}`);
+			} else if (!resource.shouldWrite) {
+				chapter.hasRemoteResources = true;
+			}
+
+			return resource.shouldWrite ? resource.bookPath : resource.url;
 		});
 		// QUESTION REVIEW should this just be for debug mode?
 		this.page.on('console', msg => {
@@ -199,6 +213,86 @@ class PostProcessor {
 			footer: genChapterFooter(bookLinks, externalLinks, bookOptions)
 		};
 	}
+	// async switchImagesToLocal(page = this.page) {
+	// 	const {defaultOrigin} = this.options;
+
+	// 	// @ts-ignore
+	// 	if (!page._pageBindings || !page._pageBindings.has('keepThisImage')) {
+	// 		await page.exposeFunction('keepThisImage', async url => {
+	// 			let response = this.cache.get(url);
+	// 			if (!response) {
+	// 				// force image to download, response handler should catch it and put in cache
+	// 				await page.evaluateHandle(async src => {
+	// 					return new Promise((resolve, reject) => {
+	// 						const img = new Image();
+	// 						img.onload = () => {
+	// 							if (img.naturalWidth === 0) {
+	// 								return reject(new Error('Image unreadable'));
+	// 							}
+	// 							resolve();
+	// 						};
+	// 						img.onerror = reject;
+	// 						img.src = src;
+	// 					});
+	// 				}, url);
+
+	// 				// this is not a good guarantee...maybe use Canvas to directly create new resource?
+	// 				response = (
+	// 					this.cache.get(url) ||
+	// 					this.cache.get(url.replace('www.scp-wiki.net', 'scp-wiki.wdfiles.com'))
+	// 				);
+
+	// 				if (!response) {
+	// 					// throw new Error(`No asset found for ${url}`);
+	// 					console.warn(`No asset found for ${url}`);
+	// 					return url;
+	// 				}
+	// 			}
+	// 			//don't store locally if configured
+	// 			if (this.options.remoteImages) {
+	// 				response.setRemote();
+	// 				// url is already absolute
+	// 				return url;
+	// 			}
+
+	// 			response.setLocal();
+
+	// 			// moved compression to here to make sure filetype conversion gets handled
+	// 			try {
+	// 				// COMBAK TODO allow for different options
+	// 				await response.compress();
+	// 			} catch (err) {
+	// 				console.warn(`Failed to compress response - ${err}`);
+	// 			}
+
+	// 			return response.bookPath;
+	// 		});
+	// 	}
+
+	// 	await page.$$eval('img', async images => {
+	// 		const out = [];
+	// 		await Promise.all(images.map(async el => {
+	// 			// ignore invalid images
+	// 			// @ts-ignore
+	// 			if (!el.src) {
+	// 				return;
+	// 			}
+	// 			try {
+	// 				// @ts-ignore
+	// 				const urlObj = new URL(el.src, window.location.href);
+	// 				const absUrl = urlObj.toString();
+	// 				// tell puppeteer to keep
+	// 				// @ts-ignore
+	// 				const newSrc = await window.keepThisImage(absUrl);
+	// 				// NOTE may cause 404, hope that's okay!
+	// 				// @ts-ignore
+	// 				el.src = newSrc;
+	// 			} catch (err) {
+	// 				console.error('Error handling image', err);
+	// 			}
+	// 		}));
+	// 	});
+	// }
 }
 
 module.exports = PostProcessor;

@@ -251,8 +251,7 @@ class Book {
 					content,
 					id,
 					filename,
-					save: !remote,
-					remote: !!remote
+					cache: remote ? Resource.CacheEnum.remote : Resource.CacheEnum.local
 				});
 				this.resources.push(r);
 				console.log(`REMOTE RESOURCE: ADDED ${r.bookPath}`);
@@ -298,9 +297,9 @@ class Book {
 				const r = new Resource({
 					url: `http://localhost/${basename}`,
 					content,
-					filename: basename,
-					save: true
+					filename: basename
 				});
+				r.setLocal();
 				this.resources.push(r);
 			} catch (err) {
 				console.error('failed reading local file', file, err);

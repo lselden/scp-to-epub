@@ -25,6 +25,16 @@ const folders = config.get('output.folders');
 const defaultOrigin = config.get('discovery.defaultOrigin', 'http://www.scp-wiki.net');
 const defaultUrlObj = urlLib.parse(defaultOrigin);
 
+/** @typedef {'local' | 'remote' | 'none' | 'maybe'} CacheType */
+
+/** @type {{local: 'local', remote: 'remote', none: 'none', maybe: 'maybe'}} */
+const CacheEnum = {
+	local: 'local',
+	remote: 'remote',
+	none: 'none',
+	maybe: 'maybe'
+};
+
 /**
  *
  */
@@ -38,6 +48,7 @@ class Resource {
 	 * @param {string} [opts.filename]
 	 * @param {string} [opts.mimeType]
 	 * @param {string[]} [opts.from]
+	 * @param {CacheType} [opts.cache]
 	 * @param {boolean} [opts.save]
 	 * @param {boolean} [opts.remote]
 	 * @param {boolean} [opts.excludeFromManifest]
@@ -57,8 +68,6 @@ class Resource {
 		this.mimeType;
 		/** @type {string[]} */
 		this.from = [];
-		/** @type {boolean} */
-		this.save;
 		/** @type {string} */
 		this.bookPath;
 		/** @type {string} */
@@ -67,6 +76,8 @@ class Resource {
 		this.aliases;
 		/** @type {number} */
 		this.depth;
+		/** @type {CacheType} */
+		this.cache;
 
 		let {
 			url = '',
@@ -75,8 +86,9 @@ class Resource {
 			filename,
 			mimeType,
 			from = [],
-			save = false,
-			remote = false,
+			cache = CacheEnum.none,
+			save = undefined,
+			remote = undefined,
 			excludeFromManifest = false,
 			depth = 0,
 			aliases = []
@@ -92,11 +104,17 @@ class Resource {
 
 		this.mimeType = this.mimeType.replace(/; charset=.*/, '');
 
-		Object.assign(this, {url, content, excludeFromManifest, aliases, depth});
+		Object.assign(this, {url, content, excludeFromManifest, aliases, depth, cache});
 		this.addBacklinks(...from);
 
-		this.save = !!save;
-		this.remote = !!remote;
+		// backwards compatibility just in case
+		if (save !== undefined) {
+			this.save = !!save;
+		}
+		if (remote !== undefined) {
+			this.remote = !!remote;
+		}
+
 		// TODO wrap mime so it doesn't come up with stupid extensions
 		this.extension = (mime.getExtension(this.mimeType) || '')
 			.replace('jpeg', 'jpg')
@@ -143,8 +161,19 @@ class Resource {
 		}
 
 		this.depth = Math.min(this.depth, that.depth);
-		this.save = this.save || that.save;
-		this.remote = this.remote || that.remote;
+
+		if (this.cache === that.cache) {
+			// ignore
+		} else if ([this.cache, that.cache].includes(CacheEnum.local)) {
+			this.cache = CacheEnum.local;
+		} else if ([this.cache, that.cache].includes(CacheEnum.remote)) {
+			this.cache = CacheEnum.remote;
+		} else {
+			this.cache = CacheEnum.none;
+		}
+
+		// this.save = this.save || that.save;
+		// this.remote = this.remote || that.remote;
 		return this;
 	}
 	/**
@@ -178,10 +207,13 @@ class Resource {
 		return /html|xml/.test(this.mimeType);
 	}
 	get shouldWrite() {
-		return this.save && !!this.content && !this.isDataUrl;
+		return (this.cache === CacheEnum.local) && !!this.content && !this.isDataUrl;
 	}
 	get shouldIncludeInManifest() {
-		return this.shouldWrite || this.remote;
+		return this.shouldWrite || this.cache === CacheEnum.remote;
+	}
+	get isDisposable() {
+		return this.cache === CacheEnum.none;
 	}
 	get isPlaceholder() {
 		return this.isDoc && !this.content;
@@ -192,6 +224,40 @@ class Resource {
 	set filename(val) {
 		this._filename = val;
 		this.bookPath = this._getBookPath();
+	}
+	get save() {
+		console.trace('DEPRECIATED - getting save on resource');
+		return this.cache !== CacheEnum.local;
+	}
+	set save(val) {
+		console.trace('DEPRECIATED - setting save on resource');
+		if (val) {
+			this.cache = CacheEnum.local;
+		} else if (this.cache !== CacheEnum.remote) {
+			this.cache = CacheEnum.none;
+		}
+	}
+	get remote() {
+		console.trace('DEPRECIATED - setting "remote" on resource');
+		return this.cache === CacheEnum.remote;
+	}
+	set remote(val) {
+		console.trace('DEPRECIATED - setting "remote" on resource');
+		if (val) {
+			this.cache = CacheEnum.remote;
+		} else if (this.cache !== CacheEnum.local) {
+			this.cache = CacheEnum.none;
+		}
+	}
+	setLocal() {
+		this.cache = CacheEnum.local;
+	}
+	setRemote(force = false) {
+		// don't set remote if already set to local
+		if (this.shouldWrite && !force) {
+			return;
+		}
+		this.cache = CacheEnum.remote;
 	}
 	_getBookPath() {
 		const key = (this.isImage && 'images') ||
@@ -315,6 +381,9 @@ class Resource {
 	}
 	get properties() {
 		return this.id === 'cover-image' ? ['cover-image'] : [];
+	}
+	static get CacheEnum() {
+		return CacheEnum;
 	}
 }
 

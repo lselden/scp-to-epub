@@ -101,7 +101,7 @@ ${
 					if (!asset.shouldIncludeInManifest) {
 						return;
 					}
-					const href = asset.remote ? asset.url : bookPath;
+					const href = asset.shouldWrite ? bookPath : asset.url;
 					// remote-resources, cover-image, scripted, nav
 					const props = (Array.isArray(properties) && properties.length && properties[0]) ? `properties="${properties.join(' ')}"` : '';
 					return `\t\t<item id="${id}" href="${href}" media-type="${mimeType}" ${props} />`;

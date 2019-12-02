@@ -5,6 +5,7 @@ const urlLib = require('url');
 const {safeFilename} = require('./lib/utils');
 const scpperDB = require('./scpper-db');
 const Resource = require('./lib/resource');
+const DiskCache = require('./lib/disk-cache');
 const {systemLinks, systemPrefixes, metaTags} = require('./system-links');
 
 function isEmpty(arr) {
@@ -42,6 +43,13 @@ class WikiDataLookup {
 			...opts,
 			cache: cacheOpts
 		};
+
+		if (this.options.cache.stats) {
+			this.diskCache = new DiskCache({
+				...cacheOpts,
+				cacheInMemory: true
+			});
+		}
 	}
 	async initialize() {
 		// not actually necessary if loading lazily
@@ -55,34 +63,57 @@ class WikiDataLookup {
 			return;
 		}
 
+		await this.diskCache.initialize();
+
 		this.statCache = new Map();
+
 		try {
-			// make sure directory exists
-			await fs.mkdir(this.options.cache.path, {recursive: true});
-			const statFiles = await fs.readdir(this.options.cache.path, { withFileTypes: true });
-			for (let file of statFiles) {
-				// only valid entries
-				if (!file.isFile || !file.name.endsWith('.json')) {
-					continue;
+			this.diskCache._cache.forEach((value, diskKey) => {
+				if (!diskKey.endsWith('.json')) {
+					return;
 				}
-				const pageId = file.name.split('_')[0];
-				this.statCache.set(pageId, file.name);
-			}
+				if (path.dirname(diskKey) !== 'stats') {
+					return;
+				}
+				const [pageId] = path.basename(value.path)
+					.split('_');
+				this.statCache.set(pageId, diskKey);
+			});
+			// const statsPath = path.join(this.options.cache.path, 'stats');
+			// // make sure directory exists
+			// await fs.mkdir(statsPath, {recursive: true});
+			// const statFiles = await fs.readdir(statsPath, { withFileTypes: true });
+			// for (let file of statFiles) {
+			// 	// only valid entries
+			// 	if (!file.isFile || !file.name.endsWith('.json')) {
+			// 		continue;
+			// 	}
+			// 	const pageId = file.name.split('_')[0];
+			// 	this.statCache.set(pageId, file.name);
+			// }
 		} catch (err) {
 			console.warn('Unable to load stats cache', err);
 		}
 	}
 	async saveCachedStats(stats) {
-		stats.lastCached = new Date();
-		// make name safe
 		const filename = `${stats.id}_${stats.pageName}.json`
 			.replace(/[ <>():"\/\\|?*\x00-\x1F]/g, '_');
-		const filepath = path.join(this.options.cache.path, filename);
-		try {
-			await fs.writeFile(filepath, JSON.stringify(stats, null, '  '));
-		} catch (err) {
-			console.warn('failed to write stats to cache', err);
-		}
+		const content = JSON.stringify(stats, null, '  ');
+
+		await this.diskCache.set(path.join('stats', filename), content);
+
+		// const statsPath = path.join(this.options.cache.path, 'stats');
+
+		// stats.lastCached = new Date();
+		// // make name safe
+		// const filename = `${stats.id}_${stats.pageName}.json`
+		// 	.replace(/[ <>():"\/\\|?*\x00-\x1F]/g, '_');
+		// const filepath = path.join(statsPath, filename);
+		// try {
+		// 	await fs.writeFile(filepath, JSON.stringify(stats, null, '  '));
+		// } catch (err) {
+		// 	console.warn('failed to write stats to cache', err);
+		// }
 	}
 	async getCachedStats(pageId) {
 		const cacheOpts = this.options.cache;
@@ -92,22 +123,33 @@ class WikiDataLookup {
 		if (!this.statCache) {
 			await this.loadCache();
 		}
+
 		//  make sure in cache
-		const filename = this.statCache.get(`${pageId}`.replace(/[ <>():"\/\\|?*\x00-\x1F]/g, '_'));
-		if (!filename) {
+		const diskId = path.join('stats', `${pageId}`.replace(/[ <>():"\/\\|?*\x00-\x1F]/g, '_'));
+
+		const cacheEntry = await this.diskCache.get(diskId);
+
+		if (!cacheEntry) {
 			return;
 		}
-		try {
-			const raw = await fs.readFile(path.join(cacheOpts.path, filename));
-			const stats = JSON.parse(raw.toString());
-			const age = (new Date()).getTime() - (new Date(stats.lastCached)).getTime();
-			// don't return if stale
-			if (age <= cacheOpts.maxAge) {
-				return stats;
-			}
-		} catch (err) {
-			console.warn(`Failed to get cache data for ${pageId}`, err);
-		}
+
+		return cacheEntry.content;
+
+		// if (!filename) {
+		// 	return;
+		// }
+		// const statsPath = path.join(this.options.cache.path, 'stats');
+		// try {
+		// 	const raw = await fs.readFile(path.join(statsPath, filename));
+		// 	const stats = JSON.parse(raw.toString());
+		// 	const age = (new Date()).getTime() - (new Date(stats.lastCached)).getTime();
+		// 	// don't return if stale
+		// 	if (age <= cacheOpts.maxAge) {
+		// 		return stats;
+		// 	}
+		// } catch (err) {
+		// 	console.warn(`Failed to get cache data for ${pageId}`, err);
+		// }
 	}
 	async getStats(pageName, pageId) {
 		const {stats: cacheEnabled} = this.options.cache;
