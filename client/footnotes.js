@@ -18,7 +18,7 @@ export default function () {
 	const endnotes = [];
 	const footrefs = $$('sup.footnoteref');
 	const randId = rand().slice(0,4);
-	footrefs.forEach(ref => {
+	[...footrefs].reverse().forEach(ref => {
 		const refA = ref.querySelector(':scope > a.footnoteref');
 		const footnote = document.getElementById(refA.id.replace('footnoteref', 'footnote'));
 		const noteNumber = refA.innerText;
@@ -47,7 +47,7 @@ export default function () {
 
 			const content = footnote.innerHTML.replace(/^\./, '');
 
-			endnotes.push({
+			endnotes.unshift({
 				targetId,
 				refId,
 				noteNumber,

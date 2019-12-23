@@ -28,7 +28,8 @@ class BookMaker {
 	/**
 	 *
 	 * @param {import('..').Book | import('..').BookOptions} book
-	 * @param {import('..').BookMakerConfig} opts
+	 * @param {import('..').BookMakerConfig} [opts]
+	 * @param {Browser} [browser]
 	 */
 	constructor(book, opts = {}, browser) {
 		/** @type {Browser} */
@@ -129,7 +130,7 @@ class BookMaker {
 		const shouldLoad = config.get('input.autoLoad');
 
 		// TODO REVIEW
-		if (this.options.bookOptions && shouldLoad) {
+		if (shouldLoad && this.options.bookOptions) {
 			await this.loadBook(this.options.bookOptions);
 		}
 		// await this.wikiLookup.initialize();

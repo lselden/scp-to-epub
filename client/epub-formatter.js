@@ -30,6 +30,7 @@ import cleanTagPage from './clean-tag-page.js';
 import inlineIframes from './inline-iframes.js';
 import fixMedia from './fix-media.js';
 import cleanForumPage from './clean-forum-post.js';
+import detectChat from './detect-chat.js';
 
 function moveMain() {
 	const origEl = document.querySelector(`#${config.mainContentId}`);
@@ -70,7 +71,7 @@ function fixVoiceover() {
 		if (!/Item\s*#:?\s*$/i.test(el.textContent)) {
 			return;
 		}
-		el.style.speak = 'literal-punctuation';
+		el.style.speakAs = 'literal-punctuation';
 		// el.setAttribute('role', 'text');
 		// el.setAttribute('aria-label', 'Item Number');
 
@@ -82,7 +83,7 @@ function fixVoiceover() {
 		const text = el.nextSibling.textContent;
 		const newEl = document.createElement('span');
 		// @ts-ignore
-		newEl.style.speak = 'spell-out';
+		newEl.style.speakAs = 'spell-out';
 		// newEl.setAttribute('role', 'text');
 		// newEl.setAttribute('aria-label', `${text.replace(/(\d)/g, '$1 ')}`);
 		newEl.textContent = text;
@@ -158,6 +159,7 @@ function addNamespaces() {
 		{name: 'fix-anom-bar', fn: anomBar},
 		{name: 'uncollapse', fn: uncollapse},
 		{name: 'uncollapse-colmod', fn: uncollapseColmod},
+		{name: 'detect-chat', fn: detectChat},
 		// {name: '', fn: fixRating},
 		{name: 'make-header-h1', fn: fixHeader},
 		{name: 'fix-tabviews', fn: fixTabs},

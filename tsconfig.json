@@ -2,17 +2,18 @@
   "compilerOptions": {
     "module": "commonjs",
     "esModuleInterop": true,
-    "target": "es6",
+    "target": "ES2018",
     "checkJs": true,
     "allowJs": true,
     "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "downlevelIteration": true
   },
   "exclude": [
     "node_modules"
   ],
-  "lib": ["es2015"],
+  "lib": ["es2017"],
   "compileOnSave": true,
   "typeAcquisition": {"enable": true}
 }

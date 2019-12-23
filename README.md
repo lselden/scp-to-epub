@@ -1,6 +1,6 @@
 # scp-to-epub
 ## THE BOOKS
-If you just want to download some eBooks head to the [releases](https://github.com/lselden/scp-to-epub/releases) page.
+If you just want to download some eBooks head to the [releases](https://github.com/lselden/scp-to-epub/releases) page. Or check out an online version here: [pixel art collab](https://lselden.github.io/scp-to-epub/pixel-art-collab)
 
 ## DESCRIPTION
 This is a web scraper that generates ebooks from pages on the [SCP Foundation Wiki](http://www.scp-wiki.net/). It uses a headless browser ([puppeteer](https://github.com/GoogleChrome/puppeteer/)) to load pages, formats the pages to be e-reader friendly, then compiles them into an EPUB-format ebook.

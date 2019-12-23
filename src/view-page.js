@@ -1,13 +1,15 @@
 const path = require('path');
 const Book = require('./lib/book');
 const BookMaker = require('./book-maker');
-
+const config = require('./book-config');
 
 module.exports = async function testPage (urls, cfg = {}) {
 	const {
 		waitTime = 500,
 		defaultOrigin = 'http://www.scp-wiki.net'
 	} = cfg;
+
+	config.set('input.autoLoad', false);
 
 	if (!Array.isArray(urls)) {
 		urls = [urls];
