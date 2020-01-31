@@ -52,7 +52,7 @@ async function makeCover(browser, opts = {}) {
 		mimeType: mime.getType(imagePath || imageUrl) || mime.getType(format),
 		content,
 		aliases: ['http://localhost/cover-image'],
-		save: true
+		cache: 'local'
 	});
 
 	// nothing else to do

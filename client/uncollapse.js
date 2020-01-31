@@ -94,6 +94,9 @@ export function uncollapseColmod(target) {
 			unfolded = { innerText: ''  }
 		] = [...$$(titleEl, 'a')];
 
+		const contents = [...$$(block, ':scope .colmod-content')]
+			.filter(el => el.closest('.colmod-block') === block);
+
 		const newEl = makeCollapseSection(folded.innerText, unfolded.innerText, contents);
 
 		block.replaceWith(newEl);

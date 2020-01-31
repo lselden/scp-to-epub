@@ -175,7 +175,7 @@ export function annotateRedacted(el = document.body) {
 
 export function annotateBlackbox(el = document.body) {
 	helpers.$$(el, '.bblock, .dblock').forEach(block => {
-		const newEl = helpers.replaceWith(block, 'mark');
+		const newEl = helpers.switchTag(block, 'mark');
 		newEl.className = `${block.className} blackbox`;
 	});
 }

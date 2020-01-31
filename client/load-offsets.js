@@ -74,11 +74,10 @@ async function getOffsetContent(url) {
 	return listBox;
 }
 
-async function appendOffset(linkEl) {
+export async function appendOffset(linkEl) {
 	const {url, i, offsetId, pageName} = parseLink(linkEl, document.location);
 
 	const content = await getOffsetContent(url);
-
 	const skeleton = document.createElement('section');
 	skeleton.className = 'offset-item';
 	skeleton.innerHTML = `<h2 id="${offsetId}">${pageName} Offset ${i}</h2>`;

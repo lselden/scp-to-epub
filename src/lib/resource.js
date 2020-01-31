@@ -226,11 +226,11 @@ class Resource {
 		this.bookPath = this._getBookPath();
 	}
 	get save() {
-		console.trace('DEPRECIATED - getting save on resource');
+		console.trace('DEPRECIATED - getting save on resource - use "cache" instead');
 		return this.cache !== CacheEnum.local;
 	}
 	set save(val) {
-		console.trace('DEPRECIATED - setting save on resource');
+		console.trace('DEPRECIATED - setting save on resource - use "cache" instead');
 		if (val) {
 			this.cache = CacheEnum.local;
 		} else if (this.cache !== CacheEnum.remote) {
@@ -238,11 +238,11 @@ class Resource {
 		}
 	}
 	get remote() {
-		console.trace('DEPRECIATED - setting "remote" on resource');
+		console.trace('DEPRECIATED - setting "remote" on resource - use "cache" instead');
 		return this.cache === CacheEnum.remote;
 	}
 	set remote(val) {
-		console.trace('DEPRECIATED - setting "remote" on resource');
+		console.trace('DEPRECIATED - setting "remote" on resource - use "cache" instead');
 		if (val) {
 			this.cache = CacheEnum.remote;
 		} else if (this.cache !== CacheEnum.local) {
