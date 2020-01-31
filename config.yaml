@@ -11,7 +11,7 @@ input:
   customCSS: ''
   additionalResources: []
   wikidot: true
-  autoLoad: undefined
+  #autoLoad: 
 output:
   #path: './output'
   #tempDir: './output'

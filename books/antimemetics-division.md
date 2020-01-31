@@ -45,6 +45,7 @@ exclude: []
 *   [CASE HATE RED](/case-hate-red)
 *   [Ará Orún](/ara-orun)
 *   [Unthreaded](/unthreaded)
+*   [Wild Light](/the-wild-light)
 *   to be continued
 
 ## _What the Dead Know_ by sirpudding (2018)
@@ -77,4 +78,6 @@ exclude: []
 *   [SCP-3959](/scp-3959) by Billith
 *   [SCP-3959 (LEVEL 5 CLEARANCE)](/scp-3959-restricted) by Billith
 *   [SCP-3002](/scp-3002) by MayD
+*   [SCP-3664](/scp-3664) by NatVoltaic
+*   [SCP-4937](/scp-4937) by Lt Flops
 *   **[All pages tagged "antimemetic"](http://www.scp-wiki.net/system:page-tags/tag/antimemetic)**
