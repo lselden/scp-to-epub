@@ -8,6 +8,6 @@ export default {
 		});
 	},
 	async afterParse() {
-		console.log('after');
+
 	}
 }
