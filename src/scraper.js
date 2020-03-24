@@ -528,7 +528,7 @@ class Scraper {
 								}
 								resolve();
 							};
-							img.onerror = reject;
+							img.onerror = evt => reject(new Error('Network failure'));
 							img.src = src;
 						});
 					}, imageUrl);
@@ -554,7 +554,7 @@ class Scraper {
 					response.cache = CacheEnum.maybe;
 				}
 			} catch (err) {
-				console.warn('Error marking images for caching', err);
+				console.warn(`Error marking image for caching ${imageUrl}`, err);
 			}
 		}
 	}
