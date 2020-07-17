@@ -40,15 +40,21 @@ output:
   diskConcurrency: 1
 bookOptions:
   appendixDepthCutoff: 2
+  ### whether to include rating info in book
   showRating: true
+  ### whether to include detected audio links
   includeAudioAdaptations: true
   hideSupplemental: true
   tocTitle: 'Table Of Contents'
   prefaceTitle: 'Preface'
 discovery:
+  ### default # of additional articles to pull
   maxChapters: 50
+  ### how far down to follow the rabbit - 2 = main page -> linked articles -> linked articles
   maxDepth: 2
+  ### default include these articles 
   include: []
+  ### default never include these articles
   exclude: []
   # defaultOrigin: 'http://scp-wiki.net'
 browser:
@@ -65,10 +71,12 @@ cover:
   height: 2560
   templateHTML: ''
 preProcess:
+  ### how many pages to scrape in parallel I found errors when I did more than one at a time on the wikidot side
   concurrency: 1
   closeTabs: true
   skipMetaDepth: 1
 postProcess:
+  ### number of pages to run in parallel when sanitizing xml and adding internal links
   concurrency: 3
 static:
   enabled: true
@@ -76,8 +84,12 @@ static:
   # root: '.'
   cache: true
 cache:
+  ### cache statistics pages, otherwise pull each time
   stats: true
+  ### cache pages. Set to false to pull fresh copies each time
   pages: true
+  ### path to put cached content
   # path: './cache'
-  # 30 * 24 * 60 * 60 * 1000
-  maxAge: 2592000000
+  ### cache files for this long (in milliseconds). Default is 4 months
+  # 4 * 30 * 24 * 60 * 60 * 1000
+  maxAge: 10368000000

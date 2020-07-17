@@ -76,7 +76,8 @@ const systemLinks = [
 	"tales-by-date",
 	"reviewers-spotlight-archive",
 	"144-hour-jam-contest",
-	"event-featured-archive"
+	"event-featured-archive",
+	"licensing-master-list"
 ];
 
 const systemPrefixes = [
