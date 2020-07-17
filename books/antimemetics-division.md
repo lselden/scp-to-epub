@@ -29,13 +29,25 @@ exclude: []
 *   [SCP-055](/scp-055)
 
 ## _There Is No Antimemetics Division_ by qntm (2015)
+
+This story is complete.
+
 *   [We Need To Talk About Fifty-Five](/we-need-to-talk-about-fifty-five)
 *   [Introductory Antimemetics](/introductory-antimemetics)
 *   [Unforgettable, That's What You Are](/unforgettable-that-s-what-you-are)
 *   [CASE COLOURLESS GREEN](/case-colourless-green)
 *   [Your Last First Day](/your-last-first-day)
 
-## _Five Five Five Five Five_ by qntm (2017–)
+## Interlude
+
+Read this before _Five Five Five Five Five_.
+
+*   [SCP-2256](/scp-2256)
+
+
+## _Five Five Five Five Five_ by qntm (2017–2020)
+
+This story is a direct sequel to _There Is No Antimemetics Division_. This story is complete.
 
 *   [SCP-3125](/scp-3125)
 *   [Where Have You Been All My Life](/where-have-you-been-all-my-life)
@@ -46,9 +58,13 @@ exclude: []
 *   [Ará Orún](/ara-orun)
 *   [Unthreaded](/unthreaded)
 *   [Wild Light](/the-wild-light)
-*   to be continued
+*   [Blood/Brain](/blood-brain)
+*   [Tombstone](/tombstone)
+*   Epilogue: [Champions Of Nothing](/champions-of-nothing)
 
 ## _What the Dead Know_ by sirpudding (2018)
+
+This is a side story mostly taking place during and after _There Is No Antimemetics Division_.
 
 *   [SCP-2111](/scp-2111) (2015)
 *   [In the Trenches with the Dead](/in-the-trenches-with-the-dead)
@@ -59,6 +75,7 @@ exclude: []
 
 *   [Revenants](/revenants) by Photosynthetic
 *   [Eureka](http://www.scp-wiki.net/forum/t-77225/scp-055#post-1532588) by Voct
+*   [Numbers Lie](/numbers-lie) by CityToast
 *   [SCP-2256](/scp-2256) by qntm
 *   [SCP-2358](/scp-2358) by HotCocoaNerd
 *   [SCP-2828](/scp-2828) by ooblex
