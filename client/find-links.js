@@ -20,7 +20,7 @@ export default async function () {
 		el.removeAttribute('onclick');
 	}
 
-	for (let el of helpers.$$('a')) {
+	for (let el of helpers.$$('a:not([rel=nofollow])')) {
 		// no onclicks!
 		el.removeAttribute('onclick');
 		el.removeAttribute('target');
@@ -51,6 +51,7 @@ export default async function () {
 		const isExternal = !checkWhitelist(url);
 		// ignore externl links
 		if (isExternal) {
+			console.debug(`Skipped external link ${url}`)
 			continue;
 		}
 

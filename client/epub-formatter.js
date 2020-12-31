@@ -31,6 +31,7 @@ import inlineIframes from './inline-iframes.js';
 import fixMedia from './fix-media.js';
 import cleanForumPage from './clean-forum-post.js';
 import detectChat from './detect-chat.js';
+import fixLicensing from './fix-licensing.js';
 
 function moveMain() {
 	const origEl = document.querySelector(`#${config.mainContentId}`);
@@ -152,6 +153,7 @@ function addNamespaces() {
 		{name: 'inline-iframes', fn: inlineIframes},
 		{name: 'clean-tag-pages', fn: cleanTagPage},
 		{name: 'clean-forum', fn: cleanForumPage},
+		{name: 'fix-licensing', fn: fixLicensing},
 		{name: 'move-main', fn: moveMain},
 		{name: 'move-breadcrumbs', fn: moveBreadcrumbs },
 		{name: 'remove-cruft', fn: removeUnnecessary},
