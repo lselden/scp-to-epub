@@ -239,7 +239,7 @@ class PostProcessor {
 	// 				// this is not a good guarantee...maybe use Canvas to directly create new resource?
 	// 				response = (
 	// 					this.cache.get(url) ||
-	// 					this.cache.get(url.replace('www.scp-wiki.net', 'scp-wiki.wdfiles.com'))
+	// 					this.cache.get(url.replace('www.scpwiki.com', 'scp-wiki.wdfiles.com'))
 	// 				);
 
 	// 				if (!response) {

@@ -10,7 +10,7 @@ author: 'SCP Foundation'
 appendixDepthCutoff: 1
 maxDepth: 1
 maxChapters: 60
-defaultOrigin: http://www.scp-wiki.net
+defaultOrigin: http://www.scpwiki.com
 exclude: []
 ---
 
@@ -87,7 +87,7 @@ exclude: []
 
 <figcaption class="scp-image-caption">
 
-SCP Chalk Symbols by <a href="http://www.scp-wiki.net/toadking07-art-hub" rel="nofollow">toadking07</a>
+SCP Chalk Symbols by <a href="http://www.scpwiki.com/toadking07-art-hub" rel="nofollow">toadking07</a>
 
 </figcaption>
 </figure>

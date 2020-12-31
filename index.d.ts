@@ -209,7 +209,7 @@ export interface BookMakerConfig extends BookMakerPrivateConfig {
      */
     maxDepth?: number,
     /**
-     * explicitly specify pages to include in book. Can be relative ('taboo') or absolute ('http://www.scp-wiki.net/taboo')
+     * explicitly specify pages to include in book. Can be relative ('taboo') or absolute ('http://www.scpwiki.com/taboo')
      */
     include?: string[],
     /**
@@ -258,7 +258,7 @@ export interface BookMakerConfig extends BookMakerPrivateConfig {
     /**
      * base origin for links - for using with Wanderers library or international sites
      * Changing this is not fully tested
-     * @default http://www.scp-wiki.net
+     * @default http://www.scpwiki.com
      */
     defaultOrigin?: string,
     browser?: Browser

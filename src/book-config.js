@@ -3,7 +3,7 @@
 const path = require('path');
 const config = require('./lib/config');
 
-const defaultOrigin = config.get('discovery.defaultOrigin', 'http://www.scp-wiki.net');
+const defaultOrigin = config.get('discovery.defaultOrigin', 'http://www.scpwiki.com');
 
 config.util.defaults({
 	metadata: {

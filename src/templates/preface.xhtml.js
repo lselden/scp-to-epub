@@ -39,7 +39,7 @@ function genPreface(data, options = {}) {
 			</figure>` : ''
 		}<h1>${escape(prefaceTitle)}</h1>
 		${prefaceHTML || ''}
-		<p>This ebook was auto-generated from content on the <a href="http://scp-wiki.net">SCP Foundation</a> Wiki. Each chapter includes author information and link to the original.</p>
+		<p>This ebook was auto-generated from content on the <a href="${config.get('discovery.defaultOrigin', 'http://www.scpwiki.com')}">SCP Foundation</a> Wiki. Each chapter includes author information and link to the original.</p>
 		<p>Statistics and some other information were gleaned from <a href="https://www.scpper.com">ScpperDB</a>.</p>
 		<p>Unless otherwise stated, all content is licensed under <a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 License</a></p>
 		${(fonts && fonts.length) ? `<p>This ebook is typeset using the fonts ${

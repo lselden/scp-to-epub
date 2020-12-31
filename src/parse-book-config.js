@@ -83,7 +83,7 @@ async function extractDocParts(html, app) {
 	const {options, browser, scraper} = app;
 	const headerSelector = 'h2';
 	const {
-		defaultOrigin = 'http://www.scp-wiki.net'
+		defaultOrigin = 'http://www.scpwiki.com'
 	} = options;
 
 	// const page = await browser.newPage();

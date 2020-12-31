@@ -30,7 +30,7 @@ class WikiDataLookup {
 			...(opts.cache)
 		};
 
-		const defaultOrigin = opts.defaultOrigin || 'http://www.scp-wiki.net';
+		const defaultOrigin = opts.defaultOrigin || 'http://www.scpwiki.com';
 
 		this.options = {
 			headless: false,
@@ -435,7 +435,7 @@ class WikiDataLookup {
 		throw new Error('Not Implemented');
 	}
 	async getLinksByTag(tag) {
-		const url = tag.startsWith('http') ? tag : `http://www.scp-wiki.net/system:page-tags/tag/${tag}`;
+		const url = tag.startsWith('http') ? tag : `http://www.scpwiki.com/system:page-tags/tag/${tag}`;
 		const page = await this.browser.newPage();
 		await page.goto(url, { waitUntil: 'load'});
 		const links = await page.$$eval('#tagged-pages-list .pages-list-item a[href]', links => {

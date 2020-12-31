@@ -4,14 +4,14 @@ cover:
   path: 'books/blackwood_vs_pesterbot.png'
 preface: |
   
-  Cover image by [Junior Psychologist "Chibi" Yamagusuku](http://www.scp-wiki.net/jr-psych-chibis-personnel-file)
+  Cover image by [Junior Psychologist "Chibi" Yamagusuku](http://www.scpwiki.com/jr-psych-chibis-personnel-file)
 language: en
 publisher: 'SCP Foundation'
 author: 'SCP Foundation'
 appendixDepthCutoff: 1
 maxDepth: 2
 maxChapters: 100
-defaultOrigin: http://www.scp-wiki.net
+defaultOrigin: http://www.scpwiki.com
 exclude: []
 ---
 

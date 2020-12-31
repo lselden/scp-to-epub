@@ -7,9 +7,7 @@ const viewPage = require('./src/view-page');
 const {safeFilename} = require('./src/lib/utils');
 
 async function processSingle (urls, cfg, tmpDir, destination) {
-	const {
-		defaultOrigin = 'http://www.scp-wiki.net'
-	} = cfg;
+	const defaultOrigin = cfg.defaultOrigin || config.get('discovery.defaultOrigin', 'http://www.scpwiki.com');
 
 	if (!Array.isArray(urls)) {
 		urls = [urls];

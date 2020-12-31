@@ -60,7 +60,7 @@ Drawn from this discussion page. A wide-swath of content from all corners of the
 
 > I maintain that this should be a benchmark for anyone who wants to write here. It's not overly complicated, it doesn't do more than it needs to, and it's incredibly well written.
 
-[Kalinin's Proposal](http://www.scp-wiki.net/kalinins-proposal) - "Past and Future" by Kalinin
+[Kalinin's Proposal](/kalinins-proposal) - "Past and Future" by Kalinin
 
 > yeah so it's not a true tale. Who cares. In my opinion, it's the best proposal on the site and one of the best series I've read here, ever. There is so much fridge horror here the TV Tropes page should just link to it.
 
@@ -288,7 +288,7 @@ A list of SCPs hand-picked by their authors as being among their best work. Each
 
 > _Do you feel it, Yehezkel? You're starting to forget already._
 
-#10: <a href="http://www.wikidot.com/user:info/leveritas)" rel="nofollow">SCP-4550: An Operational Foundation Site](http://www.scp-wiki.net/scp-4550) by [Leveritas</a>
+#10: <a href="http://www.wikidot.com/user:info/leveritas)" rel="nofollow">SCP-4550: An Operational Foundation Site](/scp-4550) by [Leveritas</a>
 
 > _''I don't remember what my last name is.''_
 

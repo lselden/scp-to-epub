@@ -1,8 +1,6 @@
 const config = require('../book-config');
 const {filenameForUrl, escape} = require('../lib/utils');
 
-const defaultOrigin = config.get('discovery.defaultOrigin', 'http://www.scp-wiki.net');
-
 function genSystemChapterHeader(chapter, config = {}) {
 	const {
 		stats

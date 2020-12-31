@@ -3,7 +3,7 @@
 If you just want to download some eBooks head to the [releases](https://github.com/lselden/scp-to-epub/releases) page. Or check out an online version here: [pixel art collab](https://lselden.github.io/scp-to-epub/pixel-art-collab)
 
 ## DESCRIPTION
-This is a web scraper that generates ebooks from pages on the [SCP Foundation Wiki](http://www.scp-wiki.net/). It uses a headless browser ([puppeteer](https://github.com/GoogleChrome/puppeteer/)) to load pages, formats the pages to be e-reader friendly, then compiles them into an EPUB-format ebook.
+This is a web scraper that generates ebooks from pages on the [SCP Foundation Wiki](http://www.scpwiki.com/). It uses a headless browser ([puppeteer](https://github.com/GoogleChrome/puppeteer/)) to load pages, formats the pages to be e-reader friendly, then compiles them into an EPUB-format ebook.
 
 ## INSTRUCTIONS
 
@@ -16,7 +16,7 @@ This is a web scraper that generates ebooks from pages on the [SCP Foundation Wi
 ### Create a book from a single page: 
 ```sh
 # A page that links to other pages
-node index.js --page "http://www.scp-wiki.net/old-man-in-the-sea-hub" --title "Old Man And The Sea Canon Hub" --output "old-man-in-the-sea.epub"
+node index.js --page "http://www.scpwiki.com/old-man-in-the-sea-hub" --title "Old Man And The Sea Canon Hub" --output "old-man-in-the-sea.epub"
 
 # Or just one article (related links go into Appendix)
 node index.js --page scp-049 --max-depth 2 --appendix-depth-cutoff 1 --max-chapters 20 --output ./output/scp-o49.epub
@@ -33,7 +33,7 @@ node index.js --book "books/antimemetics-division.md" --output "~/Documents/scp-
 
 ### Preview how a page will look when formatted
 ```sh
-node index.js --view "http://www.scp-wiki.net/random:random-scp"
+node index.js --view "http://www.scpwiki.com/random:random-scp"
 ```
 Use this option to load a (non-headless) browser to the specified page. Once the
 page is loaded it will format it for mobile viewing. Clicking on any links will
@@ -48,7 +48,7 @@ will reload overrides / styles).
 * **Cross-link friendly:** Automatically includes related content. Will pull linked pages into the Appendix.
 * **Night Mode:** Cleans up text/background colors. In iOS iBooks app it has some additional intelligence about keeping colors while keeping text legible.
 * **TTS friendly** - uses semantic HTML markup, to improve text-to-speech parsing.
-* **Audio included** - inline audio files are playable (in supported e-readers). Any available [Audio Adaptations](http://www.scp-wiki.net/audio-adaptations) are referenced for each chapter.
+* **Audio included** - inline audio files are playable (in supported e-readers). Any available [Audio Adaptations](http://www.scpwiki.com/audio-adaptations) are referenced for each chapter.
 * **Friendly footnotes** - "fancy"-style popup footnotes for iBooks and some other e-readers
 * **Book Templates** - Create new ebook based on a template, either local (see `books` folder) or [remote](http://scp-sandbox-3.wikidot.com/tmonty).
 
@@ -74,5 +74,5 @@ If you see any formatting or other errors in the ebooks then please open a Githu
 scp-to-epub code is Creative Commons Attribution 3.0 License. Unless otherwise stated, all content within ebooks is licensed under [Creative Commons Attribution-ShareAlike 3.0 License](http://creativecommons.org/licenses/by-sa/3.0/)
 
 ## SIMILAR PROJECTS
-* [SCP Foundation: Ebook edition](http://www.scp-wiki.net/ebooks)
-* [SCP Series Field Manual](http://www.scp-wiki.net/forum/t-12612670/new-scp-001-to-scp-1999-documentation-ebooks#post-4379359)
+* [SCP Foundation: Ebook edition](http://www.scpwiki.com/ebooks)
+* [SCP Series Field Manual](http://www.scpwiki.com/forum/t-12612670/new-scp-001-to-scp-1999-documentation-ebooks#post-4379359)

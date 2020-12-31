@@ -155,9 +155,9 @@ class Scraper {
 		} catch (err) {
 			console.warn('unable to intercept request', err);
 		}
-		if (this.options.preProcess.useWikiDotUrls && url.startsWith('http://www.scp-wiki.net')) {
+		if (this.options.preProcess.useWikiDotUrls && url.startsWith('http://www.scp-wiki.net') || url.startsWith('http://www.scpwiki.com')) {
 			request.continue({
-				url: url.replace('http://www.scp-wiki.net', 'http://scp-wiki.wikidot.com')
+				url: url.replace('http://www.scp-wiki.net', 'http://scp-wiki.wikidot.com').replace('http://www.scpwiki.com', 'http://scp-wiki.wikidot.com')
 			});
 		} else {
 			request.continue();
@@ -328,10 +328,13 @@ class Scraper {
 					return;
 				}
 				let fn = console[type];
-				if (!fn) {
+				if (type === 'timeEnd') {
+					fn = console.debug;
+				} else if (!fn) {
 					console.debug(`invalid console msg type ${type}`);
 					fn = console.log;
 				}
+
 				fn.call(console, msg.text());
 			});
 		}
@@ -536,7 +539,8 @@ class Scraper {
 					// this is not a good guarantee...maybe use Canvas to directly create new resource?
 					response = (
 						this.cache.get(imageUrl) ||
-						this.cache.get(imageUrl.replace('www.scp-wiki.net', 'scp-wiki.wdfiles.com'))
+						this.cache.get(imageUrl.replace('www.scp-wiki.net', 'scp-wiki.wdfiles.com')) ||
+						this.cache.get(imageUrl.replace('www.scpwiki.com', 'scp-wiki.wdfiles.com'))
 					);
 
 					if (!response) {

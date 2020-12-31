@@ -72,8 +72,10 @@ export const links = {
 		'/user:'
 	],
 	whitelist: [
-		/scp-wiki\.net/,
-		/scp.*wikidot\.com$/
+		/scp-wiki\.net$/,
+		/scpwiki\.com$/,
+		/scp.*wikidot\.com$/,
+		/scp-wiki-cn\.org$/
 	]
 };
 

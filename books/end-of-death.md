@@ -3,14 +3,14 @@ title: End of Death
 cover:
   url: http://scp-wiki.wdfiles.com/local--files/end-of-death-hub/big.png
 preface: |
-  Cover image by [Zhange](http://www.scp-wiki.net/zhange-artwork)
+  Cover image by [Zhange](http://www.scpwiki.com/zhange-artwork)
 language: en
 publisher: 'SCP Foundation'
 author: 'SCP Foundation'
 appendixDepthCutoff: 1
 maxDepth: 1
 maxChapters: 100
-defaultOrigin: http://www.scp-wiki.net
+defaultOrigin: http://www.scpwiki.com
 exclude: []
 ---
 > <div style="text-align: center;">
@@ -143,5 +143,5 @@ exclude: []
 *   **[PACKAGE DXV-180294-217](/package-dxv-180294-217)** - by _TheMightyMcB and CrankyMonkey2_
 
 ## Supplemental
-*   [End of Death Hub](http://www.scp-wiki.net/end-of-death-hub)
-*   [View all pages tagged "end-of-death"](http://www.scp-wiki.net/system:page-tags/tag/end-of-death#pages)
+*   [End of Death Hub](http://www.scpwiki.com/end-of-death-hub)
+*   [View all pages tagged "end-of-death"](http://www.scpwiki.com/system:page-tags/tag/end-of-death#pages)

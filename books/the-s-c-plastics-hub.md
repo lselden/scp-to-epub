@@ -8,7 +8,7 @@ author: 'SCP Foundation'
 appendixDepthCutoff: 1
 maxDepth: 2
 maxChapters: 100
-defaultOrigin: http://www.scp-wiki.net
+defaultOrigin: http://www.scpwiki.com
 exclude: []
 ---
 ## S & C Plastics Hub
@@ -54,7 +54,7 @@ exclude: []
 
 [Fools of Us All](/sh-tpost-and-c-plastics-tale) - April 1st is a quiet day.
 
-[I. H. Pickman's Proposal](http://www.scp-wiki.net/i-h-p-proposal)\- The Story of Your Life.
+[I. H. Pickman's Proposal](http://www.scpwiki.com/i-h-p-proposal)\- The Story of Your Life.
 
 [A Christmas Caterwaul](/a-christmas-caterwaul)\- What the Dickens?
 
@@ -131,9 +131,9 @@ exclude: []
 
 [Black Autumn Hub](/black-autumn-hub) - This is a Halloween Sloth's Pit will never forget.
 
-[Black Autumn II: Rise of the Pit Sloth Hub](http://scp-wiki.net/rise-of-the-pit-sloth-hub)— Sloths Creep from Pits
+[Black Autumn II: Rise of the Pit Sloth Hub](http://scpwiki.com/rise-of-the-pit-sloth-hub)— Sloths Creep from Pits
 
-[Black Autumn 3: Discordant Anthology Hub](http://www.scp-wiki.net/discordant-anthology-hub) - Spread of Apples
+[Black Autumn 3: Discordant Anthology Hub](http://www.scpwiki.com/discordant-anthology-hub) - Spread of Apples
 
 Footnotes
 

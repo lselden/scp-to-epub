@@ -3,6 +3,8 @@
 const systemLinks = [
 	// blank is homepage
 	"",
+	"scp-series-6",
+	"scp-series-6-tales-edition",
 	"scp-series-5",
 	"scp-series-5-tales-edition",
 	"scp-series-4",

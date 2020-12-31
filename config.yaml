@@ -56,7 +56,8 @@ discovery:
   include: []
   ### default never include these articles
   exclude: []
-  # defaultOrigin: 'http://scp-wiki.net'
+  ### Origin to use for external links. Could change to https://scp-wiki.wikidot.com or http://scp-wiki.net
+  defaultOrigin: 'http://www.scpwiki.com'
 browser:
   headless: true
   debug: false

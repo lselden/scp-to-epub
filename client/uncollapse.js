@@ -56,13 +56,18 @@ function makeCollapseSection(foldText = '', unfoldText = '', contents = []) {
 	});
 	const isOnlyFirstVerb = unfoldTokens.length === 1;
 
+	const hasUnfolded = !isSame && !isSameSaveFirst;
+
 	// remove "Show", "Open", "Display" etc.
 	if (!isSame && (isSameSaveFirst || isOnlyFirstVerb)) {
 		// NOTE this doesn't maintain exact whitespace (if not just spaces)...I think that's fine
-		foldText = foldTokens.slice(1).join(' ');
+		const newFoldText = foldTokens.slice(1).join(' ');
+		// make sure there's something to display (otherwise 1 word entries will get lost)
+		if (newFoldText || hasUnfolded) {
+			foldText = newFoldText;
+		}
 	}
 
-	const hasUnfolded = !isSame && !isSameSaveFirst;
 	const foldTag = hasUnfolded ? 's' : 'span';
 	newEl.innerHTML = (`
 		<h2 id="${headerId}"

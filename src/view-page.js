@@ -6,7 +6,7 @@ const config = require('./book-config');
 module.exports = async function testPage (urls, cfg = {}) {
 	const {
 		waitTime = 500,
-		defaultOrigin = 'http://www.scp-wiki.net'
+		defaultOrigin = config.get('discovery.defaultOrigin', 'http://www.scpwiki.com')
 	} = cfg;
 
 	config.set('input.autoLoad', false);
@@ -68,6 +68,7 @@ module.exports = async function testPage (urls, cfg = {}) {
 				}
 				console.log(`waiting (${Math.round(waitTime / 1000)}) seconds`);
 				await new Promise(done => setTimeout(done, waitTime));
+				//@ts-ignore
 				await render();
 			}, waitTime);
 			await style(page);

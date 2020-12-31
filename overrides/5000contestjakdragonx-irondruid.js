@@ -23,7 +23,7 @@ export default {
 		newEl.closest('.list-pages-box').appendChild(supplement);
 
 
-		// http://www.scp-wiki.net/5000contestjakdragonx-irondruid/offset/1
+		// http://www.scpwiki.com/5000contestjakdragonx-irondruid/offset/1
 	},
 	async afterParse() {
 		document.querySelectorAll('.hidden-text:empty')

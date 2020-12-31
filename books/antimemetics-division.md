@@ -12,7 +12,7 @@ preface: |
   > Welcome to the Antimemetics Division.
   >
   > No, this is not your first day.
-  > -- [Antimemetics Division Hub](http://www.scp-wiki.net/antimemetics-division-hub)
+  > -- [Antimemetics Division Hub](http://www.scpwiki.com/antimemetics-division-hub)
 
   Cover image by [SunnyClockwork](http://scp-wiki.wikidot.com/sunny-s-black-and-white-art)
 language: en
@@ -21,7 +21,7 @@ author: 'SCP Foundation'
 appendixDepthCutoff: 2
 maxDepth: 2
 maxChapters: 100
-defaultOrigin: http://www.scp-wiki.net
+defaultOrigin: http://www.scpwiki.com
 exclude: []
 ---
 
@@ -74,7 +74,7 @@ This is a side story mostly taking place during and after _There Is No Antimemet
 ## And other stories
 
 *   [Revenants](/revenants) by Photosynthetic
-*   [Eureka](http://www.scp-wiki.net/forum/t-77225/scp-055#post-1532588) by Voct
+*   [Eureka](http://www.scpwiki.com/forum/t-77225/scp-055#post-1532588) by Voct
 *   [Numbers Lie](/numbers-lie) by CityToast
 *   [SCP-2256](/scp-2256) by qntm
 *   [SCP-2358](/scp-2358) by HotCocoaNerd
@@ -97,4 +97,4 @@ This is a side story mostly taking place during and after _There Is No Antimemet
 *   [SCP-3002](/scp-3002) by MayD
 *   [SCP-3664](/scp-3664) by NatVoltaic
 *   [SCP-4937](/scp-4937) by Lt Flops
-*   **[All pages tagged "antimemetic"](http://www.scp-wiki.net/system:page-tags/tag/antimemetic)**
+*   **[All pages tagged "antimemetic"](http://www.scpwiki.com/system:page-tags/tag/antimemetic)**

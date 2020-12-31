@@ -22,7 +22,7 @@ function safeName(str) {
 }
 
 const folders = config.get('output.folders');
-const defaultOrigin = config.get('discovery.defaultOrigin', 'http://www.scp-wiki.net');
+const defaultOrigin = config.get('discovery.defaultOrigin', 'http://www.scpwiki.com');
 const defaultUrlObj = urlLib.parse(defaultOrigin);
 
 /** @typedef {'local' | 'remote' | 'none' | 'maybe'} CacheType */
@@ -373,8 +373,9 @@ class Resource {
 		};
 
 		// TODO FIXME HACK
-		if (url.host === 'scp-wiki.wikidot.com') {
-			url.host = /scp-wiki/.test(defaultUrlObj.host) ? defaultUrlObj.host : 'www.scp-wiki.net';
+		// this is to normalize the URLs to the standard domain
+		if (url.host !== defaultUrlObj.host && /scp-wiki\.wikidot\.com|scpwiki\.com|scp-wiki\.net/.test(url.host)) {
+			url.host = defaultUrlObj.host;
 		}
 
 		return `${url.protocol || 'http:'}//${url.host || ''}${url.pathname}`;
