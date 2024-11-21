@@ -4,6 +4,8 @@ const path = require('path');
 const urlLib = require('url');
 const mime = require('mime');
 const Resource = require('./lib/resource');
+const { getAssetPath } = require('./lib/path-utils');
+const { debug } = require('./lib/utils');
 
 /**
  *
@@ -19,7 +21,7 @@ async function makeCover(browser, opts = {}) {
 		width = 1600,
 		height = 2560,
 		quality = 70,
-		templateHtml = path.join(__dirname, '../client/cover.html'),
+		templateHtml
 	} = opts;
 	let {
 		format = 'jpg'
@@ -68,7 +70,12 @@ async function makeCover(browser, opts = {}) {
 			waitUntil: ['networkidle2']
 		});
 	} else {
-		const html = await fs.readFile(templateHtml);
+        const foundPath = await getAssetPath(templateHtml);
+        if (!foundPath) {
+            throw new Error(`COVER - cannot find specified template cover html ${templateHtml} - try setting absolute path in config.yaml`);
+        }
+        debug(`Loading cover from ${foundPath}`)
+		const html = await fs.readFile(foundPath);
 		await page.setContent(html.toString(), { waitUntil: ['load', 'networkidle0']});
 	}
 	await page.evaluate((author, title) => {

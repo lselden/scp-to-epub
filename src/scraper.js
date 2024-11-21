@@ -6,9 +6,15 @@ const StaticServer = require('./lib/serve-file');
 const Resource = require('./lib/resource');
 const Chapter = require('./lib/chapter');
 const Link = require('./lib/link');
-const {safeFilename, filenameForUrl} = require('./lib/utils');
+const {safeFilename, filenameForUrl, debug} = require('./lib/utils');
 
 const {CacheEnum} = Resource;
+
+/**
+ * @import {Browser, Page, Request, Response} from 'puppeteer'
+ * @import {BookMakerConfig} from '..'
+ * @import BookMaker from './book-maker'
+ */
 
 /** @typedef {import("puppeteer").Browser} Browser */
 /** @typedef {import("puppeteer").Page} Page */
@@ -18,19 +24,22 @@ const {CacheEnum} = Resource;
 class Scraper {
 	/**
 	 *
-	 * @param {import('./book-maker')} app
-	 * @param {import('..').BookMakerConfig} opts
+	 * @param {BookMaker} app
+	 * @param {BookMakerConfig} opts
 	 */
 	constructor(app, opts = {}) {
 		const {
 			browser, cache, wikiLookup
 		} = app;
 
+        /** @type {BookMakerConfig} */
+        this.options;
+
 		this.totalRequests = 0;
 
 		this.initialize(opts);
 
-		this.server = new StaticServer();
+		this.server = new StaticServer(this.options.static);
 
 		/** @type {import("puppeteer").Browser} */
 		this.browser = browser;
@@ -53,7 +62,7 @@ class Scraper {
 			},
 			static: {
 				prefix: '__epub__',
-				root: path.join(__dirname, '..'),
+				// root: path.join(__dirname, '../static'),
 				cache: true
 			},
 			preProcess: {
@@ -164,7 +173,7 @@ class Scraper {
 		}
 	}
 	/**
-	 * @param {import("puppeteer").Response} res
+	 * @param {Response} res
 	 */
 	async interceptResponse(res) {
 		// ignore invalid
@@ -558,7 +567,7 @@ class Scraper {
 					response.cache = CacheEnum.maybe;
 				}
 			} catch (err) {
-				console.warn(`Error marking image for caching ${imageUrl}`, err);
+				console.warn(`Error marking image for caching ${imageUrl} ${err}`);
 			}
 		}
 	}

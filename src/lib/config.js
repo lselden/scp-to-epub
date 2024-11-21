@@ -240,4 +240,27 @@ if (!global[GLOBAL_CONFIG]) {
 
 const config = global[GLOBAL_CONFIG];
 
+config.util.defaults({
+    preProcess: {
+        concurrency: 1,
+        skipMetaDepth: 1
+    },
+    postProcess: {
+        concurrency: 3
+    },
+    useWikiDotUrls: true,
+    cover: {
+        path: '',
+        width: 1600,
+        height: 2560,
+        templateHtml: 'static/cover.html'
+    },
+    static: {
+        prefix: '__epub__',
+        root: 'static',
+        cache: true,
+    },
+    ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
+});
+
 module.exports = config;

@@ -13,7 +13,7 @@ class ResourceCache {
 		/** @type {Map<string, Resource>} */
 		this.bookFiles = new Map();
 	}
-	/**
+    /**
 	 *
 	 * @param {string | Resource} resource
 	 * @returns {Resource}

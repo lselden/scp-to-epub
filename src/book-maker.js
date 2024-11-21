@@ -18,6 +18,7 @@ const Chapter = require('./lib/chapter');
 const DocPart = require('./lib/doc-part');
 const {loadBookConfig, loadBookRemote, extractDocParts} = require('./parse-book-config');
 const makeCover = require('./make-cover');
+const { debug } = require('./lib/utils');
 
 /** @typedef {import("puppeteer").Browser} Browser */
 /** @typedef {import("puppeteer").Page} Page */
@@ -95,11 +96,11 @@ class BookMaker {
 				path: '',
 				width: 1600,
 				height: 2560,
-				templateHtml: path.join(__dirname, '../client/cover.html')
+				templateHtml: 'static/cover.html'
 			},
 			static: {
 				prefix: '__epub__',
-				root: path.join(__dirname, '..'),
+				// root: path.join(__dirname, '../static'),
 				cache: true,
 			},
 			ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'
@@ -247,18 +248,6 @@ class BookMaker {
 		}
 		console.log('Processed!');
 	}
-	/**
-	 * @deprecated this was to support using wikidot api to get backlinks, but it's wonky
-	 */
-	// async getToken(subdomain = 'scp-wiki') {
-	// 	const context = await this.browser.createIncognitoBrowserContext();
-	// 	const page = await context.newPage();
-	// 	page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36');
-	// 	page.setCacheEnabled(false);
-	// 	const response = await page.goto(`http://${subdomain}.wikidot.com`);
-	// 	const headers = response.headers();
-	// 	console.log(headers['set-cookie']);
-	// }
 	async include(targets) {
 		if (!Array.isArray(targets)) {
 			targets = [targets];

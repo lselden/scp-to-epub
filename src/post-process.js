@@ -6,6 +6,7 @@ const {filenameForUrl} = require('./lib/utils');
 const DocPart = require('./lib/doc-part');
 const Resource = require('./lib/resource');
 const {genChapterFooter, genChapterHeader} = require('./templates/chapter-parts');
+const { getAssetPath } = require('./lib/path-utils');
 
 class PostProcessor {
 	/**
@@ -54,7 +55,7 @@ class PostProcessor {
 		};
 	}
 	async initialize() {
-		this.page = await this.browser.newPage();
+        this.page = await this.browser.newPage();
 		// TODO handle fragment: urls
 		this.page.exposeFunction('getBookPath', href => {
 			const resource = this.cache.get(href);
@@ -100,8 +101,8 @@ class PostProcessor {
 		this.page.on('console', msg => {
 			console.log('POST PROCESS CONSOLE', msg.type(), msg.text());
 		})
-		await this.page.addScriptTag({
-			path: path.join(__dirname, '../client/post-process.js')
+        await this.page.addScriptTag({
+			path: await getAssetPath('client/post-process.js')
 		});
 	}
 	async processBook(chapters) {

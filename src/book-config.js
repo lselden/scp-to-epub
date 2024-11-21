@@ -28,9 +28,9 @@ config.util.defaults({
 		autoLoad: undefined
 	},
 	output: {
-		path: path.join(__dirname, '../output'),
-		tempDir: path.join(__dirname, '../output'),
-		localResources: path.join(__dirname, '../assets'),
+		path: './output',
+		tempDir: './output',
+		localResources: './assets',
 		cleanTempFolder: true,
 		keepTempFiles: true,
 		folders: {
@@ -108,13 +108,13 @@ config.util.defaults({
 	static: {
 		enabled: true,
 		prefix: '__epub__',
-		root: path.join(__dirname, '..'),
+		root: path.join(__dirname, '../static'),
 		cache: true
 	},
 	cache: {
 		stats: true,
 		pages: true,
-		path: path.join(__dirname, '../cache'),
+		path: './cache',
 		maxAge: 30 * 24 * 60 * 60 * 1000
 	},
 	hooks: {

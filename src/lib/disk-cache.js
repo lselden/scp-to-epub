@@ -14,7 +14,7 @@ class DiskCache {
 		this.options = {
 			enable: true,
 			ignore: undefined,
-			path: path.join(__dirname, '../cache'),
+			path: './cache',
 			cacheInMemory: false,
 			concurrency: config.get('output.diskConcurrency', 3),
 			// one month default cache time

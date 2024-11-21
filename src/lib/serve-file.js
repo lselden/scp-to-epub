@@ -2,6 +2,8 @@ const path = require('path');
 const fs = require('fs').promises;
 const urlLib = require('url');
 const mime = require('mime');
+const config = require('./config');
+const { getAssetPath } = require('./path-utils');
 
 const UP_PATH_REGEXP = /(?:^|[\\/])\.\.(?:[\\/]|$)/
 
@@ -9,7 +11,7 @@ class StaticServer {
 	constructor(options = {}) {
 		const {
 			prefix = '__epub__',
-			root = path.join(__dirname, '../..'),
+			root = path.join(__dirname, '../../static'),
 			cache = false,
 			enabled = true
 		} = options;
@@ -95,7 +97,14 @@ class StaticServer {
 			};
 		}
 
-		const filepath = path.normalize(path.join(this.root, pathname));
+		let filepath = await getAssetPath(pathname);
+        if (!filepath) {
+            // ignore - probably false anyways
+            if (pathname.includes('overrides')) return;
+
+            console.debug(`Cannot find requested path ${pathname}`);
+            filepath = path.normalize(path.join(this.root, pathname));
+        }
 
 		if (filepath in this.cache) {
 			return this.cache[filepath];

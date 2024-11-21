@@ -1,7 +1,11 @@
+const fs = require('fs');
 const path = require('path');
 const Book = require('./lib/book');
 const BookMaker = require('./book-maker');
 const config = require('./book-config');
+const { getAssetPath } = require('./lib/path-utils');
+
+
 
 module.exports = async function testPage (urls, cfg = {}) {
 	const {
@@ -42,17 +46,22 @@ module.exports = async function testPage (urls, cfg = {}) {
 		// TODO get from book.stylesheets
 		await Promise.all(
 			[
-				'assets/css/base.css',
-				'assets/css/style.css',
-				'assets/css/fonts.css',
+				'css/base.css',
+				'css/style.css',
+				'css/fonts.css',
 				'client/ibooks.css'
-			].map(style => page.addStyleTag({
-				path: path.join(__dirname, '..', style)
-			}))
+			].map(async (style) => {
+                const stylePath = await getAssetPath(style);
+                if (!stylePath) return;
+                await page.addStyleTag({
+                    path: stylePath
+                });
+            })
 		);
-		await page.evaluate(() => {
-			document.querySelector('html').setAttribute('__ibooks_internal_theme', 'Night');
-		});
+        const theme = config.get('view.theme', 'Night');
+		await page.evaluate((theme) => {
+			document.querySelector('html').setAttribute('__ibooks_internal_theme', theme);
+		}, theme);
 	}
 
 	(await builder.browser.pages())

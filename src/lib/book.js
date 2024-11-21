@@ -18,6 +18,7 @@ const genPreface = require('../templates/preface.xhtml');
 const rmdir = promisify(rimraf);
 
 const {uuid} = require('./utils');
+const { exists, getAssetPath } = require('./path-utils');
 
 class Book {
 	/**
@@ -268,15 +269,21 @@ class Book {
 		 */
 		let localFiles;
 
+        const assetsDir = await getAssetPath(localPath);
+        if (!assetsDir) {
+            console.error(`Unable to find CSS assets at ${localPath}, ebook may not render properly`);
+            return;
+        }
+
 		try {
-			const dirListing = await fs.promises.readdir(localPath, { withFileTypes: true });
+			const dirListing = await fs.promises.readdir(assetsDir, { withFileTypes: true });
 			const subFolders = dirListing
 				.filter(dir => {
 					return dir.isDirectory();
 				});
 			localFiles = [];
 			await pMap(subFolders, async dirent => {
-				const dir = path.join(localPath, dirent.name);
+				const dir = path.join(assetsDir, dirent.name);
 				// NOTE no try/catch...?...
 				const files = await fs.promises.readdir(dir);
 				// QUESTION do we need to filter out thumbs / ds_config files?
