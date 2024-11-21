@@ -2,11 +2,12 @@ const urlLib = require('url');
 const path = require('path');
 const pMap = require('p-map');
 const config = require('./book-config');
-const {filenameForUrl} = require('./lib/utils');
+const {filenameForUrl, debug} = require('./lib/utils');
 const DocPart = require('./lib/doc-part');
 const Resource = require('./lib/resource');
 const {genChapterFooter, genChapterHeader} = require('./templates/chapter-parts');
 const { getAssetPath } = require('./lib/path-utils');
+const { isLocalProxyEnabled, getLocalProxyUrl } = require('./lib/kiwiki-cache');
 
 class PostProcessor {
 	/**
@@ -146,6 +147,13 @@ class PostProcessor {
 				chapter.error = error;
 				console.warn(`Failed to parse ${chapter.url} completely - parse error. ${error}`);
 			}
+
+            if (isLocalProxyEnabled()) {
+                debug(`removing local proxy address from any links in ${chapter.url}`);
+                const localProxy = getLocalProxyUrl();
+                content = content.replaceAll(localProxy.replace(/https?:\/\//, ''), '');
+
+            }
 
 			// not valid doctype
 			if (!/^<!DOCTYPE html>/.test(content)) {

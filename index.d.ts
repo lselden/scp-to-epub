@@ -261,6 +261,7 @@ export interface BookMakerConfig extends BookMakerPrivateConfig {
      * @default http://www.scpwiki.com
      */
     defaultOrigin?: string,
+    localArchiveProxy?: string,
     browser?: Browser
 }
 

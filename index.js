@@ -4,15 +4,18 @@ const config = require('./src/book-config');
 const Book = require('./src/lib/book');
 const BookMaker = require('./src/book-maker');
 const viewPage = require('./src/view-page');
-const {safeFilename} = require('./src/lib/utils');
+const {safeFilename, maybeProxyUrl} = require('./src/lib/utils');
+const { configureLocalProxy } = require('./src/lib/kiwiki-cache');
+
 
 async function processSingle (urls, cfg, tmpDir, destination) {
 	const defaultOrigin = cfg.defaultOrigin || config.get('discovery.defaultOrigin', 'http://www.scpwiki.com');
+    configureLocalProxy();
 
-	if (!Array.isArray(urls)) {
+    if (!Array.isArray(urls)) {
 		urls = [urls];
 	}
-	urls = urls.map(u => (new URL(u, defaultOrigin)).toString());
+	urls = urls.map(u => new URL(u, defaultOrigin).toString());
 
 	const book = new Book(cfg);
 	const builder = new BookMaker(book, cfg);
@@ -220,7 +223,7 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 
 	let builder;
 
-	if (argv.onlyZip) {
+    if (argv.onlyZip) {
 		const book = new Book(cfg);
 		await book.zip(tempDir, destination);
 	} else if (bookUrl) {

@@ -59,8 +59,14 @@ discovery:
   include: []
   ### default never include these articles
   exclude: []
-  ### Origin to use for external links. Could change to https://scp-wiki.wikidot.com or http://scp-wiki.net
-  defaultOrigin: 'http://www.scpwiki.com'
+  ### Origin to use for external links. Could change to https://scp-wiki.wikidot.com or http://scp-wiki.net or http://www.scpwiki.com
+  #defaultOrigin: 'http://www.scpwiki.com'
+  defaultOrigin: 'https://scp-wiki.wikidot.com/'
+
+  ### KIWIX support - you can try to get content from a KIWIX mirror (https://dev.library.kiwix.org/#lang=eng&q=scp)
+  # if using kiwix archive then put the proxy url (remove trailing scp-wiki.wikidot.com)
+  #localArchiveProxy: 'http://127.0.0.1:8080/content/scp-wiki_en_all_2024-09/'
+
 browser:
   ##########################################
   ###         NOTE IMPORTANT!!!!!        ###

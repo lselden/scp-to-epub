@@ -7,6 +7,7 @@ const Resource = require('./lib/resource');
 const Chapter = require('./lib/chapter');
 const Link = require('./lib/link');
 const {safeFilename, filenameForUrl, debug} = require('./lib/utils');
+const { configureLocalProxy, maybeProxyUrl, shouldProxyUrl, serveResponseFromProxy, toProxyUrl, fromProxyUrl } = require('./lib/kiwiki-cache');
 
 const {CacheEnum} = Resource;
 
@@ -117,15 +118,25 @@ class Scraper {
 			browser: config.get('browser'),
 			preProcess: config.get('preProcess'),
 			static: config.get('static'),
-			hooks: config.get('hooks')
+			hooks: config.get('hooks'),
+            localArchiveProxy: config.get('discovery.localArchiveProxy')
 		},
 		opts);
 
 		if (this.options.remoteImages === undefined) {
 			this.options.remoteImages = config.get('output.images.remote', false);
 		}
+        this._removeFromPageName = '';
+        if (URL.canParse(this.options.localArchiveProxy)) {
+            let val = new URL(this.options.localArchiveProxy).pathname;
+            if (!val.endsWith('/')) { val += '/'; }
+            
+            this._removeFromPageName = val.slice(1).replace(/[\/\\() +&:]/g, '_');
+        }
+        configureLocalProxy();
+        debug('initialize scraper with options', this.options);
 	}
-	/**
+    /**
 	 *
 	 * @param {Request} request
 	 */
@@ -164,6 +175,15 @@ class Scraper {
 		} catch (err) {
 			console.warn('unable to intercept request', err);
 		}
+        
+        if (shouldProxyUrl(url)) {
+            const payload = await serveResponseFromProxy(toProxyUrl(url));
+            if (payload) {
+                request.respond(payload);
+                return;
+            }
+        }
+
 		if (this.options.preProcess.useWikiDotUrls && url.startsWith('http://www.scp-wiki.net') || url.startsWith('http://www.scpwiki.com')) {
 			request.continue({
 				url: url.replace('http://www.scp-wiki.net', 'http://scp-wiki.wikidot.com').replace('http://www.scpwiki.com', 'http://scp-wiki.wikidot.com')
@@ -214,7 +234,7 @@ class Scraper {
 				}
 				// COMBAK this could take up A LOT of RAM...maybe store to disk or just wait?
 			}
-
+            debug(`RESOURCE cached ${resource.canononicalUrl}`.slice(0, 140));
 			this.cache.set(resource);
 		} catch (err) {
 			console.error(`Unable to load response body for ${res.url()}`, err);
@@ -224,12 +244,15 @@ class Scraper {
 		return this.cache.cleanCacheForPage(url, options);
 	}
 	async loadPage(url, depth = 0) {
+        debug(`loading page ${url} - depth ${depth}`);
 		const {closeTabs} = this.options.preProcess;
+        const pageUrl = await maybeProxyUrl(url);
+
 		const {
 			page,
 			response,
 			error
-		} = await this.createPage(url);
+		} = await this.createPage(pageUrl);
 
 		// throw error if 404 response
 		if (error) {
@@ -242,13 +265,14 @@ class Scraper {
 
 		const forwardLinks = new Map();
 		await page.exposeFunction('registerLink', async payload => {
-			const existing = this.cache.get(payload.url);
+            const unProxiedUrl = fromProxyUrl(payload.url);
+			const existing = this.cache.get(unProxiedUrl);
 			if (existing) {
 				existing.addBacklinks(url);
 				forwardLinks.set(Resource.asCanononical(payload.url), payload.title);
 				return;
 			}
-			const mimeType = mime.getType(payload.url) || mime.getType('xhtml');
+			const mimeType = mime.getType(unProxiedUrl) || mime.getType('xhtml');
 
 			// not a chapter, but content.
 			// TODO COMBAK save these as resource? maybe....
@@ -258,7 +282,7 @@ class Scraper {
 			}
 
 			const linkResource = new Link({
-				url: payload.url,
+				url: unProxiedUrl,
 				from: [url],
 				depth: depth + 1,
 				// TODO no need for redundancy
@@ -548,6 +572,7 @@ class Scraper {
 					// this is not a good guarantee...maybe use Canvas to directly create new resource?
 					response = (
 						this.cache.get(imageUrl) ||
+                        this.cache.get(imageUrl.replace('https', 'http')) ||
 						this.cache.get(imageUrl.replace('www.scp-wiki.net', 'scp-wiki.wdfiles.com')) ||
 						this.cache.get(imageUrl.replace('www.scpwiki.com', 'scp-wiki.wdfiles.com'))
 					);
@@ -597,9 +622,9 @@ class Scraper {
 		// @ts-ignore
 		const {defaultOrigin} = this.options;
 		if (defaultOrigin && !/\/\/(www\.|)scp-wiki(\.net|\.wikidot\.com)$/.test(defaultOrigin)) {
-			defaultSite = (urlLib.parse(defaultOrigin).hostname || '').replace(/www\.|\.com|\.wikidot|\.net|\.org)/g, '');
+			defaultSite = (urlLib.parse(defaultOrigin).hostname || '').replace(/www\.|\.com|\.wikidot|\.net|\.org/g, '');
 		}
-		const {pageName, pageId, siteName} = await page.evaluate(defaultSite => {
+		let {pageName, pageId, siteName} = await page.evaluate(defaultSite => {
 			// @ts-ignore
 			const info = window.WIKIREQUEST && window.WIKIREQUEST.info;
 			let pageName = info && info.pageUnixName;
@@ -611,6 +636,9 @@ class Scraper {
 			const siteName = (info && info.siteUnixName) || defaultSite;
 			return { pageName, pageId, siteName };
 		}, defaultSite);
+        if (this._removeFromPageName) {
+            pageName = pageName.replace(this._removeFromPageName, '');
+        }
 		// handle tags separately
 		if (/^system:page-tags/.test(pageName)) {
 			const tag = page.url().split('/').slice(-1)[0];

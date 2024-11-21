@@ -1,3 +1,4 @@
+const {debuglog} = require('util');
 const urlLib = require('url');
 const path = require('path');
 
@@ -71,10 +72,27 @@ function normalizePath(pathname) {
 	return pathname.replace(/\\/g, '/');
 }
 
+/**
+ * 
+ * @param {string} u 
+ * @param {string | URL} [defaultOrigin]
+ * @param {string | URL} [localArchiveProxy] 
+ * @returns 
+ */
+function maybeProxyUrl(u, defaultOrigin = undefined, localArchiveProxy) {
+    const url = new URL(u, defaultOrigin ? defaultOrigin : undefined)
+    if (!localArchiveProxy) return url.toString();
+    return `${localArchiveProxy}/${url.toString().replace(/^https?:\/\//, '')}`;
+}
+
+const debug = debuglog('scp'); 
+
 module.exports = {
 	uuid,
 	escape,
 	safeFilename,
 	filenameForUrl,
-	normalizePath
+	normalizePath,
+    maybeProxyUrl,
+    debug
 };

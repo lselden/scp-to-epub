@@ -2,11 +2,13 @@ const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 const path = require('path');
 const urlLib = require('url');
-const {safeFilename} = require('./lib/utils');
+const {safeFilename, debug} = require('./lib/utils');
 const scpperDB = require('./scpper-db');
 const Resource = require('./lib/resource');
 const DiskCache = require('./lib/disk-cache');
 const {systemLinks, systemPrefixes, metaTags} = require('./system-links');
+const config = require('./book-config');
+const { maybeProxyUrl } = require('./lib/kiwiki-cache');
 
 function isEmpty(arr) {
 	return !(arr && (typeof arr === 'object') && Object.keys(arr).length > 0);
@@ -152,6 +154,16 @@ class WikiDataLookup {
 		// }
 	}
 	async getStats(pageName, pageId) {
+        if (!this.options.enableStats) {
+            return {
+				pageName,
+				author: '',
+				date: '',
+				rating: '',
+				score: ''
+			};
+        }
+
 		const {stats: cacheEnabled} = this.options.cache;
 		// check if exists
 		if (pageId && cacheEnabled) {
@@ -204,6 +216,7 @@ class WikiDataLookup {
 		});
 	}
 	async loadMetaPages() {
+        debug('Loading metadata pages');
 		await Promise.all([
 			this.loadAdaptationList(),
 			this.loadAuthorsList(),
@@ -224,10 +237,11 @@ class WikiDataLookup {
 		} catch (err) {
 			console.warn('Failure loading cached author list', err);
 		}
-
+        debug('Loading authors meta list');
 		const page = await this.browser.newPage();
 		page.setUserAgent(this.options.ua);
-		await page.goto(this.options.authorsUrl);
+        const url = await maybeProxyUrl(this.options.authorsUrl);
+		await page.goto(url);
 		this.authorsList = await page.$$eval('.pages-list-item a', links => {
 			const out = {};
 			links.forEach(el => {
@@ -257,10 +271,11 @@ class WikiDataLookup {
 		} catch (err) {
 			console.warn('Failure loading cached artworks list', err);
 		}
-
+        debug('loading artworks meta list');
 		const page = await this.browser.newPage();
 		page.setUserAgent(this.options.ua);
-		await page.goto(this.options.artworkUrl);
+        const url = await maybeProxyUrl(this.options.artworkUrl);
+		await page.goto(url);
 		this.artworksList = await page.$$eval('.pages-list-item a', links => {
 			const out = {};
 			links.forEach(el => {
@@ -290,10 +305,11 @@ class WikiDataLookup {
 		} catch (err) {
 			console.warn('Failure loading cached hubs list', err);
 		}
-
+        debug('loading cached hubs list');
 		const page = await this.browser.newPage();
 		page.setUserAgent(this.options.ua);
-		await page.goto(this.options.hubsUrl);
+        const url = await maybeProxyUrl(this.options.hubsUrl);
+		await page.goto(url);
 		this.hubList = await page.$$eval('.pages-list-item a', links => {
 			const out = {};
 			links.forEach(el => {
@@ -323,10 +339,11 @@ class WikiDataLookup {
 		} catch (err) {
 			console.warn('Failure loading cached audio adaptations list', err);
 		}
-
+        debug('loading audio adaptations meta page');
 		const page = await this.browser.newPage();
 		page.setUserAgent(this.options.ua);
-		await page.goto(this.options.audioAdaptationsUrl, {
+        const url = await maybeProxyUrl(this.options.audioAdaptationsUrl);
+		await page.goto(url, {
 			waitUntil: ['load', 'domcontentloaded']
 		});
 		this.audioAdaptations = await page.$$eval('.wiki-content-table tr', rows => {
@@ -422,20 +439,9 @@ class WikiDataLookup {
 			return context.outerHTML();
 		}, options);
 	}
-	async getLinksFromUrl(url, options = {}) {
-		const {
-			selector = 'body',
-			startSelector,
-			endSelector,
-			sameDomain = true
-		} = options;
-
-		const page = await this.browser.newPage();
-		await page.goto(url, { waitUntil: 'load'});
-		throw new Error('Not Implemented');
-	}
 	async getLinksByTag(tag) {
-		const url = tag.startsWith('http') ? tag : `http://www.scpwiki.com/system:page-tags/tag/${tag}`;
+		let url = tag.startsWith('http') ? tag : `http://www.scpwiki.com/system:page-tags/tag/${tag}`;
+        url = await maybeProxyUrl(url);
 		const page = await this.browser.newPage();
 		await page.goto(url, { waitUntil: 'load'});
 		const links = await page.$$eval('#tagged-pages-list .pages-list-item a[href]', links => {

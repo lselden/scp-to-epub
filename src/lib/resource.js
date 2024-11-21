@@ -5,6 +5,7 @@ const urlLib = require('url');
 const mime = require('mime');
 const sharp = require('sharp');
 const config = require('../book-config');
+const { isProxiedUrl, fromProxyUrl } = require('./kiwiki-cache');
 
 function uuid() {
 	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -358,7 +359,9 @@ class Resource {
 		if (url instanceof Resource) {
 			return url.canononicalUrl;
 		}
-
+        if (isProxiedUrl(url)) {
+            url = fromProxyUrl(url);
+        }
 		if (url instanceof URL) {
 			url = urlLib.parse(`${url}`);
 		}
