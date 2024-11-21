@@ -228,8 +228,8 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 	} else if (page) {
 		builder = await processSingle(page, cfg, tempDir, destination);
 	} else {
-		cmd.help();
-		process.exit();
+		cmd.showHelp();
+        process.exit();
 	}
 
 	console.log(`Wrote ${title} to ${destination}, temp files in ${tempDir}`);

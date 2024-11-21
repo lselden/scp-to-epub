@@ -15,7 +15,10 @@ input:
 output:
   #path: './output'
   #tempDir: './output'
+  ### override css folder / anything else included in epub.
+  ### using an absolute path is a good idea
   #localResources: './assets'
+
   ### clear temp folder contents before running
   cleanTempFolder: true
   ### keep temp folder after converting to ebook
@@ -59,6 +62,25 @@ discovery:
   ### Origin to use for external links. Could change to https://scp-wiki.wikidot.com or http://scp-wiki.net
   defaultOrigin: 'http://www.scpwiki.com'
 browser:
+  ##########################################
+  ###         NOTE IMPORTANT!!!!!        ###
+  ###         !!!!LOOK AT THIS!!!!!      ###
+  ##########################################
+
+  ### If you're running this as a node.js project then you shouldn't need to set this value - the correct version *should*
+  ### get downloaded correctly
+  ### Set this path to the path of a compatible browser for puppeteer to automate
+  ### If **MAY** work with your built in browser, but it's intended to work with the specific version this tool
+  ### was built against (v131 at time of writing)
+  ### See https://pptr.dev/guides/configuration for more info
+  ### If for some reason you need to manually download check out https://www.chromium.org/getting-involved/download-chromium/
+  ### Set to system version of chrome - MAY NOT WORK
+  #executablePath: C:\Program Files\Google\Chrome\Application\chrome.exe
+  ### Set to relative path
+  #executablePath: chrome-win64/chrome.exe
+
+
+  ### headless: false === open up the automated browser window while it works
   headless: true
   debug: false
   width: 768
@@ -66,11 +88,18 @@ browser:
   timeout: 600000
   ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'
 cover:
+  ### Local path to image file to use as cover
   path: ''
+  ### Remote URL to image to use as cover
   url: ''
+  ### width of cover image
   width: 1600
+  ### height of cover image
   height: 2560
-  templateHTML: ''
+  ### Image JPEG quality of image (if image is jpg)
+  quality: 70
+  ### the template HTML to use for creating the cover - default should be fine?
+  #templateHTML: 'D:/path/to/cover.html'
 preProcess:
   ### how many pages to scrape in parallel I found errors when I did more than one at a time on the wikidot side
   concurrency: 1
@@ -80,16 +109,15 @@ postProcess:
   ### number of pages to run in parallel when sanitizing xml and adding internal links
   concurrency: 3
 static:
-  enabled: true
-  prefix: '__epub__'
-  # root: '.'
-  cache: true
+  ### Folder to serve static content from. Make absolute path if you want to override it
+  root: 'static'
 cache:
   ### cache statistics pages, otherwise pull each time
   stats: true
   ### cache pages. Set to false to pull fresh copies each time
   pages: true
   ### path to put cached content
+  ### Probably best to set to absolute path
   # path: './cache'
   ### cache files for this long (in milliseconds). Default is 4 months
   # 4 * 30 * 24 * 60 * 60 * 1000

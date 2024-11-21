@@ -1,0 +1,5 @@
+### DEFAULTS
+### These are some default settings for the packaged version of this tool.
+### Don't change these values! Instead override them in config.yaml
+browser:
+  executablePath: chrome/chrome.exe
