@@ -9,10 +9,14 @@ let localProxySettings = {};
 function configureLocalProxy() {
     localCacheUrl = config.get('discovery.localArchiveProxy');
     localProxySettings = {
+        staticPrefix: `/${config.get('static.prefix', '__epub__')}`,
         verify: true,
         https: true,
         timeoutMs: 1000 * 10,
         ...config.get('discovery.localArchiveProxyCfg', {})
+    }
+    if (localCacheUrl) {
+        console.log(`Using local cache ${localCacheUrl}`);
     }
 }
 
@@ -27,8 +31,10 @@ function getLocalProxyUrl() {
 }
 
 function shouldProxyUrl(url = '') {
+    url = `${url || ''}`;
     return !!localCacheUrl && !!url &&
-        (!`${url}`.startsWith('http://') || localProxySettings.https);
+        (!url.startsWith('http://') || localProxySettings.https) &&
+        !url.includes(localProxySettings.staticPrefix);
 }
 
 /**
@@ -47,7 +53,7 @@ function toProxyUrl(url = '') {
  */
 function fromProxyUrl(proxyUrl = '') {
     if (!localCacheUrl) return proxyUrl;
-    return `${proxyUrl}`.replace(localCacheUrl, proxyUrl.replace(/:.+/, ':'))
+    return `${proxyUrl}`.replace(localCacheUrl, proxyUrl.replace(/:.+/, '://'))
 }
 
 function isProxiedUrl(url) {
@@ -58,27 +64,32 @@ async function maybeProxyUrl(url) {
     if (!shouldProxyUrl(url)) return url;
 
     
-    let newUrl = toProxyUrl(url);
+    let proxyUrl = toProxyUrl(url);
     if (!localProxySettings.verify) {
-        return newUrl;
+        return proxyUrl;
     }
-    const [_cacheKey] = `${url}`.split('?');
+    const inProxy = await checkProxyHasUrl(proxyUrl);
+
+    debug(`KIWIKI ${inProxy ? 'PROXY' : 'BYPASS'} ${url}`);
+    return inProxy ? proxyUrl : url;
+}
+
+async function checkProxyHasUrl(proxyUrl) {
+    // NOTE this ignores query parameters...should be okay for proxy purposes I think?
+    const [_cacheKey] = `${proxyUrl}`.split('?');
     let inProxy = urlVerifyCache.get(_cacheKey);
     if (inProxy != undefined) {
-        return inProxy ? newUrl : url;
+        return inProxy;
     }
 
     const res = await Promise.race([
         setTimeout(localProxySettings.timeoutMs, {ok: false, timeout: true}, { ref: false }),
-        fetch(newUrl, { method: 'HEAD' })
-            .catch(err => { debug(`ignoring error in testing proxy for url ${newUrl} ${err}`); return undefined })
+        fetch(proxyUrl, { method: 'HEAD' })
+            .catch(err => { debug(`ignoring error in testing proxy for url ${proxyUrl} ${err}`); return undefined })
     ]);
     inProxy = !!res?.ok;
     urlVerifyCache.set(_cacheKey, inProxy);
-
-    return inProxy
-        ? newUrl
-        : url;
+    return inProxy;
 }
 
 async function serveResponseFromProxy(proxyUrl) {
@@ -87,6 +98,7 @@ async function serveResponseFromProxy(proxyUrl) {
         return undefined;
     });
     if (!res || !res.ok) return undefined;
+    
     return {
         body: new Uint8Array(await res.arrayBuffer()),
         contentType: res.headers.get('content-type'),
@@ -98,6 +110,7 @@ async function serveResponseFromProxy(proxyUrl) {
 module.exports = {
     configureLocalProxy,
     maybeProxyUrl,
+    checkProxyHasUrl,
     isLocalProxyEnabled,
     isProxiedUrl,
     toProxyUrl,

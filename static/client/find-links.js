@@ -12,7 +12,13 @@ function checkWhitelist(url) {
 }
 
 export default async function () {
-	const {origin, pathname, href: pageUrl} = document.location;
+    let {origin, pathname, href: pageUrl} = document.location;
+
+    if (window.__epubCanonicalUrl) {
+        // console.debug('Using canonical url', window.__epubCanonicalUrl);
+        pageUrl = window.__epubCanonicalUrl;
+    }
+
 	const links = new Map();
 
 	// get rid of interactive elements - should be gone already, but just in case
@@ -47,8 +53,9 @@ export default async function () {
 			href = `/${href}`;
 		}
 
-		const url = new URL(href, pageUrl);
-		const isExternal = !checkWhitelist(url);
+		let url = new URL(href, pageUrl);
+
+		let isExternal = !checkWhitelist(url);
 		// ignore externl links
 		if (isExternal) {
 			console.debug(`Skipped external link ${url}`)
