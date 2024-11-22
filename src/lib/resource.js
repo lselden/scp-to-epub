@@ -277,13 +277,15 @@ class Resource {
 			quality = 70,
 			// 1mb
 			maxSize = 1024 * 1024,
+            jpegIfSizeLargerThan,
 			resizeOptions
 		} = config.util.extendDeep(
 			{
 				resizeOptions: {
 					fit: 'inside',
 					withoutEnlargement: true
-				}
+				},
+                jpegIfSizeLargerThan: 512000
 			},
 			config.get('output.images'),
 			options
@@ -313,13 +315,17 @@ class Resource {
 		// const meta = await sharp(this.content).metadata();
 		// }
 
-		const forcePng = /svg|gif|png|mng|apng/i.test(this.extension);
+		let shouldUsePng = /svg|gif|png|mng|apng/i.test(this.extension);
+
+        if ((this.content.length || this.content.size) >= jpegIfSizeLargerThan) {
+            shouldUsePng = false;
+        }
 
 		await new Promise((resolve, reject) => {
 			sharp(this.content)
 				.resize(width, height, resizeOptions)
-				.jpeg({ quality, force: !forcePng })
-				.png({ force: forcePng })
+				.jpeg({ quality, force: !shouldUsePng,  })
+				.png({ force: shouldUsePng })
 				.toBuffer((err, data, info) => {
 					if (err) {
 						reject(err);

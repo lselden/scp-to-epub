@@ -24,18 +24,23 @@ output:
   ### keep temp folder after converting to ebook
   keepTempFiles: true
   images:
-    ### set to true to not store images. Note this isn't very compatible with most ebook readers
+    ### set to true to not store images.
+    ### Note this isn't very compatible with most ebook readers, but saves a lot of space
     remote: false
     ### compress images. NOTE: if disabled this won't convert webp/other non-compatible types
     compress: true
+
     ### max width of images
     width: 768
     ### max height of images
     height: 1024
-    ### JPEG conversion quality
-    quality: 70
+    ### JPEG conversion quality - 70 = higher quality, 30 = smaller size
+    quality: 30
     ### convert SVG to png. Recommended
     convertSVG: true
+    ### set to true to force everything to JPG instead of PNG if bigger than X bytes
+    ### default 102400 = 100kb
+    jpegIfSizeLargerThan: 102400
     ### sharp library advanced options
     resizeOptions:
       fit: 'inside'
