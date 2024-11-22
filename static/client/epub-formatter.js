@@ -32,6 +32,7 @@ import fixMedia from './fix-media.js';
 import cleanForumPage from './clean-forum-post.js';
 import detectChat from './detect-chat.js';
 import fixLicensing from './fix-licensing.js';
+import {storeStats, getStoredStats} from './get-stats.js';
 
 function moveMain() {
 	const origEl = document.querySelector(`#${config.mainContentId}`);
@@ -142,7 +143,7 @@ function addNamespaces() {
 	window.__epubFormattingComplete = false;
 	// console.timeStamp('epub-format-start');
 	console.time('epub-format');
-	const {
+    const {
 		beforeParse = () => {},
 		afterParse = () => {}
 	} = await getOverrides();
@@ -150,6 +151,7 @@ function addNamespaces() {
 		{name: 'clear-problem-scripts', fn: clearProblemScripts},
 		{name: 'make-xhtml', fn: addNamespaces},
 		{name: 'before-parse', fn: beforeParse},
+        {name: 'store-stats', fn: storeStats },
 		{name: 'inline-iframes', fn: inlineIframes},
 		{name: 'clean-tag-pages', fn: cleanTagPage},
 		{name: 'clean-forum', fn: cleanForumPage},

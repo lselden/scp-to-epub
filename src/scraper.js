@@ -7,7 +7,7 @@ const Resource = require('./lib/resource');
 const Chapter = require('./lib/chapter');
 const Link = require('./lib/link');
 const {safeFilename, filenameForUrl, debug} = require('./lib/utils');
-const { configureLocalProxy, maybeProxyUrl, shouldProxyUrl, serveResponseFromProxy, toProxyUrl, fromProxyUrl } = require('./lib/kiwiki-cache');
+const { configureLocalProxy, maybeProxyUrl, shouldProxyUrl, serveResponseFromProxy, toProxyUrl, fromProxyUrl, isProxiedUrl, checkProxyHasUrl } = require('./lib/kiwiki-cache');
 
 const {CacheEnum} = Resource;
 
@@ -68,7 +68,7 @@ class Scraper {
 			},
 			preProcess: {
 				concurrency: 1,
-				useWikiDotUrls: false,
+				useWikiDotUrls: true,
 				backlinks: false,
 				tags: true,
 				closeTabs: true
@@ -141,7 +141,7 @@ class Scraper {
 	 * @param {Request} request
 	 */
 	async interceptRequest(request) {
-		const url = request.url();
+		let url = request.url();
 		const urlObj = urlLib.parse(url);
 
 		try {
@@ -175,8 +175,21 @@ class Scraper {
 		} catch (err) {
 			console.warn('unable to intercept request', err);
 		}
+
+        let rewriteUrl = undefined;
         
-        if (shouldProxyUrl(url)) {
+        if (isProxiedUrl(url)) {
+            // test to make sure it exists - if not allow for fallback
+            const isCachedLocally = await checkProxyHasUrl(url);
+
+            if (!isCachedLocally) {
+                 // un-proxy the url to try to get from origin
+                rewriteUrl = fromProxyUrl(url);
+                url = rewriteUrl;
+            }
+            // otherwise just keep going
+        } else if (shouldProxyUrl(url)) {
+            // check to see if proxy has content - if not keep going
             const payload = await serveResponseFromProxy(toProxyUrl(url));
             if (payload) {
                 request.respond(payload);
@@ -185,12 +198,11 @@ class Scraper {
         }
 
 		if (this.options.preProcess.useWikiDotUrls && url.startsWith('http://www.scp-wiki.net') || url.startsWith('http://www.scpwiki.com')) {
-			request.continue({
-				url: url.replace('http://www.scp-wiki.net', 'http://scp-wiki.wikidot.com').replace('http://www.scpwiki.com', 'http://scp-wiki.wikidot.com')
-			});
-		} else {
-			request.continue();
-		}
+            rewriteUrl = url
+                .replace(/www.scp-wiki.net|www.scpwiki.com/, 'scp-wiki.wikidot.com');
+        }
+
+        request.continue({ ...rewriteUrl && {url: rewriteUrl}});
 	}
 	/**
 	 * @param {Response} res
@@ -301,7 +313,7 @@ class Scraper {
 		const tags = this.options.preProcess.tags ? await this.getTags(page) : [];
 
 		if (await this.shouldSkip(page, depth, tags)) {
-			console.log(`Skipping page ${url} due to tags`);
+			console.log(`Skipping page ${url} because meta (author/artwork etc)`);
 			return;
 		}
 
@@ -355,11 +367,32 @@ class Scraper {
 				if (isForiegn && type !== 'error') {
 					return;
 				}
-				const text = msg.text();
+				let text = msg.text();
 				// ignore these errors
 				if (text.includes('ERR_BLOCKED_BY_CLIENT')) {
 					return;
 				}
+                const traceLocation = msg.stackTrace()?.[0]?.url || '';
+                // kiwiki unnecessary messages
+                if (/wombat.js/.test(traceLocation)) return;
+
+                if (text.includes('Manifest: Line: 1')) return;
+
+                // ignore no overrides message
+                if (text.includes("404 (Not Found)") && traceLocation.includes('__epub__/overrides')) {
+                    return;
+                }
+
+                if (text.includes('404 (Not Found)') && /about%3Ablank|pixel|resize-iframe/.test(traceLocation)) {
+                    return;
+                }
+
+                if (text.startsWith('Failed to load resource') && traceLocation) {
+                    text += ' - ' + traceLocation;
+                    type = 'warn';
+                }
+
+
 				let fn = console[type];
 				if (type === 'timeEnd') {
 					fn = console.debug;
@@ -368,7 +401,7 @@ class Scraper {
 					fn = console.log;
 				}
 
-				fn.call(console, msg.text());
+				fn.call(console, text);
 			});
 		}
 
@@ -417,6 +450,10 @@ class Scraper {
 			});
 		return this._frontPromise;
 	}
+    /**
+     * 
+     * @param {Page & {_pageBindings: any}} page 
+     */
 	async formatPage(page) {
 		if (!page._pageBindings || !page._pageBindings.has('keepResource')) {
 			await page.exposeFunction('keepResource', async (absUrl) => {
@@ -445,7 +482,7 @@ class Scraper {
 			});
 		}
 
-		if (!page._pageBindings || !page._pageBindings.has('frameEvaluate')) {
+        if (!page._pageBindings || !page._pageBindings.has('frameEvaluate')) {
 			await page.exposeFunction('frameEvaluate', async (framePath, fnSource) => {
 				try {
 					const frame = page.frames().find(frame => (frame.url() || '').includes(framePath));
@@ -499,6 +536,11 @@ class Scraper {
 			});
 		}
 
+        await page.evaluate((canonicalUrl) => {
+            console.log(`Canonical URL: ${canonicalUrl}`);
+            window.__epubCanonicalUrl = canonicalUrl;
+        }, fromProxyUrl(page.url()))
+
 		// TODO this may timeout becaues the page is waiting for an animation frame
 		// @ts-ignore
 		const whenFormatted = page.waitForFunction(() => window.__epubFormattingComplete === true, {
@@ -529,6 +571,10 @@ class Scraper {
 			}
 		}
 	}
+    /**
+     * 
+     * @param {Page} page 
+     */
 	async switchImagesToLocal(page) {
 		const imageUrls = await page.$$eval('img', images => {
 			return images
@@ -555,21 +601,24 @@ class Scraper {
 				let response = this.cache.get(imageUrl);
 				if (!response) {
 					// force image to download, response handler should catch it and put in cache
-					await page.evaluateHandle(async src => {
+                    // would fetch be better?
+					const loadResult = await page.evaluate(async src => {
 						return new Promise((resolve, reject) => {
 							const img = new Image();
 							img.onload = () => {
 								if (img.naturalWidth === 0) {
-									return reject(new Error('Image unreadable'));
+									resolve('ERR_INVALID');
 								}
-								resolve();
+								resolve('OK');
 							};
-							img.onerror = evt => reject(new Error('Network failure'));
+							img.onerror = evt => {
+                                resolve('ERR_NETWORK');
+                            }
 							img.src = src;
 						});
 					}, imageUrl);
 
-					// this is not a good guarantee...maybe use Canvas to directly create new resource?
+                    // this is not a good guarantee...maybe use Canvas to directly create new resource?
 					response = (
 						this.cache.get(imageUrl) ||
                         this.cache.get(imageUrl.replace('https', 'http')) ||
@@ -577,7 +626,21 @@ class Scraper {
 						this.cache.get(imageUrl.replace('www.scpwiki.com', 'scp-wiki.wdfiles.com'))
 					);
 
-					if (!response) {
+                    switch (loadResult) {
+                        case 'ERR_INVALID':
+                            debug(`IMAGE - Invalid Response / no size ${imageUrl}`);
+                            break;
+                        case 'ERR_NETWORK':
+                            debug(`IMAGE - Network Error ${imageUrl}`);
+                            break;
+                    }
+                    
+                    if (loadResult !== 'OK') {
+                        // known not found
+                        continue;
+                    }
+
+                    if (!response) {
 						// throw new Error(`No asset found for ${url}`);
 						console.warn(`No asset found for ${imageUrl}`);
 						continue;
@@ -616,6 +679,11 @@ class Scraper {
 			.join(' - ')
 			.trim();
 	}
+    /**
+     * 
+     * @param {*} page 
+     * @returns {Promise<import('./scpper-db').SCPStats>}
+     */
 	async getStats(page) {
 		// COMBAK the checks for adding the site prefix havne't been tested and may not work. Especially changing the default site.
 		let defaultSite = 'scp-wiki';
@@ -624,7 +692,30 @@ class Scraper {
 		if (defaultOrigin && !/\/\/(www\.|)scp-wiki(\.net|\.wikidot\.com)$/.test(defaultOrigin)) {
 			defaultSite = (urlLib.parse(defaultOrigin).hostname || '').replace(/www\.|\.com|\.wikidot|\.net|\.org/g, '');
 		}
-		let {pageName, pageId, siteName} = await page.evaluate(defaultSite => {
+        /**
+         * @type {import('./scpper-db').SCPStats}
+         */
+        const stats = {
+            pageName: '',
+            title: '',
+            author: '',
+            date: '',
+            rating: '',
+            score: '',
+            comments: '',
+            //pageId: undefined,
+            siteName: defaultSite,
+            tags: '',
+            licenseInfo: ''
+        }
+		const pageStats = await page.evaluate(defaultSite => {
+            if (typeof getStoredStats === 'function') {
+                // client/get-stats.js
+                return {
+                    siteName: defaultSite,
+                    ...getStoredStats()
+                };
+            }
 			// @ts-ignore
 			const info = window.WIKIREQUEST && window.WIKIREQUEST.info;
 			let pageName = info && info.pageUnixName;
@@ -632,18 +723,20 @@ class Scraper {
 			if (!pageName) {
 				pageName = location.pathname.slice(1).replace(/[\/\\() +&:]/g, '_');
 			}
-			const pageId = info && info.pageId;
+			const id = info && info.pageId;
 			const siteName = (info && info.siteUnixName) || defaultSite;
-			return { pageName, pageId, siteName };
+			return { pageName, id, siteName };
 		}, defaultSite);
+        Object.assign(stats, pageStats);
+        const {id} = stats;
         if (this._removeFromPageName) {
-            pageName = pageName.replace(this._removeFromPageName, '');
+            stats.pageName = stats.pageName.replace(this._removeFromPageName, '');
         }
 		// handle tags separately
-		if (/^system:page-tags/.test(pageName)) {
+		if (/^system:page-tags/.test(stats.pageName)) {
 			const tag = page.url().split('/').slice(-1)[0];
 			return {
-				id: pageId,
+				id: stats.id,
 				title: `All pages tagged "${tag}"`,
 				kind: 'System',
 				date: new Date('2008-07-19'),
@@ -651,10 +744,10 @@ class Scraper {
 				siteName: defaultSite,
 				pageName: `tagged_${tag}`
 			};
-		} else if (pageName === 'forum:thread') {
+		} else if (stats.pageName === 'forum:thread') {
 			const forumFor = (new URL(page.url())).pathname.replace(/.*\//, '');
 			return {
-				id: pageId,
+				id: stats.id,
 				title: `${forumFor} / Discussion`,
 				kind: 'System',
 				date: new Date('2008-07-19'),
@@ -663,18 +756,18 @@ class Scraper {
 				pageName: `forum_${forumFor}`
 			};
 		}
-		const stats = await this.wikiLookup.getStats(pageName, pageId);
-		stats.siteName = siteName;
+        // overwrite with data from scpper if enabled
+        Object.assign(stats, await this.wikiLookup.getStats(stats.pageName, stats.id));
 
 		if (/^(fragment:|system:|forum:)/.test(stats.pageName)) {
 			console.warn('Possibly invalid pagename', stats.pageName);
 			stats.pageName = stats.pageName.replace(':', '_');
 		}
 		if (/\/offset\//.test(page.url())) {
-			console.warn(`Offset page loaded (${stats.pageName}), this may overwrite parent`, stats);
+			console.warn(`Offset page loaded (${stats.pageName}), this may overwrite parent`, {title: stats.title, pageName: stats.pageName});
 		}
-		if (siteName !== defaultSite) {
-			stats.pageName = `${siteName.replace(/\./g, '_')}${stats.pageName}`;
+		if (stats.siteName !== defaultSite) {
+			stats.pageName = `${stats.siteName.replace(/\./g, '_')}${stats.pageName}`;
 		}
 		return stats;
 	}

@@ -20,7 +20,7 @@ class Chapter extends Resource {
 		/** @type {string[]} */
 		this._author;
 
-		/** @type {import("../scpper-db").SCPStats} */
+		/** @type {import("../scpper-db").SCPStats & {licenseInfo?: string}} */
 		// @ts-ignore
 		this.stats = {};
 

@@ -1,8 +1,8 @@
 const got = require('got');
 const urlLib = require('url');
 
-const baseUri = 'http://scpper.com';
-const defaultSite = 'en';
+let baseUri = 'http://scpper.com';
+let defaultSite = 'en';
 
 // SCP Foundation (scp-wiki.net): "en"
 // Russian branch (scpfoundation.ru): "ru"

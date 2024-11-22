@@ -1,4 +1,5 @@
 const config = require('../book-config');
+const Chapter = require('../lib/chapter');
 const {filenameForUrl, escape} = require('../lib/utils');
 
 function genSystemChapterHeader(chapter, config = {}) {
@@ -29,9 +30,9 @@ function genChapterHeader(chapter, audioAdaptations = [], options = {}) {
 	}
 
 	/** @type {Date | undefined} */
-	let date = new Date(stats.date);
+	let date = stats.date ? new Date(stats.date) : undefined;
 
-	if (isNaN(date.getTime())) {
+	if (date && isNaN(date.getTime())) {
 		console.warn(`Failed processing posted date for ${chapter.title} - value is ${JSON.stringify(stats.date)}`);
 		date = undefined;
 	}
@@ -39,7 +40,8 @@ function genChapterHeader(chapter, audioAdaptations = [], options = {}) {
 	const {
 		showRating = true,
 		includeAudioAdaptations = true,
-		includeReferences = false
+		includeReferences = false,
+        showTags = true
 	} = options;
 
 	const rows = [];
@@ -86,7 +88,7 @@ function genChapterHeader(chapter, audioAdaptations = [], options = {}) {
 		<p><br /></p>
 		<h1 id="page-title">${escape(title)}</h1>
 		<p role="doc-subtitle">${escape(altTitle)}</p>
-		<aside>
+		<aside class="chapter-meta-list">
 			<ul>${
 				rows
 					.map(([key, value]) => `<li>${key ? `<b>${escape(key)}:</b>` : ''} ${value}</li>`)
@@ -107,27 +109,52 @@ function genChapterHeader(chapter, audioAdaptations = [], options = {}) {
 	</header>`;
 }
 
-function genChapterFooter(bookLinks = [], externalLinks = [], config = {}) {
-	return `<footer class="chapter-footer chapter-meta">${
-		bookLinks.length ?
-		`<nav>
-			<h3>Referenced By:</h3>
-			<ol>${
-				bookLinks
-					.map(({title, url}) => `<li><a href="${url}">${escape(title)}</a></li>`)
-					.join('')
-			}</ol>
-		</nav>` : ''
-		}${externalLinks.length ?
-		`<aside>
-			<h3>External Links:</h3>
-			<ul>${
-				externalLinks
-					.map(({title, url}) => `<li><a href="${url}">${escape(title)}</a></li>`)
-					.join('')
-			}</ul>
-		</aside>` : ''
-	}</footer>`;
+/**
+ * 
+ * @param {Chapter} chapter 
+ * @param {Array<{title: string, url: string}>} bookLinks 
+ * @param {Array<{title: string, url: string}>} externalLinks 
+ * @param {import('../..').BookMakerConfig} options 
+ * @returns 
+ */
+function genChapterFooter(chapter, bookLinks = [], externalLinks = [], options = {}) {
+    const {
+		stats,
+		url,
+		forwardLinks: links = []
+	} = chapter;
+
+    const refText = bookLinks.length && `<nav>
+        <h3>Referenced By:</h3>
+        <ol>${
+            bookLinks
+                .map(({title, url}) => `<li><a href="${url}">${escape(title)}</a></li>`)
+                .join('')
+        }</ol>
+    </nav>`;
+    const extLinks = externalLinks.length && `<aside>
+        <h3>External Links:</h3>
+        <ul>${
+            externalLinks
+                .map(({title, url}) => `<li><a href="${url}">${escape(title)}</a></li>`)
+                .join('')
+        }</ul>
+    </aside>`;
+
+    // const licText = stats.licenseInfo && `<aside>
+    //     <h3>Licensing / Citation</h3>
+    //     <p class="license-info">${escape(stats.licenseInfo).replace(/\n+/g, '<br/>')}</p>
+    // </aside>`;
+
+    const tagsText = (stats.tags && options.showTags)
+        ? `<aside class="tags"><small>${stats.tags}</small></aside>`
+        : '';
+
+	return `<footer class="chapter-footer chapter-meta">
+        ${refText || ''}
+        ${extLinks || ''}
+        ${tagsText || ''}
+	</footer>`;
 }
 
 module.exports = {

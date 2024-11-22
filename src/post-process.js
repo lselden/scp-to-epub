@@ -219,7 +219,7 @@ class PostProcessor {
 		return {
 			header: genChapterHeader(chapter, audioAdaptations, bookOptions),
 			stylesheets,
-			footer: genChapterFooter(bookLinks, externalLinks, bookOptions)
+			footer: genChapterFooter(chapter, bookLinks, externalLinks, bookOptions)
 		};
 	}
 	// async switchImagesToLocal(page = this.page) {

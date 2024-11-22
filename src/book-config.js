@@ -123,7 +123,8 @@ config.util.defaults({
 		afterFormat: undefined,
 		// request: 'function',
 		// response: 'function'
-	}
+	},
+    enableStats: false
 });
 
 // add quick keys for common config values

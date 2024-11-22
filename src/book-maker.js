@@ -242,7 +242,7 @@ class BookMaker {
 		await this.include(include);
 
 		for (let depth = 1; depth <= maxDepth; depth++) {
-			console.log(`SUPPLEMENTAL ${depth}/${maxDepth} - remaining ${remainingChapters}/${maxChapters}`);
+			console.log(`SUPPLEMENTAL depth=${depth}/${maxDepth} - remaining chapters ${remainingChapters}/${maxChapters}`);
 			await this.includePending(depth);
 			// have to switch how this is updated
 			remainingChapters = maxChapters - this.book.getChapterCount();
@@ -253,7 +253,7 @@ class BookMaker {
 		if (!Array.isArray(targets)) {
 			targets = [targets];
 		}
-		console.log('Loading first batch of chapters');
+		console.log(`Loading first batch of chapters (${targets.length})`);
 		const chapters = await this.loadChapters(targets);
 		this.book.chapters.push(...chapters);
 		console.log('Finished including');
@@ -319,6 +319,7 @@ class BookMaker {
 		let pending = this.getPendingSupplemental({maxDepth, exclude});
 		// if too many then sort by most referenced
 		if (pending.length > maxPending) {
+            debug(`Pending supplemental exceeded max ${pending.length}/${maxPending} - depth ${depth}`);
 			const toKeep = [...pending]
 				.sort((a, b) => {
 					// make meta articles less important
