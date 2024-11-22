@@ -40,7 +40,7 @@ class BookMaker {
 
 		this.wikiLookup = new WikiDataLookup(this, this.options);
 		this.cache = new ResourceCache();
-		this.scraper = new Scraper(this, opts);
+		this.scraper = new Scraper(this, this.options);
 		this.postProcessor = new PostProcessor(this, opts);
 
 		if (book instanceof Book) {

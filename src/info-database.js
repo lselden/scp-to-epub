@@ -1,8 +1,8 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
-const path = require('path');
+const path = require('path/posix');
 const urlLib = require('url');
-const {safeFilename, debug} = require('./lib/utils');
+const {safeFilename, debug, escape} = require('./lib/utils');
 const scpperDB = require('./scpper-db');
 const Resource = require('./lib/resource');
 const DiskCache = require('./lib/disk-cache');
@@ -42,6 +42,7 @@ class WikiDataLookup {
 			authorsUrl: `${new URL('/system:page-tags/tag/author', defaultOrigin)}`,
 			artworkUrl: `${new URL('/system:page-tags/tag/artwork', defaultOrigin)}`,
 			ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36',
+            enableStats: true,
 			...opts,
 			cache: cacheOpts
 		};
@@ -49,60 +50,62 @@ class WikiDataLookup {
 		if (this.options.cache.stats) {
 			this.diskCache = new DiskCache({
 				...cacheOpts,
-				cacheInMemory: true
+				cacheInMemory: false
 			});
 		}
 	}
-	async initialize() {
-		// not actually necessary if loading lazily
-		await Promise.all([
-			this.loadMetaPages(),
-			this.loadCache()
-		]);
-	}
-	async loadCache() {
-		if (!this.options.cache.stats) {
-			return;
-		}
+    // only store stats lazily
+    statCache = new Map();
+    #whenLoaded = undefined;
+	async loadCache(force = false) {
+        if (!this.options.cache.stats) {
+            return;
+        }
+        if (this.#whenLoaded && !force) {
+            return this.#whenLoaded;
+        }
+        this.#whenLoaded = (async () => {
+            debug('Reading stat cache entries from disk');
+            await this.diskCache.initialize();
 
-		await this.diskCache.initialize();
+            
 
-		this.statCache = new Map();
-
-		try {
-			this.diskCache._cache.forEach((value, diskKey) => {
-				if (!diskKey.endsWith('.json')) {
-					return;
-				}
-				if (path.dirname(diskKey) !== 'stats') {
-					return;
-				}
-				const [pageId] = path.basename(value.path)
-					.split('_');
-				this.statCache.set(pageId, diskKey);
-			});
-			// const statsPath = path.join(this.options.cache.path, 'stats');
-			// // make sure directory exists
-			// await fs.mkdir(statsPath, {recursive: true});
-			// const statFiles = await fs.readdir(statsPath, { withFileTypes: true });
-			// for (let file of statFiles) {
-			// 	// only valid entries
-			// 	if (!file.isFile || !file.name.endsWith('.json')) {
-			// 		continue;
-			// 	}
-			// 	const pageId = file.name.split('_')[0];
-			// 	this.statCache.set(pageId, file.name);
-			// }
-		} catch (err) {
-			console.warn('Unable to load stats cache', err);
-		}
+            // try {
+            //     // this.diskCache._cache.forEach((value, diskKey) => {
+            //     //     if (!diskKey.endsWith('.json')) {
+            //     //         return;
+            //     //     }
+            //     //     if (path.dirname(diskKey) !== 'stats') {
+            //     //         return;
+            //     //     }
+            //     //     const [pageId] = path.basename(value.path)
+            //     //         .split('_');
+            //     //     this.statCache.set(pageId, diskKey);
+            //     // });
+            //     // const statsPath = path.join(this.options.cache.path, 'stats');
+            //     // // make sure directory exists
+            //     // await fs.mkdir(statsPath, {recursive: true});
+            //     // const statFiles = await fs.readdir(statsPath, { withFileTypes: true });
+            //     // for (let file of statFiles) {
+            //     // 	// only valid entries
+            //     // 	if (!file.isFile || !file.name.endsWith('.json')) {
+            //     // 		continue;
+            //     // 	}
+            //     // 	const pageId = file.name.split('_')[0];
+            //     // 	this.statCache.set(pageId, file.name);
+            //     // }
+            // } catch (err) {
+            //     console.warn('Unable to load stats cache', err);
+            // }
+        })();
+        return this.#whenLoaded;
 	}
 	async saveCachedStats(stats) {
-		const filename = `${stats.id}_${stats.pageName}.json`
-			.replace(/[ <>():"\/\\|?*\x00-\x1F]/g, '_');
-		const content = JSON.stringify(stats, null, '  ');
+        const content = JSON.stringify(stats, null, '  ');
 
-		await this.diskCache.set(path.join('stats', filename), content);
+        const diskKey = this.#asCacheKey(stats.id, stats.pageName);
+		await this.diskCache.set(diskKey, content);
+        this.statCache.set(diskKey, stats);
 
 		// const statsPath = path.join(this.options.cache.path, 'stats');
 
@@ -117,57 +120,58 @@ class WikiDataLookup {
 		// 	console.warn('failed to write stats to cache', err);
 		// }
 	}
-	async getCachedStats(pageId) {
+    #asCacheKey(pageId, pageName = 'list') {
+        pageName = `${pageName}`.slice(0, 80);
+        return path.posix.join('stats', safeFilename(`${pageId}_${pageName}.json`, '.json'));
+    }
+	async getCachedStats(pageId, pageName) {
 		const cacheOpts = this.options.cache;
 		if (!cacheOpts.stats) {
 			return;
 		}
-		if (!this.statCache) {
-			await this.loadCache();
-		}
+
+        await this.loadCache();
 
 		//  make sure in cache
-		const diskId = path.join('stats', `${pageId}`.replace(/[ <>():"\/\\|?*\x00-\x1F]/g, '_'));
+		const diskId = this.#asCacheKey(pageId, pageName);
 
 		const cacheEntry = await this.diskCache.get(diskId);
 
-		if (!cacheEntry) {
+		if (!cacheEntry?.content) {
 			return;
 		}
 
-		return cacheEntry.content;
+        let raw = cacheEntry.content;
+        if (typeof raw === 'object' && !(raw instanceof Buffer) && Array.isArray(raw.list)) {
+            return raw;
+        }
+        let stats;
+        try {
+            stats = JSON.parse(raw.toString());
+        } catch (error) {
+            console.warn(`Failed to parse cache data for ${pageId}`, error);
+            return;
+        }
 
-		// if (!filename) {
-		// 	return;
-		// }
-		// const statsPath = path.join(this.options.cache.path, 'stats');
-		// try {
-		// 	const raw = await fs.readFile(path.join(statsPath, filename));
-		// 	const stats = JSON.parse(raw.toString());
-		// 	const age = (new Date()).getTime() - (new Date(stats.lastCached)).getTime();
-		// 	// don't return if stale
-		// 	if (age <= cacheOpts.maxAge) {
-		// 		return stats;
-		// 	}
-		// } catch (err) {
-		// 	console.warn(`Failed to get cache data for ${pageId}`, err);
-		// }
+        const lastCached = stats.lastCached || cacheEntry.modified;
+        const age = Date.now() - new Date(lastCached).getTime();
+		// don't return if stale
+        if (!isNaN(age) && age > cacheOpts.maxAge) {
+            return undefined;
+        }
+        return stats;
 	}
 	async getStats(pageName, pageId) {
         if (!this.options.enableStats) {
             return {
-				pageName,
-				author: '',
-				date: '',
-				rating: '',
-				score: ''
+				pageName
 			};
         }
 
 		const {stats: cacheEnabled} = this.options.cache;
 		// check if exists
 		if (pageId && cacheEnabled) {
-			const result = await this.getCachedStats(pageId);
+			const result = await this.getCachedStats(pageId, pageName);
 			if (result) {
 				return result;
 			}
@@ -193,20 +197,21 @@ class WikiDataLookup {
 		} catch (err) {
 			console.error(`Failed to get stats for ${pageName} ${pageId}`, err);
 			return {
-				pageName,
-				author: '',
-				date: '',
-				rating: '',
-				score: ''
+				pageName
 			};
 		}
 	}
-	async getCachedList(listName) {
-		// __meta__authors
-		const data = await this.getCachedStats(`meta--${listName}`);
-		if (data) {
-			return data.list;
-		};
+	getCachedList = async (listName) => {
+        const pageId = `meta--${listName}`;
+        const cacheKey = this.#asCacheKey(pageId, 'list');
+        let data = this.statCache.get(cacheKey);
+        
+        // __meta__authors
+        if (!data) {
+            data = await this.getCachedStats(pageId, 'list')
+            data && this.statCache.set(cacheKey, data);
+        }
+		return data?.list;
 	}
 	async saveCachedList(listName, list) {
 		await this.saveCachedStats({
@@ -217,8 +222,9 @@ class WikiDataLookup {
 	}
 	async loadMetaPages() {
         debug('Loading metadata pages');
+        await this.loadCache();
+        await this.loadAdaptationList();
 		await Promise.all([
-			this.loadAdaptationList(),
 			this.loadAuthorsList(),
 			this.loadArtworksList(),
 			this.loadHubsList()
@@ -245,7 +251,7 @@ class WikiDataLookup {
 		this.authorsList = await page.$$eval('.pages-list-item a', links => {
 			const out = {};
 			links.forEach(el => {
-				const pageName = (el.getAttribute('href') || '').slice(1);
+				const pageName = escape(el.getAttribute('href') || '').slice(1);
 				if (!pageName) {
 					return;
 				}
@@ -279,7 +285,7 @@ class WikiDataLookup {
 		this.artworksList = await page.$$eval('.pages-list-item a', links => {
 			const out = {};
 			links.forEach(el => {
-				const pageName = (el.getAttribute('href') || '').slice(1);
+				const pageName = escape(el.getAttribute('href') || '').slice(1);
 				if (!pageName) {
 					return;
 				}
@@ -313,7 +319,7 @@ class WikiDataLookup {
 		this.hubList = await page.$$eval('.pages-list-item a', links => {
 			const out = {};
 			links.forEach(el => {
-				const pageName = (el.getAttribute('href') || '').slice(1);
+				const pageName = escape(el.getAttribute('href') || '').slice(1);
 				if (!pageName) {
 					return;
 				}
@@ -362,7 +368,7 @@ class WikiDataLookup {
 					console.log('bad!', rawHref);
 					return;
 				}
-				const pageName = rawHref.slice(1);
+				const pageName = escape(rawHref).slice(1);
 				console.log('found', pageName);
 				const payload = [...links].map(a => {
 					return {

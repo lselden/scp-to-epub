@@ -1,9 +1,9 @@
 const fs = require('fs').promises;
-const path = require('path');
+const path = require('path/posix');
 const urlLib = require('url');
 const pMap = require('p-map');
 const config = require('../book-config');
-const {safeFilename, normalizePath} = require('./utils');
+const {safeFilename, normalizePath, debug} = require('./utils');
 
 function isEmpty(arr) {
 	return !(arr && (typeof arr === 'object') && Object.keys(arr).length > 0);
@@ -23,68 +23,84 @@ class DiskCache {
 			...opts
 		};
 	}
-	async initialize() {
-		if (!this.options.enable) {
-			return;
-		}
+    #init = undefined;
+	async initialize(force = false) {
+        if (!this.options.enable) {
+            console.log('Disk Cache disabled - will remote content each time');
+            return;
+        }
+        if (this.#init && !force) {
+            return this.#init;
+        }
 
-		const readDirRecursive = async (baseDir) => {
-			// QUESTION should we just use dedicated glob library?
-			const entries = await fs.readdir(baseDir, { withFileTypes: true });
-			const {files, dirs} = entries.reduce((out, entry) => {
-				const fullPath = path.join(baseDir, entry.name);
-				if (entry.isFile() && !this._shouldIgnore(fullPath)) {
-					out.files.push(fullPath);
-				} else if (entry.isDirectory()) {
-					out.dirs.push(fullPath);
-				}
-				return out;
-			}, {files: [], dirs: []});
+        this.#init = (async () => {
+            this._cache = new Map();
+            this._dirs = new Set(['.', this.options.path]);
+            try {
+                const baseDir = this.options.path;
+                // make sure directory exists
+                await fs.mkdir(baseDir, {recursive: true});
+                // QUESTION should we just use dedicated glob library?
+                const {files, dirs} = await this.#readDirectory(baseDir);
+                dirs.forEach(dir => this._dirs.add(dir));
 
-			const allDirs = [];
-			for (let dir of dirs) {
-				const subEntries = await readDirRecursive(dir);
-				files.push(...subEntries.files);
-				allDirs.push(dir, ...subEntries.dirs);
-			}
+                files.forEach(file => {
+                    this._cache.set(file.id, file);
+                });
 
-			return {
-				files,
-				dirs: allDirs
-			};
-		}
-
-		this._cache = new Map();
-		this._dirs = new Set(['.', this.options.path]);
-		try {
-			const baseDir = this.options.path;
-			// make sure directory exists
-			await fs.mkdir(baseDir, {recursive: true});
-			// QUESTION should we just use dedicated glob library?
-			const entries = await readDirRecursive(baseDir);
-
-			entries.dirs.forEach(dir => this._dirs.add(dir));
-			await pMap(entries.files, async file => {
-				try {
-					const pageId = this.asCachePath(path.relative(baseDir, file));
-					const stats = await fs.stat(file);
-					this._cache.set(pageId, {
-						id: pageId,
-						path: file,
-						modified: stats.mtime,
-						size: stats.size
-					});
-				} catch (err) {
-					console.warn(`Error reading info for cached file ${file}`, err);
-				}
-			}, { concurrency: this.options.concurrency });
-		} catch (err) {
-			console.warn('Unable to load stats cache', err);
-		}
+                debug(`Found ${this._cache.size} cached entries`);
+            } catch (err) {
+                console.warn('Unable to load stats cache', err);
+            }
+        })();
+        return this.#init;
 	}
+    /**
+     * 
+     * @param {string} baseDir 
+     * @returns {Promise<{files: Array<{id: string, path: string, modified: number, size: number}>, dirs: string[] }>}
+     */
+    #readDirectory = async (baseDir) => {
+        const files = [];
+        const dirs = [];
+        baseDir = path.normalize(baseDir).replaceAll('\\', '/');
+
+        const listing = await fs.readdir(baseDir, { withFileTypes: true, recursive: true });
+        await pMap(listing, async (entry) => {
+            const dir = entry.parentPath ?? entry.path;
+            const fullPath = path.join(dir, entry.name).replaceAll('\\', '/');
+            if (entry.isDirectory()) {
+                dirs.push(fullPath);
+                return;
+            }
+            if (!entry.isFile() || this._shouldIgnore(fullPath)) {
+                return;
+            }
+            const stats = await fs.stat(fullPath)
+                .catch(err => {
+                    console.warn(`Error reading info for cached file ${fullPath}`, err);
+                    return;
+                });
+            if (!stats) return;
+            const pageId = this.asCachePath(path.relative(baseDir, fullPath));
+            files.push({
+                id: pageId,
+                path: fullPath,
+                modified: stats.mtime,
+                size: stats.size
+            });
+        }, { concurrency: this.options.concurrency });
+        return {
+            files,
+            dirs
+        };
+    }
 	asCachePath(uri) {
 		const UP_PATH_REGEXP = /(?:^|[\\/])\.\.(?:[\\/]|$)/g;
 		uri = this._normalizeUrl(uri);
+
+        // standardize path separators
+        uri = uri.replaceAll('\\', '/');
 
 		let dir = path.basename(path.dirname(uri)).replace(UP_PATH_REGEXP, '');
 		let file = path.basename(uri);
