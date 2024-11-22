@@ -84,6 +84,9 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		})
 		.implies('book', 'output')
 		.implies('page', 'output')
+        .option('include', {
+			describe: 'also include additional pages,separated by commas'
+		})
 		.option('tempDir', {
 			alias: ['d', 'dir'],
 			describe: 'Temporary working directory',
@@ -152,6 +155,12 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		pageName = safeFilename(`${argv.title}`);
 	}
 
+    const argInclude = (argv.include || '')
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
+
+
 	const {
 		page,
 		book: bookUrl,
@@ -187,7 +196,10 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		},
 		discovery: {
 			maxChapters,
-			maxDepth
+			maxDepth,
+            ...(argInclude && argInclude.length > 0) && {
+                include: argInclude
+            }
 		},
 		output: {
 			keepTempFiles,
