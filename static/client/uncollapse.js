@@ -72,9 +72,9 @@ function makeCollapseSection(foldText = '', unfoldText = '', contents = []) {
 	newEl.innerHTML = (`
 		<h2 id="${headerId}"
 			class="epub-collapse-header ${hasUnfolded ? 'epub-has-unfolded' : ''}">
-			<${foldTag} class="epub-collapse-folded-text">${foldText}</${foldTag}>
+			<${foldTag} class="epub-collapse-folded-text">${escape(foldText)}</${foldTag}>
 		${ hasUnfolded ?
-			`<ins role="doc-subtitle">${unfoldText}</ins>` :
+			`<ins role="doc-subtitle">${escape(unfoldText)}</ins>` :
 			''
 		}
 		</h2>

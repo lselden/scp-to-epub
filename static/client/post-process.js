@@ -15,6 +15,8 @@ function cleanupHead (doc) {
 			el.remove();
 		}
 	});
+    // remove all meta elements, b/c can cause bad parsing in some apps
+    [...doc.head.querySelectorAll('meta[name]')].forEach(el => el.remove());
 }
 
 function fixDocType (doc) {
@@ -96,7 +98,7 @@ async function registerRemote(doc, originalUrl) {
 				}
 			}
 		} catch (err) {
-			console.warn('Failed to process media element', err);
+			console.warn(`Failed to process media element ${err}`);
 		}
 	}
 

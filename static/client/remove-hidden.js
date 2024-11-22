@@ -21,7 +21,7 @@ async function removeHidden() {
 		const isVisible = await isIntersectingViewport(el);
 		if (!isVisible) {
 			if (el.matches('section')) {
-				debugger;
+				// debugger;
 			}
 			removeMap.add(el);
 			return;
