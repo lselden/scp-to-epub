@@ -89,6 +89,7 @@
     min-width: 50%;
     max-width: 100%;
     text-align: left;
+    word-break: break-all;
     box-sizing: border-box;
     margin: 0 auto;
 }
@@ -100,10 +101,10 @@
         justify-content: center;
     }
 
-    .chapter-meta li {
+    /* .chapter-meta li {
         width: 100%;
         white-space: pre;
-    }
+    } */
 }
 
 .offset-item {

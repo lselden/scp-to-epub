@@ -1,4 +1,34 @@
 # scp-to-epub
+
+## Update 2024 - Executable Version
+
+I dusted off this project and I'm surprised it still works! I added a packaged binary version of the tool *(Windows only, I don't have a mac handy)* that you can use without having to install node etc.
+
+### Getting Started - Windows
+
+* Download the zip from the [releases](https://github.com/lselden/scp-to-epub/releases) page, and extract to disk.
+* This tool uses [browser automation](https://pptr.dev/) to load/format webpages, so it needs to point to a compatible browser (tested with Chrome, Edge/Firefox *may* work). If you get errors about Chromium not being installed then update the `executablePath` in config.yaml to point to `chrome.exe`
+* It's a commandline tool, so open up a cmd/powershell prompt and navigate to the extracted folder.
+
+### Usage
+
+* Quick: make a book from a single page and it's linked articles:
+
+```sh
+### pass full URL or just the article slug
+scp-to-epub.exe --page https://scp-wiki.wikidot.com/department-contest
+scp-to-epub.exe --page department-contest
+
+### Some system pages, like tag list works too!
+scp-to-epub.exe --page "https://scp-wiki.wikidot.com/system:page-tags/tag/food" --title "Food SCP Articles"
+
+### Specify a "book" markdown file with a custom list of entries
+scp-to-epub.exe --book "books/top-by-year-2022.md"
+
+### Opens a page in the browser, applying all formatting changes to work as an ebook
+scp-to-epub.exe --view "scp-504"
+```
+
 ## THE BOOKS
 If you just want to download some eBooks head to the [releases](https://github.com/lselden/scp-to-epub/releases) page. Or check out an online version here: [pixel art collab](https://lselden.github.io/scp-to-epub/pixel-art-collab)
 
@@ -76,3 +106,7 @@ scp-to-epub code is Creative Commons Attribution 3.0 License. Unless otherwise s
 ## SIMILAR PROJECTS
 * [SCP Foundation: Ebook edition](http://www.scpwiki.com/ebooks)
 * [SCP Series Field Manual](http://www.scpwiki.com/forum/t-12612670/new-scp-001-to-scp-1999-documentation-ebooks#post-4379359)
+
+## DISCLAIMER
+
+This project is provided AS-IS with no guarantees. I didn't write/contribute to any of the linked/packaged 3rd-party content, and take no responsibility nor endorse said content.
