@@ -131,6 +131,15 @@ cover:
   quality: 70
   ### the template HTML to use for creating the cover - default should be fine?
   #templateHTML: 'D:/path/to/cover.html'
+  ### Use a SCP page / theme as a basis of the cover - ex: or any linked on https://scp-wiki.wikidot.com/black-highlighter-themes
+  #theme: /theme:uiu-bhl-theme
+  ### for use with theme - set whether to use theme's logo ('auto'), the default SCP logo or custom URL
+  #themeImage: 'auto'
+  ### alternatively, set themeImage to 'none' and specify backgroundImage to make image fullscreen
+  #backgroundImage: https://scp-wiki.wdfiles.com/local--files/scp8000contesthub/banner.jpg
+  ### for use with theme - allow extra CSS overrides after creating
+  #overrideCSS: '.cover-title: { color: rgb(var(--medium-accent))} .cover-author: { cover: rgb(var(--alt-accent))} .cover-image { background: #ff78ee; }'
+
 preProcess:
   ### how many pages to scrape in parallel I found errors when I did more than one at a time on the wikidot side
   concurrency: 1

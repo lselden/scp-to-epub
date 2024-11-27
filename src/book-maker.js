@@ -457,8 +457,10 @@ class BookMaker {
 			author: [].concat(this.book.author || 'SCP Foundation').join(' & '),
 			...options
 		};
-		const resource = await makeCover(this.browser, opts);
-		this.cache.set(resource);
+        const resource = await makeCover(this.browser, opts);
+        if (resource) {
+            this.cache.set(resource);
+        }
 	}
 	async destroy() {
 		await this.browser.close();

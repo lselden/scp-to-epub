@@ -31,6 +31,17 @@ async function processSingle (urls, cfg, tmpDir, destination) {
 		console.log(`SUPPLEMENTAL ${depth}/${builder.options.maxDepth}`);
 		await builder.includePending(depth);
 	}
+
+    if (!book.title) {
+        let {title, author} = book.chapters[0] ?? {};
+        book.title = title;
+        author = (Array.isArray(author) ? author.join(' & ') : author || '').trim();
+        if (author) {
+            book.author = `by ${`${author}`.replace(/^\s*by\s+/, '')}`;
+        }
+    }
+    await builder.makeCover();
+
 	console.log('WRITING');
 	await builder.finalize();
 	await builder.write(destination, tmpDir);
@@ -96,6 +107,9 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 			// FIXME
 			default: config.get('output.tempDir')
 		})
+        .option('coverTheme', {
+            describe: 'SCP Page/Theme page to use for creating cover (ex. /theme:black-highlighter-theme)'
+        })
 		.option('keepTempFiles', {
 			alias: ['keep'],
 			describe: 'Keep temporary folder, instead of deleting. Use --no-keep to delete',
@@ -179,6 +193,7 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		maxDepth,
 		keepTempFiles,
 		remoteImages,
+        coverTheme,
 		output
 	} = argv;
 
@@ -213,7 +228,12 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		browser: {
 			headless: !showBrowser,
 			debug
-		}
+		},
+        cover: {
+            ...coverTheme && {
+                theme: coverTheme
+            }
+        }
 	}));
 
 	if (viewUrl) {
