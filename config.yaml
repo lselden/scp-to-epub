@@ -74,8 +74,16 @@ discovery:
   defaultOrigin: 'https://scp-wiki.wikidot.com/'
 
   ### KIWIX support - you can try to get content from a KIWIX mirror (https://dev.library.kiwix.org/#lang=eng&q=scp)
-  # if using kiwix archive then put the proxy url (remove trailing scp-wiki.wikidot.com)
-  #localArchiveProxy: 'http://127.0.0.1:8080/content/scp-wiki_en_all_2024-09/'
+  # if using kiwix archive then put the mirror url (remove trailing scp-wiki.wikidot.com)
+  #localArchiveMirror: 'http://127.0.0.1:8080/content/scp-wiki_en_all_2024-09/'
+  ### settings for local archive mirror
+  #localArchiveMirrorCfg:
+    ### if url includes any of these strings then don't mirror
+    #exclude: ['127.0.0.1', 'some/specific/path', '.mp4']
+    ### whether to make a HEAD request to see if mirror has the content. may slow things down slightly
+    #verify: true
+    ### milliseconds to wait for verify before going to source
+    #timeoutMs: 10000
 
 browser:
   ##########################################

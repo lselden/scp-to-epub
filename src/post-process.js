@@ -7,7 +7,8 @@ const DocPart = require('./lib/doc-part');
 const Resource = require('./lib/resource');
 const {genChapterFooter, genChapterHeader} = require('./templates/chapter-parts');
 const { getAssetPath } = require('./lib/path-utils');
-const { isLocalProxyEnabled, getLocalProxyUrl } = require('./lib/kiwiki-cache');
+const { isLocalMirrorEnabled, getLocalMirrorUrl } = require('./lib/kiwiki-cache');
+const Chapter = require('./lib/chapter');
 
 class PostProcessor {
 	/**
@@ -66,7 +67,7 @@ class PostProcessor {
 			}
 			return href;
 		});
-		this.page.exposeFunction('registerRemoteResource', async (resourceUrl, originalUrl) => {
+		this.page.exposeFunction('registerRemoteResource', async (resourceUrl, originalUrl, {typeHint = undefined, shouldCompress = undefined} = {}) => {
 			let resource = this.cache.get(resourceUrl);
 			// if no resource already then just mark as remote
 			if (!resource) {
@@ -76,18 +77,38 @@ class PostProcessor {
 				this.cache.set(resource);
 			}
 
+            if (!resource.mimeType && typeHint) {
+                resource.mimeType = typeHint;
+            } else if (!resource.mimeType) {
+                // REVIEW - necessary to make sure content type is good?
+                // await resource.tryDetectMimeType();
+            }
+
 			// check if should be stored locally
 			if (resource.isImage && resource.content && !this.options.remoteImages) {
-				resource.setLocal();
-				// COMBAK QUESTION pass configurable options?
-				await resource.compress();
+                // COMBAK QUESTION pass configurable options?
+                try {
+                    await resource.compress({
+                        ...(shouldCompress !== undefined) && { compress: shouldCompress }
+                    });
+                    resource.setLocal();
+                } catch (err) {
+                    console.debug(`error compressing image for ${originalUrl} ${resourceUrl} - likely invalid ${err}`)
+                    // clear out content b/c not falid
+                    resource.content = undefined;
+                    resource.setInvalid();
+                }
 			}
 
 			if (!resource.shouldWrite) {
 				resource.setRemote();
 			}
 
-			resource.addBacklinks(originalUrl);
+            try {
+			    resource.addBacklinks(originalUrl);
+            } catch (err) {
+                console.debug(`error adding resource backlinks for ${originalUrl} ${resourceUrl} - ${err}`);
+            }
 
 			const chapter = /** @type {import("./lib/chapter")} */(this.cache.get(originalUrl));
 			if (!chapter) {
@@ -148,10 +169,10 @@ class PostProcessor {
 				console.warn(`Failed to parse ${chapter.url} completely - parse error. ${error}`);
 			}
 
-            if (isLocalProxyEnabled()) {
-                debug(`removing local proxy address from any links in ${chapter.url}`);
-                const localProxy = getLocalProxyUrl();
-                content = content.replaceAll(localProxy.replace(/https?:\/\//, ''), '');
+            if (isLocalMirrorEnabled()) {
+                debug(`removing local mirror address from any links in ${chapter.url}`);
+                const localMirror = getLocalMirrorUrl();
+                content = content.replaceAll(localMirror.replace(/https?:\/\//, ''), '');
 
             }
 

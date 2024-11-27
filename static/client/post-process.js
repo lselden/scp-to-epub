@@ -41,7 +41,9 @@ async function updateLinks (doc, originalUrl) {
 		// magic value to avoid updating
 
 		// use URL constructor to ensure external relative links are preserved
-		const urlObj = new URL(anchor.getAttribute('href'), originalUrl);
+        const attr = anchor.getAttribute('href');
+        if (!attr || !URL.canParse(attr, originalUrl)) continue;
+		const urlObj = new URL(attr, originalUrl);
 		let href = urlObj.toString();
 
 		// TODO this is only needed for header front-matter, so really isn't necessary anymore
@@ -87,11 +89,22 @@ async function registerRemote(doc, originalUrl) {
 				continue;
 			}
 
+            let typeHint = {
+                audio: 'audio/mpeg',
+                video: 'video/mp4',
+                img: 'image/jpeg',
+                iframe: 'text/html'
+            }[el.tagName.toLowerCase()] || undefined;
+
+            let shouldCompress = /true|false/.test(el.dataset.compress)
+                ? el.dataset.compress === "true"
+                : undefined;
+
 
 			// @ts-ignore
 			if (typeof window.registerRemoteResource === 'function') {
 				// @ts-ignore
-				const canononicalUrl = await window.registerRemoteResource(href, originalUrl);
+				const canononicalUrl = await window.registerRemoteResource(href, originalUrl, {typeHint, shouldCompress});
 				// make sure redirected content use the same url
 				if (canononicalUrl !== href) {
 					el.src = canononicalUrl;
@@ -116,18 +129,28 @@ function addExtras (doc, extras, originalUrl) {
 	doc.head.insertAdjacentHTML('beforeend', extras.stylesheets);
 
 	const main = doc.querySelector('[role="doc-chapter"]');
-	const origHead = doc.querySelector('#page-title');
-	if (origHead) {
-		origHead.insertAdjacentHTML('afterend', extras.header);
-		origHead.remove();
-	} else {
-		main.insertAdjacentHTML('afterbegin', extras.header);
-	}
-	if (main) {
-		main.insertAdjacentHTML('beforeend', extras.footer);
-	} else {
-		console.error(`FAILED TO ADD HEADER/FOOTER - NOT PROPERLY FORMATTED PAGE ${originalUrl}`);
-	}
+    try {
+        const origHead = doc.querySelector('#page-title');
+        if (origHead) {
+            origHead.insertAdjacentHTML('afterend', extras.header);
+            origHead.remove();
+        } else {
+            main.insertAdjacentHTML('afterbegin', extras.header);
+        }       
+    } catch (error) {
+        console.warn(`Unable to add header - malformed ${error}`, JSON.stringify(extras.header));
+        throw error;
+    }
+    try {
+        if (main) {
+            main.insertAdjacentHTML('beforeend', extras.footer);
+        } else {
+            console.error(`FAILED TO ADD HEADER/FOOTER - NOT PROPERLY FORMATTED PAGE ${originalUrl}`);
+        }
+    } catch (error) {
+        console.warn(`Unable to add footer - malformed ${error}`, JSON.stringify(extras.footer));
+        throw error;
+    }
 }
 
 // somehow some spam iframes made it in
@@ -199,6 +222,8 @@ window.processChapter = async function (content, extras, config = {}) {
 		haltOnError = false
 	} = config;
 
+    Object.assign(globalThis, { _extras: extras, _content: content });
+
 	let {doc, error} = this.parseDoc(content, config);
 
 	if (error && haltOnError) {
@@ -220,7 +245,7 @@ window.processChapter = async function (content, extras, config = {}) {
 			await fn(doc);
 		} catch (err) {
 			console.warn(`Error on ${name} for ${originalUrl}: ${err}`);
-			if (haltOnError) {
+            if (haltOnError) {
 				throw err;
 			}
 			error = error ? `${error}\n${err}` : `${err}`;

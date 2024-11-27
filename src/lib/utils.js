@@ -9,6 +9,31 @@ function uuid() {
 	});
 }
 
+/**
+ * don't worry about double escaping! escape away!
+ * @param {*} unsafe 
+ * @returns {string}
+ */
+function maybeEscape(unsafe) {
+    if (unsafe == undefined) {
+        return unsafe;
+    }
+    if (typeof unsafe !== 'string') {
+		unsafe = `${unsafe}`;
+	}
+	return unsafe
+        .replace(/[<"']/g, function(x) {
+            switch (x) {
+            case '<': return '&lt;';
+            case '"': return '&quot;';
+            default: return '&#039;';
+            }
+        })
+        .replace(/&(?!(?:apos|quot|[gl]t|amp);|#)/g, '&amp;');
+    
+
+}
+
 function escape(unsafe) {
 	if (typeof unsafe !== 'string') {
 		return unsafe;
@@ -72,17 +97,31 @@ function normalizePath(pathname) {
 	return pathname.replace(/\\/g, '/');
 }
 
+function normalizeUrl(url, defaultOrigin) {
+    return new URL(normalizeRelativePath(url), defaultOrigin).toString()
+}
+
+function normalizeRelativePath(url) {
+    if (typeof url !== 'string') {
+        url = `${url ?? ''}`;
+    }
+    if (url.startsWith('/') || url.startsWith('http:') || url.startsWith('https:')) {
+        return url;
+    }
+    return `/${url.replace(/\\/g, '/')}`;
+}
+
 /**
  * 
  * @param {string} u 
  * @param {string | URL} [defaultOrigin]
- * @param {string | URL} [localArchiveProxy] 
+ * @param {string | URL} [localArchiveMirror] 
  * @returns 
  */
-function maybeProxyUrl(u, defaultOrigin = undefined, localArchiveProxy) {
+function maybeMirrorUrl(u, defaultOrigin = undefined, localArchiveMirror) {
     const url = new URL(u, defaultOrigin ? defaultOrigin : undefined)
-    if (!localArchiveProxy) return url.toString();
-    return `${localArchiveProxy}/${url.toString().replace(/^https?:\/\//, '')}`;
+    if (!localArchiveMirror) return url.toString();
+    return `${localArchiveMirror}/${url.toString().replace(/^https?:\/\//, '')}`;
 }
 
 const debug = debuglog('scp'); 
@@ -90,9 +129,12 @@ const debug = debuglog('scp');
 module.exports = {
 	uuid,
 	escape,
+    maybeEscape,
 	safeFilename,
 	filenameForUrl,
 	normalizePath,
-    maybeProxyUrl,
+    maybeMirrorUrl,
+    normalizeRelativePath,
+    normalizeUrl,
     debug
 };

@@ -40,3 +40,4 @@ temp
 common/temp/**
 package-deps.json
 /build
+local.yaml

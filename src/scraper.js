@@ -7,20 +7,15 @@ const Resource = require('./lib/resource');
 const Chapter = require('./lib/chapter');
 const Link = require('./lib/link');
 const {safeFilename, filenameForUrl, debug} = require('./lib/utils');
-const { configureLocalProxy, maybeProxyUrl, shouldProxyUrl, serveResponseFromProxy, toProxyUrl, fromProxyUrl, isProxiedUrl, checkProxyHasUrl } = require('./lib/kiwiki-cache');
+const { configureLocalMirror, maybeMirrorUrl, shouldMirrorUrl, serveResponseFromMirror, toMirrorUrl, fromMirrorUrl, isProxiedUrl, checkMirrorHasUrl } = require('./lib/kiwiki-cache');
 
 const {CacheEnum} = Resource;
 
 /**
- * @import {Browser, Page, Request, Response} from 'puppeteer'
+ * @import {Browser, Page, HTTPRequest as Request, HTTPResponse as Response} from 'puppeteer'
  * @import {BookMakerConfig} from '..'
  * @import BookMaker from './book-maker'
  */
-
-/** @typedef {import("puppeteer").Browser} Browser */
-/** @typedef {import("puppeteer").Page} Page */
-/** @typedef {import("puppeteer").Request} Request */
-/** @typedef {import("puppeteer").Response} Response */
 
 class Scraper {
 	/**
@@ -119,21 +114,24 @@ class Scraper {
 			preProcess: config.get('preProcess'),
 			static: config.get('static'),
 			hooks: config.get('hooks'),
-            localArchiveProxy: config.get('discovery.localArchiveProxy')
+            localArchiveMirror: config.get('discovery.localArchiveMirror')
 		},
 		opts);
 
 		if (this.options.remoteImages === undefined) {
 			this.options.remoteImages = config.get('output.images.remote', false);
 		}
-        this._removeFromPageName = '';
-        if (URL.canParse(this.options.localArchiveProxy)) {
-            let val = new URL(this.options.localArchiveProxy).pathname;
+        this._removeFromPageName = [];
+        if (URL.canParse(this.options.localArchiveMirror)) {
+            let val = new URL(this.options.localArchiveMirror).pathname;
             if (!val.endsWith('/')) { val += '/'; }
             
-            this._removeFromPageName = val.slice(1).replace(/[\/\\() +&:]/g, '_');
+            this._removeFromPageName = [
+                val.slice(1).replace(/[\/\\() +&:]/g, '_'),
+                this.options.defaultOrigin.replace(/https?:\/\//,'').replace(/\//g, '_')
+            ];
         }
-        configureLocalProxy();
+        configureLocalMirror();
         debug('initialize scraper with options', this.options);
 	}
     /**
@@ -180,17 +178,17 @@ class Scraper {
         
         if (isProxiedUrl(url)) {
             // test to make sure it exists - if not allow for fallback
-            const isCachedLocally = await checkProxyHasUrl(url);
+            const isCachedLocally = await checkMirrorHasUrl(url);
 
             if (!isCachedLocally) {
-                 // un-proxy the url to try to get from origin
-                rewriteUrl = fromProxyUrl(url);
+                 // un-mirror the url to try to get from origin
+                rewriteUrl = fromMirrorUrl(url);
                 url = rewriteUrl;
             }
             // otherwise just keep going
-        } else if (shouldProxyUrl(url)) {
-            // check to see if proxy has content - if not keep going
-            const payload = await serveResponseFromProxy(toProxyUrl(url));
+        } else if (shouldMirrorUrl(url)) {
+            // check to see if mirror has content - if not keep going
+            const payload = await serveResponseFromMirror(toMirrorUrl(url));
             if (payload) {
                 request.respond(payload);
                 return;
@@ -213,6 +211,8 @@ class Scraper {
 			return;
 		}
 
+        const statusCode = res.status();
+
 		try {
 			// create as response
 			const resource = Resource.fromResponse(res);
@@ -229,11 +229,14 @@ class Scraper {
 				return;
 			}
 
+            const isRedirect = statusCode >= 300 && statusCode < 400;
+
 			// only downloading images at this time
 			if (
 				(resource.isImage || resource.isDataUrl) &&
 				// don't download if explicitly set to not cache images
-				!this.options.remoteImages
+				!this.options.remoteImages &&
+                !isRedirect
 			) {
 				try {
 					resource.content = await res.buffer();
@@ -258,7 +261,7 @@ class Scraper {
 	async loadPage(url, depth = 0) {
         debug(`loading page ${url} - depth ${depth}`);
 		const {closeTabs} = this.options.preProcess;
-        const pageUrl = await maybeProxyUrl(url);
+        const pageUrl = await maybeMirrorUrl(url);
 
 		const {
 			page,
@@ -277,7 +280,7 @@ class Scraper {
 
 		const forwardLinks = new Map();
 		await page.exposeFunction('registerLink', async payload => {
-            const unProxiedUrl = fromProxyUrl(payload.url);
+            const unProxiedUrl = fromMirrorUrl(payload.url);
 			const existing = this.cache.get(unProxiedUrl);
 			if (existing) {
 				existing.addBacklinks(url);
@@ -379,7 +382,7 @@ class Scraper {
                 if (text.includes('Manifest: Line: 1')) return;
 
                 // ignore no overrides message
-                if (text.includes("404 (Not Found)") && traceLocation.includes('__epub__/overrides')) {
+                if (text.includes("404 (Not Found)") && /epub.*overrides/.test(traceLocation)) {
                     return;
                 }
 
@@ -455,91 +458,91 @@ class Scraper {
      * @param {Page & {_pageBindings: any}} page 
      */
 	async formatPage(page) {
-		if (!page._pageBindings || !page._pageBindings.has('keepResource')) {
-			await page.exposeFunction('keepResource', async (absUrl) => {
-				const resource = this.cache.get(absUrl);
-				if (!resource) {
-					return false;
-				}
+		await page.exposeFunction('keepResource', async (absUrl) => {
+            const resource = this.cache.get(absUrl);
+            if (!resource) {
+                return false;
+            }
 
-				if (this.options.remoteImages) {
-					resource.setRemote();
-					return;
-				}
+            if (this.options.remoteImages) {
+                resource.setRemote();
+                return;
+            }
 
-				resource.setLocal();
+            resource.setLocal();
 
-				// moved compression to here to make sure filetype conversion gets handled
-				// REVIEW keeping compression here so possible to register arbitrary resources
-				try {
-					// COMBAK TODO allow for different options
-					await resource.compress();
-				} catch (err) {
-					console.warn(`Failed to compress response - ${err}`);
-				}
+            // moved compression to here to make sure filetype conversion gets handled
+            // REVIEW keeping compression here so possible to register arbitrary resources
+            try {
+                // COMBAK TODO allow for different options
+                await resource.compress();
+            } catch (err) {
+                console.warn(`Failed to compress response - ${err}`);
+            }
 
-				return resource.bookPath;
-			});
-		}
+            return resource.bookPath;
+        }).catch(err => {
+            // ignore!
+        });
 
-        if (!page._pageBindings || !page._pageBindings.has('frameEvaluate')) {
-			await page.exposeFunction('frameEvaluate', async (framePath, fnSource) => {
-				try {
-					const frame = page.frames().find(frame => (frame.url() || '').includes(framePath));
-					if (!frame) {
-						throw new Error(`Frame ${framePath} not found`);
-					}
-					const result = await frame.evaluate(async fnSource => {
-						console.log('prerun');
-						const result = await eval(`(${fnSource})()`);
-						await new Promise(done => requestAnimationFrame(done));
-						console.log('postrun');
-						return result;
-					}, fnSource);
-					return result;
-				} catch (err) {
-					console.log('Error!', err);
-					return undefined;
-				}
-			});
-		}
+        await page.exposeFunction('frameEvaluate', async (framePath, fnSource) => {
+            try {
+                const frame = page.frames().find(frame => (frame.url() || '').includes(framePath));
+                if (!frame) {
+                    throw new Error(`Frame ${framePath} not found`);
+                }
+                const result = await frame.evaluate(async fnSource => {
+                    console.log('prerun');
+                    const result = await eval(`(${fnSource})()`);
+                    await new Promise(done => requestAnimationFrame(done));
+                    console.log('postrun');
+                    return result;
+                }, fnSource);
+                return result;
+            } catch (err) {
+                console.log('Error!', err);
+                return undefined;
+            }
+        }).catch(err => {
+            // console.log('expose function error', err);
+        });
 
-		if (!page._pageBindings || !page._pageBindings.has('inlineFrameContents')) {
-			await page.exposeFunction('inlineFrameContents', async (framePath, selector = 'body') => {
-				const frame = page.frames().find(frame => (frame.url() || '').includes(framePath));
-				if (!frame) {
-					throw new Error(`Frame ${framePath} not found`);
-				}
-				const contents = await frame.evaluate(selector => {
-					const el = document.querySelector(selector || 'body');
-					if (!el) {
-						throw new Error(`Element not found ${selector}`);
-					}
-					return el.innerHTML;
-				}, selector);
+		await page.exposeFunction('inlineFrameContents', async (framePath, selector = 'body') => {
+            const frame = page.frames().find(frame => (frame.url() || '').includes(framePath));
+            if (!frame) {
+                throw new Error(`Frame ${framePath} not found`);
+            }
+            const contents = await frame.evaluate(selector => {
+                const el = document.querySelector(selector || 'body');
+                if (!el) {
+                    throw new Error(`Element not found ${selector}`);
+                }
+                return el.innerHTML;
+            }, selector);
 
-				await page.evaluate((framePath, contents) => {
-					/** @type {HTMLElement} */
-					let frame = [...document.getElementsByTagName('iframe')].find(el => {
-						return el.src && el.src.includes(framePath);
-					});
-					if (!frame) {
-						throw new Error(`Frame ${framePath} not found`);
-					}
-					// replace wrapper p
-					if (frame.parentElement && frame.parentElement.matches('p')) {
-						frame = frame.parentElement;
-					}
-					frame.insertAdjacentHTML('beforebegin', contents);
-					frame.remove();
-				}, framePath, contents);
-			});
-		}
+            await page.evaluate((framePath, contents) => {
+                /** @type {HTMLElement} */
+                let frame = [...document.getElementsByTagName('iframe')].find(el => {
+                    return el.src && el.src.includes(framePath);
+                });
+                if (!frame) {
+                    throw new Error(`Frame ${framePath} not found`);
+                }
+                // replace wrapper p
+                if (frame.parentElement && frame.parentElement.matches('p')) {
+                    frame = frame.parentElement;
+                }
+                frame.insertAdjacentHTML('beforebegin', contents);
+                frame.remove();
+            }, framePath, contents);
+        }).catch(err => {
+            // console.log('ignore expose error', err);
+        });
 
         await page.evaluate((canonicalUrl) => {
             console.log(`Canonical URL: ${canonicalUrl}`);
             window.__epubCanonicalUrl = canonicalUrl;
-        }, fromProxyUrl(page.url()))
+        }, fromMirrorUrl(page.url()))
 
 		// TODO this may timeout becaues the page is waiting for an animation frame
 		// @ts-ignore
@@ -571,6 +574,15 @@ class Scraper {
 			}
 		}
 	}
+    _getAltUrls(imageUrl) {
+        return (
+            this.cache.get(imageUrl) ||
+            this.cache.get(imageUrl.replace('https', 'http')) ||
+            this.cache.get(imageUrl.replace('http', 'https')) ||
+            this.cache.get(imageUrl.replace('www.scp-wiki.net', 'scp-wiki.wdfiles.com')) ||
+            this.cache.get(imageUrl.replace('www.scpwiki.com', 'scp-wiki.wdfiles.com'))
+        );
+    }
     /**
      * 
      * @param {Page} page 
@@ -598,7 +610,7 @@ class Scraper {
 
 		for (let imageUrl of imageUrls) {
 			try {
-				let response = this.cache.get(imageUrl);
+				let response = this._getAltUrls(imageUrl);
 				if (!response) {
 					// force image to download, response handler should catch it and put in cache
                     // would fetch be better?
@@ -619,12 +631,7 @@ class Scraper {
 					}, imageUrl);
 
                     // this is not a good guarantee...maybe use Canvas to directly create new resource?
-					response = (
-						this.cache.get(imageUrl) ||
-                        this.cache.get(imageUrl.replace('https', 'http')) ||
-						this.cache.get(imageUrl.replace('www.scp-wiki.net', 'scp-wiki.wdfiles.com')) ||
-						this.cache.get(imageUrl.replace('www.scpwiki.com', 'scp-wiki.wdfiles.com'))
-					);
+					response = this._getAltUrls(imageUrl);
 
                     switch (loadResult) {
                         case 'ERR_INVALID':
@@ -696,7 +703,7 @@ class Scraper {
          * @type {import('./scpper-db').SCPStats}
          */
         const stats = {
-            pageName: '',
+            // pageName: undefined,
             title: '',
             author: '',
             date: '',
@@ -720,17 +727,17 @@ class Scraper {
 			const info = window.WIKIREQUEST && window.WIKIREQUEST.info;
 			let pageName = info && info.pageUnixName;
 
-			if (!pageName) {
-				pageName = location.pathname.slice(1).replace(/[\/\\() +&:]/g, '_');
-			}
 			const id = info && info.pageId;
 			const siteName = (info && info.siteUnixName) || defaultSite;
-			return { pageName, id, siteName };
+			return { id, siteName, ...pageName && {pageName} };
 		}, defaultSite);
+
+        stats.pageName = new URL(fromMirrorUrl(page.url())).pathname.slice(1).replace(/[\/\\() +&:]/g, '_');
         Object.assign(stats, pageStats);
+        
         const {id} = stats;
-        if (this._removeFromPageName) {
-            stats.pageName = stats.pageName.replace(this._removeFromPageName, '');
+        if (this._removeFromPageName?.length > 0) {
+            stats.pageName = this._removeFromPageName.reduce((agg, str) => agg.replace(str, ''), stats.pageName);
         }
 		// handle tags separately
 		if (/^system:page-tags/.test(stats.pageName)) {

@@ -39,6 +39,9 @@ class ResourceCache {
 			}
 		}
 	}
+    getAlternates(url) {
+        
+    }
 	set(resource) {
 		const existing = this.cache.get(resource.canononicalUrl) || this.getBookCache(resource.bookPath);
 		if (existing) {

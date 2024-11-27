@@ -5,7 +5,28 @@ const urlLib = require('url');
 const mime = require('mime');
 const sharp = require('sharp');
 const config = require('../book-config');
-const { isProxiedUrl, fromProxyUrl } = require('./kiwiki-cache');
+const { isProxiedUrl, fromMirrorUrl } = require('./kiwiki-cache');
+const { debug } = require('./utils');
+
+// set the block untrusted env variable unless already explicitly set
+if (!process.env.VIPS_BLOCK_UNTRUSTED) {
+    process.env.VIPS_BLOCK_UNTRUSTED = "1";
+}
+
+let _baseOptions = undefined;
+function getCompressOptions() {
+    _baseOptions ||= config.util.extendDeep(
+        {
+            resizeOptions: {
+                fit: 'inside',
+                withoutEnlargement: true
+            },
+            jpegIfSizeLargerThan: 512000
+        },
+        config.get('output.images')
+    );
+    return _baseOptions;
+}
 
 function uuid() {
 	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
@@ -186,7 +207,7 @@ class Resource {
 			urls = urls[0];
 		}
 		const backlinks = urls
-			.filter(url => url && !url.startsWith('about'))
+			.filter(url => url && !url.startsWith('about') && !url.startsWith(':'))
 			.map(url => url && Resource.asCanononical(url))
 			.filter(url => !this.from.includes(url));
 
@@ -260,6 +281,9 @@ class Resource {
 		}
 		this.cache = CacheEnum.remote;
 	}
+    setInvalid() {
+        this.cache = CacheEnum.none;
+    }
 	_getBookPath() {
 		const key = (this.isImage && 'images') ||
 			(this.isCss && 'css') ||
@@ -268,7 +292,7 @@ class Resource {
 			'default';
 		return path.posix.join(folders[key], this.filename).replace(/^\//, '');
 	}
-	async compress(options = {}) {
+    async compress(options = {}) {
 		const {
 			compress = true,
 			convertSVG = true,
@@ -279,17 +303,10 @@ class Resource {
 			maxSize = 1024 * 1024,
             jpegIfSizeLargerThan,
 			resizeOptions
-		} = config.util.extendDeep(
-			{
-				resizeOptions: {
-					fit: 'inside',
-					withoutEnlargement: true
-				},
-                jpegIfSizeLargerThan: 512000
-			},
-			config.get('output.images'),
-			options
-		);
+		} = {
+            ...getCompressOptions(),
+			...options
+        };
 
 		// skip compression if specified.
 		if (!compress) {
@@ -339,8 +356,28 @@ class Resource {
 					resolve();
 				});
 		});
-
 	}
+    async tryDetectMimeType({defaultMimeType = 'application/octet-stream', timeoutMs = 15 * 1000, force = false } = {}) {
+        if (this.mimeType && !force) return this.mimeType;
+
+        const controller = new AbortController();
+        const {signal} = controller;
+        let timer = setTimeout(() => { controller.abort(); }, timeoutMs);
+        try {
+            const response = await fetch(this.canononicalUrl, { method: 'head', signal });
+            const type = response.headers.get('content-type');
+            if (!response.ok || !type) {
+                this.mimeType = defaultMimeType;
+            } else {
+                this.mimeType = type.replace(/; charset=.*/, '');
+            }
+        } catch (error) {
+            this.mimeType = defaultMimeType;
+        } finally {
+            clearTimeout(timer);
+        }
+        return this.mimeType;
+    }
 	/**
 	 *
 	 * @param {import("puppeteer").Response} response
@@ -366,7 +403,7 @@ class Resource {
 			return url.canononicalUrl;
 		}
         if (isProxiedUrl(url)) {
-            url = fromProxyUrl(url);
+            url = fromMirrorUrl(url);
         }
 		if (url instanceof URL) {
 			url = urlLib.parse(`${url}`);
@@ -381,11 +418,20 @@ class Resource {
 			...url
 		};
 
-		// TODO FIXME HACK
+        // TODO FIXME HACK
 		// this is to normalize the URLs to the standard domain
 		if (url.host !== defaultUrlObj.host && /scp-wiki\.wikidot\.com|scpwiki\.com|scp-wiki\.net/.test(url.host)) {
 			url.host = defaultUrlObj.host;
 		}
+
+        if (!url.host) {
+            debug('Invalid URL in resource');
+        }
+
+        // standardize wdfiles/scp as https
+        if (url.host?.endsWith('.wdfiles.com') || url.host?.endsWith('.wikidot.com') || url.host === defaultUrlObj.host) {
+            url.protocol = 'https:';
+        }
 
 		return `${url.protocol || 'http:'}//${url.host || ''}${url.pathname}`;
 	}

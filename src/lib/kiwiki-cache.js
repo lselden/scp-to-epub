@@ -4,16 +4,17 @@ const { debug } = require("./utils");
 const {setTimeout} = require('node:timers/promises');
 
 let localCacheUrl = undefined;
-let localProxySettings = {};
+let localMirrorSettings = {};
 
-function configureLocalProxy() {
-    localCacheUrl = config.get('discovery.localArchiveProxy');
-    localProxySettings = {
+function configureLocalMirror() {
+    localCacheUrl = config.get('discovery.localArchiveMirror');
+    localMirrorSettings = {
         staticPrefix: `/${config.get('static.prefix', '__epub__')}`,
+        exclude: undefined,
         verify: true,
         https: true,
         timeoutMs: 1000 * 10,
-        ...config.get('discovery.localArchiveProxyCfg', {})
+        ...config.get('discovery.localArchiveMirrorCfg', {})
     }
     if (localCacheUrl) {
         console.log(`Using local cache ${localCacheUrl}`);
@@ -22,19 +23,23 @@ function configureLocalProxy() {
 
 const urlVerifyCache = new Map();
 
-function isLocalProxyEnabled() {
+function isLocalMirrorEnabled() {
     return !!localCacheUrl;
 }
 
-function getLocalProxyUrl() {
+function getLocalMirrorUrl() {
     return localCacheUrl;
 }
 
-function shouldProxyUrl(url = '') {
+function shouldMirrorUrl(url = '') {
     url = `${url || ''}`;
-    return !!localCacheUrl && !!url &&
-        (!url.startsWith('http://') || localProxySettings.https) &&
-        !url.includes(localProxySettings.staticPrefix);
+    if (!localCacheUrl || !url) return false;
+
+    const {https, staticPrefix, exclude} = localMirrorSettings;
+    if (!url.startsWith('http://') && https) return false;
+    if (url.includes(staticPrefix)) return false;
+    if (exclude?.some(val => url.includes(val))) return false;
+    return true;
 }
 
 /**
@@ -42,58 +47,58 @@ function shouldProxyUrl(url = '') {
  * @param {string} url 
  * @returns 
  */
-function toProxyUrl(url = '') {
+function toMirrorUrl(url = '') {
     return `${localCacheUrl}${`${url}`.replace(/https?:\/\//, '')}`;
 }
 
 /**
  * 
- * @param {string} proxyUrl 
+ * @param {string} mirrorUrl 
  * @returns 
  */
-function fromProxyUrl(proxyUrl = '') {
-    if (!localCacheUrl) return proxyUrl;
-    return `${proxyUrl}`.replace(localCacheUrl, proxyUrl.replace(/:.+/, '://'))
+function fromMirrorUrl(mirrorUrl = '') {
+    if (!localCacheUrl) return mirrorUrl;
+    return `${mirrorUrl}`.replace(localCacheUrl, mirrorUrl.replace(/:.+/, '://'))
 }
 
 function isProxiedUrl(url) {
     return !!localCacheUrl && `${url}`.includes(localCacheUrl);
 }
 
-async function maybeProxyUrl(url) {
-    if (!shouldProxyUrl(url)) return url;
+async function maybeMirrorUrl(url) {
+    if (!shouldMirrorUrl(url)) return url;
 
     
-    let proxyUrl = toProxyUrl(url);
-    if (!localProxySettings.verify) {
-        return proxyUrl;
+    let mirrorUrl = toMirrorUrl(url);
+    if (!localMirrorSettings.verify) {
+        return mirrorUrl;
     }
-    const inProxy = await checkProxyHasUrl(proxyUrl);
+    const inMirror = await checkMirrorHasUrl(mirrorUrl);
 
-    debug(`KIWIKI ${inProxy ? 'PROXY' : 'BYPASS'} ${url}`);
-    return inProxy ? proxyUrl : url;
+    debug(`KIWIKI ${inMirror ? 'MIRROR' : 'BYPASS'} ${url}`);
+    return inMirror ? mirrorUrl : url;
 }
 
-async function checkProxyHasUrl(proxyUrl) {
+async function checkMirrorHasUrl(mirrorUrl) {
     // NOTE this ignores query parameters...should be okay for proxy purposes I think?
-    const [_cacheKey] = `${proxyUrl}`.split('?');
-    let inProxy = urlVerifyCache.get(_cacheKey);
-    if (inProxy != undefined) {
-        return inProxy;
+    const [_cacheKey] = `${mirrorUrl}`.split('?');
+    let inMirror = urlVerifyCache.get(_cacheKey);
+    if (inMirror != undefined) {
+        return inMirror;
     }
 
     const res = await Promise.race([
-        setTimeout(localProxySettings.timeoutMs, {ok: false, timeout: true}, { ref: false }),
-        fetch(proxyUrl, { method: 'HEAD' })
-            .catch(err => { debug(`ignoring error in testing proxy for url ${proxyUrl} ${err}`); return undefined })
+        setTimeout(localMirrorSettings.timeoutMs, {ok: false, timeout: true}, { ref: false }),
+        fetch(mirrorUrl, { method: 'HEAD' })
+            .catch(err => { debug(`ignoring error in testing proxy for url ${mirrorUrl} ${err}`); return undefined })
     ]);
-    inProxy = !!res?.ok;
-    urlVerifyCache.set(_cacheKey, inProxy);
-    return inProxy;
+    inMirror = !!res?.ok;
+    urlVerifyCache.set(_cacheKey, inMirror);
+    return inMirror;
 }
 
-async function serveResponseFromProxy(proxyUrl) {
-    const res = await fetch(proxyUrl).catch(err => {
+async function serveResponseFromMirror(mirrorUrl) {
+    const res = await fetch(mirrorUrl).catch(err => {
         debug(`Error trying to get content from proxy`, err);
         return undefined;
     });
@@ -108,14 +113,14 @@ async function serveResponseFromProxy(proxyUrl) {
 
 
 module.exports = {
-    configureLocalProxy,
-    maybeProxyUrl,
-    checkProxyHasUrl,
-    isLocalProxyEnabled,
+    configureLocalMirror,
+    maybeMirrorUrl,
+    checkMirrorHasUrl,
+    isLocalMirrorEnabled,
     isProxiedUrl,
-    toProxyUrl,
-    fromProxyUrl,
-    shouldProxyUrl,
-    getLocalProxyUrl,
-    serveResponseFromProxy
+    toMirrorUrl,
+    fromMirrorUrl,
+    shouldMirrorUrl,
+    getLocalMirrorUrl,
+    serveResponseFromMirror
 };

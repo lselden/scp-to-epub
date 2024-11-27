@@ -8,7 +8,7 @@ const Resource = require('./lib/resource');
 const DiskCache = require('./lib/disk-cache');
 const {systemLinks, systemPrefixes, metaTags} = require('./system-links');
 const config = require('./book-config');
-const { maybeProxyUrl } = require('./lib/kiwiki-cache');
+const { maybeMirrorUrl } = require('./lib/kiwiki-cache');
 
 function isEmpty(arr) {
 	return !(arr && (typeof arr === 'object') && Object.keys(arr).length > 0);
@@ -246,7 +246,7 @@ class WikiDataLookup {
         debug('Loading authors meta list');
 		const page = await this.browser.newPage();
 		page.setUserAgent(this.options.ua);
-        const url = await maybeProxyUrl(this.options.authorsUrl);
+        const url = await maybeMirrorUrl(this.options.authorsUrl);
 		await page.goto(url);
 		this.authorsList = await page.$$eval('.pages-list-item a', links => {
 			const out = {};
@@ -280,7 +280,7 @@ class WikiDataLookup {
         debug('loading artworks meta list');
 		const page = await this.browser.newPage();
 		page.setUserAgent(this.options.ua);
-        const url = await maybeProxyUrl(this.options.artworkUrl);
+        const url = await maybeMirrorUrl(this.options.artworkUrl);
 		await page.goto(url);
 		this.artworksList = await page.$$eval('.pages-list-item a', links => {
 			const out = {};
@@ -314,7 +314,7 @@ class WikiDataLookup {
         debug('loading cached hubs list');
 		const page = await this.browser.newPage();
 		page.setUserAgent(this.options.ua);
-        const url = await maybeProxyUrl(this.options.hubsUrl);
+        const url = await maybeMirrorUrl(this.options.hubsUrl);
 		await page.goto(url);
 		this.hubList = await page.$$eval('.pages-list-item a', links => {
 			const out = {};
@@ -348,7 +348,7 @@ class WikiDataLookup {
         debug('loading audio adaptations meta page');
 		const page = await this.browser.newPage();
 		page.setUserAgent(this.options.ua);
-        const url = await maybeProxyUrl(this.options.audioAdaptationsUrl);
+        const url = await maybeMirrorUrl(this.options.audioAdaptationsUrl);
 		await page.goto(url, {
 			waitUntil: ['load', 'domcontentloaded']
 		});
@@ -447,7 +447,7 @@ class WikiDataLookup {
 	}
 	async getLinksByTag(tag) {
 		let url = tag.startsWith('http') ? tag : `http://www.scpwiki.com/system:page-tags/tag/${tag}`;
-        url = await maybeProxyUrl(url);
+        url = await maybeMirrorUrl(url);
 		const page = await this.browser.newPage();
 		await page.goto(url, { waitUntil: 'load'});
 		const links = await page.$$eval('#tagged-pages-list .pages-list-item a[href]', links => {

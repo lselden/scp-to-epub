@@ -227,9 +227,9 @@ class BookMaker {
 		let remainingChapters = maxChapters;
 
 		// REVIEW should we map in try catch?
-		for (let part of docParts) {
+		for (let [index, part] of docParts.entries()) {
 			console.log(`Loading section ${part.index} ${part.title}`)
-			await this.loadDocPart(part);
+			await this.loadDocPart(part, { current: index + 1, total: docParts.length });
 			// load docpart has side effect of adding chapters to part
 			remainingChapters -= part.chapters.length;
 		}
@@ -385,7 +385,7 @@ class BookMaker {
 	 * @param {DocPart} docPart
 	 * @returns {Promise<DocPart>}
 	 */
-	async loadDocPart(docPart) {
+	async loadDocPart(docPart, partProgress) {
 		// add to cache
 		this.cache.set(docPart);
 		this.book.chapters.push(docPart);
@@ -393,11 +393,11 @@ class BookMaker {
 		const targets = docPart.links;
 
 		// add to docPart because why not
-		const chapters = await this.loadChapters(targets);
+		const chapters = await this.loadChapters(targets, undefined, partProgress);
 		docPart.chapters = chapters;
 		return docPart;
 	}
-	async loadChapters(targets, depth = 0) {
+	async loadChapters(targets, depth = 0, {current = undefined, total = 1} = {}) {
 		const {concurrency} = this.options.preProcess;
 		let chapters = await pMap(targets, async (url, index) => {
 			let chapterDepth = depth;
@@ -427,7 +427,7 @@ class BookMaker {
 				return;
 			}
 
-			console.log(`LOADING ${url} (${index + 1}/${targets.length})`);
+			console.log(`LOADING ${current ? `Part ${current}/${total} ` : ''}${url} (${index + 1}/${targets.length})`);
 			// just a list of pages tagged
 			// if (/system:page-tags/.test(url)) {
 
