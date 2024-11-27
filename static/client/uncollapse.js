@@ -1,7 +1,7 @@
 
 import config from './config.js';
 
-import helpers, {$, $$, rand} from './helpers.js';
+import helpers, {$, $$, rand, escape} from './helpers.js';
 
 export function uncollapse() {
 	const blocks = document.querySelectorAll('.collapsible-block');

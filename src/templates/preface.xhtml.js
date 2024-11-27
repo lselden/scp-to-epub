@@ -1,5 +1,8 @@
 const config = require('../book-config');
 
+
+const REPOSITORY_URL = 'https://github.com/lselden/scp-to-epub';
+
 function genPreface(data, options = {}) {
 	const {
 		id = '',
@@ -8,13 +11,13 @@ function genPreface(data, options = {}) {
 		fonts = [],
 		prefaceTitle = config.get('bookOptions.prefaceTitle', 'Preface'),
 		prefaceHTML = '',
-		resources = []
+		resources = [],
 	} = {...data, ...options};
 
 	const coverImage = resources.find(r => r.id === 'cover-image');
 	const coverImagePath = coverImage && coverImage.bookPath;
 
-	// TODO just generate this somewhere for everyone
+    // TODO just generate this somewhere for everyone
 	let stylesheetHTML = stylesheets
 		.map(path => `<link rel="stylesheet" type="text/css" href="${path}" />`)
 		.join('');
@@ -22,6 +25,10 @@ function genPreface(data, options = {}) {
 	if (config.has('input.customCSS')) {
 		stylesheetHTML += `<style>${config.get('input.customCSS')}</style>`;
 	}
+
+    const scpperNote = config.get('enableStats')
+        ? `<p>Statistics and some other information were gleaned from <a href="https://www.scpper.com">ScpperDB</a>.</p>`
+        : '';
 
 	return `<?xml version="1.0" encoding="UTF-8"?>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="${ lang }" lang="${ lang }">
@@ -40,12 +47,12 @@ function genPreface(data, options = {}) {
 		}<h1>${escape(prefaceTitle)}</h1>
 		${prefaceHTML || ''}
 		<p>This ebook was auto-generated from content on the <a href="${config.get('discovery.defaultOrigin', 'http://www.scpwiki.com')}">SCP Foundation</a> Wiki. Each chapter includes author information and link to the original.</p>
-		<p>Statistics and some other information were gleaned from <a href="https://www.scpper.com">ScpperDB</a>.</p>
+		${scpperNote}
 		<p>Unless otherwise stated, all content is licensed under <a href="http://creativecommons.org/licenses/by-sa/3.0/">Creative Commons Attribution-ShareAlike 3.0 License</a></p>
 		${(fonts && fonts.length) ? `<p>This ebook is typeset using the fonts ${
 			fonts.map(f => `<a href="${f.homepage}">${escape(f.name)}</a>`).join(', ')
 		}.</p>` : ''}
-		<p><strong>Generated:</strong> using <a href="https://github.com/lselden/scp-to-epub">scp-to-epub</a> on ${(new Date()).toDateString()}</p>
+		<p><strong>Generated:</strong> using <a href="${REPOSITORY_URL}">scp-to-epub</a> on ${(new Date()).toDateString()}</p>
 	</body>
 </html>`;
 }

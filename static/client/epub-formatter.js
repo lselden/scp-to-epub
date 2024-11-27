@@ -19,7 +19,8 @@ import {
 	annotateRedacted,
 	annotateBlackbox,
 	fixImages,
-	revealHiddenText
+	revealHiddenText,
+    fixFontTag
 } from './fix-inline.js';
 import removeHidden from './remove-hidden.js';
 import {uncollapse, uncollapseColmod} from './uncollapse.js';
@@ -175,6 +176,7 @@ function addNamespaces() {
 		{name: 'fix-blackbox', fn: annotateBlackbox},
 		{name: 'fix-inline', fn: fixInlineSemanticTags},
 		{name: 'fix-tt', fn: fixTT},
+        {name: 'fix-font', fn: fixFontTag },
 		{name: 'remove-hidden', fn: removeHidden},
 		{name: 'cleanup-whitespace', fn: cleanupWhitespace},
 		{name: 'fix-width-styles', fn: fixWidth},

@@ -127,6 +127,16 @@ export function fixTT() {
 	});
 }
 
+export function fixFontTag() {
+    helpers.$$('font').forEach(el => {
+        const color = el.getAttribute('color');
+		const newEl = helpers.switchTag(el, 'span');
+        if (color) {
+            newEl.style.color = color;
+        }
+	});
+}
+
 export function revealHiddenText() {
 	helpers.$$('[style*=font-size]').forEach(el => {
 		const [_, raw, unit] = (el.style.fontSize.match(/([\d.]+)(.+)/) || []);

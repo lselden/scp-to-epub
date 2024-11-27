@@ -1,6 +1,6 @@
 const {EOL} = require('os');
 const config = require('../book-config');
-const {escape} = require('../lib/utils');
+const {maybeEscape} = require('../lib/utils');
 const DocPart = require('../lib/doc-part');
 
 /**
@@ -9,7 +9,7 @@ const DocPart = require('../lib/doc-part');
  * @returns {string}
  */
 function genContent(data, options = {}) {
-	const {
+	let {
 		id: uniqueId = config.get('metadata.id', `scp.foundation.${Math.random().toString(16).slice(2)}`),
 		title,
 		lang = 'en',
@@ -36,6 +36,8 @@ function genContent(data, options = {}) {
 		// },
 		hideSupplemental = true
 	} = {...options, ...data};
+
+    lang = maybeEscape(lang);
 
 	let allChapters = [...chapters, ...appendix]
 		.filter(c => !c.excludeFromToc);
@@ -65,17 +67,17 @@ function genContent(data, options = {}) {
 		prefix="cc: http://creativecommons.org/ns# ibooks: http://vocabulary.itunes.apple.com/rdf/ibooks/vocabulary-extensions-1.0/">
 
 	<metadata xmlns:opf="http://www.idpf.org/2007/opf" xmlns:dc="http://purl.org/dc/elements/1.1/">
-		<dc:title>${ escape(title) }</dc:title>
-		<dc:creator id="creator">${ escape(author) }</dc:creator>
+		<dc:title>${ maybeEscape(title) }</dc:title>
+		<dc:creator id="creator">${ maybeEscape(author) }</dc:creator>
 		<meta refines="#creator" property="role" scheme="marc:relators">aut</meta>
-		<meta name="generator" content="${ escape(creator) }" />
-		<dc:contributor id="contributor">${ escape(creator) }</dc:contributor>
+		<meta name="generator" content="${ maybeEscape(creator) }" />
+		<dc:contributor id="contributor">${ maybeEscape(creator) }</dc:contributor>
 		<meta refines="#contributor" property="role" scheme="marc:relators">bkp</meta>
 		<dc:date>${ nowDate }</dc:date>
 		<dc:identifier id="uid">${ uniqueId }</dc:identifier>
 		<dc:language>${ lang }</dc:language>
 		<meta property="dcterms:modified">${ now }</meta>
-		<dc:publisher>${ escape(publisher)  }</dc:publisher>
+		<dc:publisher>${ maybeEscape(publisher)  }</dc:publisher>
 		<dc:rights>This work is licensed under a Creative Commons Attribution-Share Alike (CC BY-SA) license.</dc:rights>
 		<link rel="cc:license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/"/>
 		<meta property="cc:attributionURL">http://creativecommons.org/videos/a-shared-culture</meta>
@@ -91,7 +93,7 @@ function genContent(data, options = {}) {
 ${
 			resources
 				.map(asset => {
-					const {
+					let {
 						id,
 						bookPath,
 						mimeType = "text/html",
@@ -101,10 +103,14 @@ ${
 					if (!asset.shouldIncludeInManifest) {
 						return;
 					}
+                    if (!mimeType) mimeType = 'text/html';
 					const href = asset.shouldWrite ? bookPath : asset.url;
 					// remote-resources, cover-image, scripted, nav
-					const props = (Array.isArray(properties) && properties.length && properties[0]) ? `properties="${properties.join(' ')}"` : '';
-					return `\t\t<item id="${id}" href="${href}" media-type="${mimeType}" ${props} />`;
+                    const hasProps = Array.isArray(properties) && properties.length && properties[0];
+					const props = hasProps
+                        ? `properties="${maybeEscape(properties.join(' '))}"`
+                        : '';
+					return `\t\t<item id="${maybeEscape(id)}" href="${maybeEscape(href)}" media-type="${maybeEscape(mimeType)}" ${props} />`;
 				})
 				.filter(x => x)
 				.join(EOL)

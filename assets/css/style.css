@@ -319,9 +319,9 @@ mark.blackbox {
 }
 
 blockquote {
-    border: 1px dashed currentColor;
+    border: 1px dotted rgba(127, 127, 127, 0.5);
     border-radius: 0.125em;
-    padding: 0.25em;
+    padding: 0.125em;
     margin-left: 0.125em;
     margin-right: 0.125em;
     font-style: normal;

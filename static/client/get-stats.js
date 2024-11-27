@@ -10,7 +10,7 @@ function parseStats() {
     // first link is page title
     var pageLink = licenseBlocks[0]?.querySelector('a');
     var authorRawText = pageLink?.nextSibling?.textContent || '';
-    var title = pageLink?.innerText || '';
+    var title = pageLink?.innerText || document.querySelector('#page-title')?.innerText || '';
     var author = /\s*by\s+(?<author>.+),\s+from the\s*/.exec(authorRawText)?.groups?.author || ''
 
     // clean out unwanted content
@@ -34,10 +34,11 @@ function parseStats() {
 function getWikiStats() {
     const info = window.WIKIREQUEST?.info;
     let {
-        pageName = location.pathname.slice(1).replace(/[\/\\() +&:]/g, '_'),
+        pageName = new URL(window.__epubCanonicalUrl || location.href).pathname.slice(1).replace(/[\/\\() +&:]/g, '_'),
         pageId,
         siteUnixName
     } = info || {};
+    
     return {
         pageName,
         ...pageId && {id: pageId},

@@ -101,7 +101,7 @@ function genChapterHeader(chapter, audioAdaptations = [], options = {}) {
 					includeAudioAdaptations
 				) ? `<h3 class="align-center">Audio Adaptations</h3><ul>${
 					audioAdaptations.map(x => {
-						return `<li><a href="${x.url}">${escape(x.title)}</a>&#160;</li>`;
+						return `<li><a href="${escape(x.url)}">${escape(x.title)}</a>&#160;</li>`;
 					}).join('')
 				}</ul>` : ''
 			}
@@ -147,7 +147,7 @@ function genChapterFooter(chapter, bookLinks = [], externalLinks = [], options =
     // </aside>`;
 
     const tagsText = (stats.tags && options.showTags)
-        ? `<aside class="tags"><small>${stats.tags}</small></aside>`
+        ? `<aside class="tags"><small>${escape(stats.tags)}</small></aside>`
         : '';
 
 	return `<footer class="chapter-footer chapter-meta">

@@ -69,10 +69,10 @@ export default function () {
 	const endnotesHTML = endnotes.length === 0 ? '' : `
 	<section role="doc-endnotes" epub:type="endnotes" aria-labelledby="${endId}">
 		<h2 id="${endId}">Footnotes</h2>
-		<ol>${
+		<ol role="list">${
 			endnotes.map(note => {
 				const suffix = config.footnotes.inline ? '-end' : ''
-				return `<li id="${note.targetId}${suffix}" role="doc-endnote" epub:type="endnote">
+				return `<li id="${note.targetId}${suffix}" role="listitem" epub:type="endnote">
 					<p>${note.content} <a href="#${note.refId}" role="doc-backlink" title="Go back to note reference" aria-label="Go back to note reference">↖</a></p>
 				</li>`;
 			}).join('\n')
