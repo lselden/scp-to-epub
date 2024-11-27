@@ -10,6 +10,7 @@ param (
     # the executablePath that will be set in default.yaml for puppeteer
     [Parameter()] [string] $BundledExecutablePath = 'bin/chrome.exe',
     [Parameter()] [string] $BinaryName = 'scp-to-epub.exe',
+    # change this if you want to try building for other platforms -- see @yao-pkg/pkg docs
     [Parameter()] [string] $PkgTarget = 'node20-win',
     [Parameter()] [switch] $NoCleanup
 )
@@ -32,7 +33,7 @@ if (-not $NoCleanup) {
 npm run build;
 
 # copy static assets (to be added to virtual filesystem)
-@('assets', 'static') | Copy-Item -Recurse -Destination $stagingFolder
+@('assets', 'static') | % { Copy-Item -Recurse $_ -Destination $stagingFolder }
 
 
 # copy cached version of chrome installed by puppeteer
@@ -40,7 +41,7 @@ if (-not $PuppeteerExecutableDir) {
     $PuppeteerExecutableDir = dir ~\.cache\puppeteer\chrome\*\*\ | select -first 1 -expand FullName
 }
 if ($CopyPuppeteerArtifacts) {
-    Copy-Item $PuppeteerExecutableDir (Join-Path $releaseFolder (Split-Path $BundledExecutablePath -Parent))
+    Copy-Item "$PuppeteerExecutableDir/*" -Recurse (Join-Path $releaseFolder (Split-Path $BundledExecutablePath -Parent))
 }
 
 # write out default.yaml so that puppeteer will load bundled version
@@ -52,7 +53,7 @@ browser:
 "@ | Set-Content (Join-Path $releaseFolder 'default.yaml');
 
 # copy assets to be distributed
-@('config.yaml', 'README.md', 'books') | Copy-Item $releaseFolder
+@('config.yaml', 'README.md', 'books') | % { Copy-Item -Recurse $_ $releaseFolder }
 
 ### rewrite package.json to remove bundled dependencies
 $pkg = get-content .\package.json -Encoding utf8 | ConvertFrom-Json
@@ -84,6 +85,6 @@ $releaseVersion = $pkg.version
 $packageName = $pkg.name
 
 $zipPath = Join-Path (Split-Path $releaseFolder -Parent) "$packageName.$releaseVersion.zip"
-Compress-Archive -Path $releaseFolder -DestinationPath $zipPath
+Compress-Archive -Path $releaseFolder -DestinationPath $zipPath -Force
 
 Pop-Location

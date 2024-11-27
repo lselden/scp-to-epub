@@ -326,7 +326,7 @@ async function makeCover({
 `;
     document.head.appendChild(s);
     await new Promise(done => setTimeout(done, 100));
-    console.log('fitting text');
+    
     fitty('.top-text.fit', { minSize: 24, maxSize: 120, observeMutations: false });
     await new Promise(done => setTimeout(done, 100));
     var titleSize = getComputedStyle(titleEl).fontSize;

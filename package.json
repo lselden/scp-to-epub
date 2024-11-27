@@ -7,8 +7,9 @@
     "types": "index.d.ts",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "pkg": "npx @yao-pkg/pkg .",
-        "build": "tsup"
+        "pkg": "npx @yao-pkg/pkg build/staging --output build/release/",
+        "build": "tsup",
+        "package": "pwsh scripts/build.ps1 -CopyPuppeteerArtifacts"
     },
     "pkg": {
         "assets": [
