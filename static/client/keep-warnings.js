@@ -5,6 +5,7 @@ export default function () {
     if (!warning) return;
 
     warning.classList.add('warning-box');
+    warning.style.height = 'initial';
     warning.closest('.modal-wrapper').replaceWith(warning);
     const header = warning.querySelector('#u-adult-header');
     if (header) {
@@ -14,7 +15,7 @@ export default function () {
     
     const id = `_${Math.random().toString(16).slice(2)}`;
     const nextPage = document.createElement('div');
-    nextPage.innerHTML = `<hr class="epub-transition epub-whitespace-break" style="height: 50vh; page-break-after: always;"><hr id="${id}" style="margin-top: 50vh">`;
+    nextPage.innerHTML = `<hr class="epub-transition epub-whitespace-break" style="height: 50vh; page-break-after: always; background: transparent"><hr id="${id}" style="margin-top: 50vh">`;
     
     warning.appendChild(nextPage);
 

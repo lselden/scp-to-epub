@@ -46,9 +46,12 @@ async function updateLinks (doc, originalUrl) {
 		const urlObj = new URL(attr, originalUrl);
 		let href = urlObj.toString();
 
-		// TODO this is only needed for header front-matter, so really isn't necessary anymore
+        // TODO this is only needed for header front-matter, so really isn't necessary anymore
 		if (anchor.dataset.external || anchor.getAttribute('rel') === 'nofollow') {
-			anchor.href = href;
+            // if xhtml then it's coded to point to specific link already
+            if (!attr?.endsWith('.xhtml')) {
+                anchor.href = href;
+            }
 			continue;
 		}
 
