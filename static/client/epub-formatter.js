@@ -25,6 +25,7 @@ import {
 import removeHidden from './remove-hidden.js';
 import {uncollapse, uncollapseColmod} from './uncollapse.js';
 import anomBar from './anom-bar.js';
+import keepWarnings from './keep-warnings.js';
 import {clearProblemScripts, removeUnnecessary, cleanupWhitespace} from './cleanup.js';
 import appendOffsets from './load-offsets.js';
 import cleanTagPage from './clean-tag-page.js';
@@ -159,6 +160,7 @@ function addNamespaces() {
 		{name: 'fix-licensing', fn: fixLicensing},
 		{name: 'move-main', fn: moveMain},
 		{name: 'move-breadcrumbs', fn: moveBreadcrumbs },
+        {name: 'keep-warnings', fn: keepWarnings },
 		{name: 'remove-cruft', fn: removeUnnecessary},
 		{name: 'append-offset-pages', fn: appendOffsets},
 		{name: 'fix-anom-bar', fn: anomBar},
