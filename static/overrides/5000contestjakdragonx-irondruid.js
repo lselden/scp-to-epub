@@ -13,7 +13,8 @@ export default {
 		const badlink = document.querySelector('[href=\\#Access]');
 		badlink.replaceWith(`Access ${badlink.textContent}`);
 
-		const pwdForm = document.querySelector('.html-block-iframe');
+		const pwdForm = [...document.querySelectorAll('#main-content .html-block-iframe')]
+        .sort((a, b) => (b.scrollHeight || 0) - (a.scrollHeight || 0))?.at(0);
 		const newEl = document.createElement('a');
 		newEl.textContent = "Enter Password";
 		newEl.href = `${document.location.pathname}/offset/1`;

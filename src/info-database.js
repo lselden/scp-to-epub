@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 const path = require('path/posix');
 const urlLib = require('url');
-const {safeFilename, debug, escape} = require('./lib/utils');
+const {safeFilename, debug} = require('./lib/utils');
 const scpperDB = require('./scpper-db');
 const Resource = require('./lib/resource');
 const DiskCache = require('./lib/disk-cache');
@@ -231,7 +231,7 @@ class WikiDataLookup {
 		])
 	}
 	async loadAuthorsList() {
-		if (!isEmpty(this.authorsList)) {
+        if (!isEmpty(this.authorsList)) {
 			return this.authorsList;
 		}
 		try {
@@ -249,9 +249,16 @@ class WikiDataLookup {
         const url = await maybeMirrorUrl(this.options.authorsUrl);
 		await page.goto(url);
 		this.authorsList = await page.$$eval('.pages-list-item a', links => {
+            function maybeEscape(unsafe) {
+                if (unsafe == void 0) { return unsafe; }
+                if (typeof unsafe !== "string") {unsafe = `${unsafe}`;}
+                return unsafe.replace(/[<"']/g, function(x) {
+                  switch (x) {case "<":return "&lt;";case '"':return "&quot;";default:return "&#039;"; }
+                }).replace(/&(?!(?:apos|quot|[gl]t|amp);|#)/g, "&amp;");
+            }
 			const out = {};
 			links.forEach(el => {
-				const pageName = escape(el.getAttribute('href') || '').slice(1);
+				const pageName = maybeEscape(el.getAttribute('href') || '').slice(1);
 				if (!pageName) {
 					return;
 				}
@@ -264,7 +271,7 @@ class WikiDataLookup {
 		return this.authorsList;
 	}
 	async loadArtworksList() {
-		if (!isEmpty(this.artworksList)) {
+        if (!isEmpty(this.artworksList)) {
 			return this.artworksList;
 		}
 
@@ -283,9 +290,16 @@ class WikiDataLookup {
         const url = await maybeMirrorUrl(this.options.artworkUrl);
 		await page.goto(url);
 		this.artworksList = await page.$$eval('.pages-list-item a', links => {
+            function maybeEscape(unsafe) {
+                if (unsafe == void 0) { return unsafe; }
+                if (typeof unsafe !== "string") {unsafe = `${unsafe}`;}
+                return unsafe.replace(/[<"']/g, function(x) {
+                  switch (x) {case "<":return "&lt;";case '"':return "&quot;";default:return "&#039;"; }
+                }).replace(/&(?!(?:apos|quot|[gl]t|amp);|#)/g, "&amp;");
+            }
 			const out = {};
 			links.forEach(el => {
-				const pageName = escape(el.getAttribute('href') || '').slice(1);
+				const pageName = maybeEscape(el.getAttribute('href') || '').slice(1);
 				if (!pageName) {
 					return;
 				}
@@ -317,9 +331,16 @@ class WikiDataLookup {
         const url = await maybeMirrorUrl(this.options.hubsUrl);
 		await page.goto(url);
 		this.hubList = await page.$$eval('.pages-list-item a', links => {
+            function maybeEscape(unsafe) {
+                if (unsafe == void 0) { return unsafe; }
+                if (typeof unsafe !== "string") {unsafe = `${unsafe}`;}
+                return unsafe.replace(/[<"']/g, function(x) {
+                  switch (x) {case "<":return "&lt;";case '"':return "&quot;";default:return "&#039;"; }
+                }).replace(/&(?!(?:apos|quot|[gl]t|amp);|#)/g, "&amp;");
+            }
 			const out = {};
 			links.forEach(el => {
-				const pageName = escape(el.getAttribute('href') || '').slice(1);
+				const pageName = maybeEscape(el.getAttribute('href') || '').slice(1);
 				if (!pageName) {
 					return;
 				}
@@ -353,6 +374,14 @@ class WikiDataLookup {
 			waitUntil: ['load', 'domcontentloaded']
 		});
 		this.audioAdaptations = await page.$$eval('.wiki-content-table tr', rows => {
+            function maybeEscape(unsafe) {
+                if (unsafe == void 0) { return unsafe; }
+                if (typeof unsafe !== "string") {unsafe = `${unsafe}`;}
+                return unsafe.replace(/[<"']/g, function(x) {
+                  switch (x) {case "<":return "&lt;";case '"':return "&quot;";default:return "&#039;"; }
+                }).replace(/&(?!(?:apos|quot|[gl]t|amp);|#)/g, "&amp;");
+            }
+
 			const thisUrl = document.location.pathname;
 			const out = {};
 			console.log('found these rows', rows);
@@ -368,7 +397,7 @@ class WikiDataLookup {
 					console.log('bad!', rawHref);
 					return;
 				}
-				const pageName = escape(rawHref).slice(1);
+				const pageName = maybeEscape(rawHref).slice(1);
 				console.log('found', pageName);
 				const payload = [...links].map(a => {
 					return {

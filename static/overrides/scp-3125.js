@@ -2,6 +2,7 @@ import {switchTag, escape} from '../client/helpers.js';
 
 export default {
 	async beforeParse() {
+        debugger;
 		const frameEvaluate = window['frameEvaluate'];
 		if (typeof frameEvaluate !== 'function') {
 			console.debug('cannot inline actual contents of iframe');
@@ -22,7 +23,9 @@ export default {
 		}
 		/* get last part of path because origin can vary */
 		/** @type {HTMLFrameElement} */
-		const frame = document.querySelector('.html-block-iframe');
+        // just choose biggest one
+		const frame = [...document.querySelectorAll('#main-content .html-block-iframe')]
+            .sort((a, b) => (b.scrollHeight || 0) - (a.scrollHeight || 0))?.at(0);
 		const framepath = (new URL(frame.src)).pathname.replace(/.*\/html\//, '');
 
 		await frameEvaluate(framepath, unlock.toString());

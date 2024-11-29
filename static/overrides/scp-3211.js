@@ -25,7 +25,8 @@ export default {
 			await new Promise(done => requestAnimationFrame(done));
 		}
 		/* get last part of path because origin can vary */
-		const frame = document.querySelector('.html-block-iframe');
+		const frame = [...document.querySelectorAll('#main-content .html-block-iframe')]
+        .sort((a, b) => (b.scrollHeight || 0) - (a.scrollHeight || 0))?.at(0);
 		// const frameParent = frame.parentElement;
 
 		const framepath = (new URL(frame.src)).pathname.replace(/.*\/html\//, '');

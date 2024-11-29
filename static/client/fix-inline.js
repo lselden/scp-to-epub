@@ -163,7 +163,7 @@ export function annotateRedacted(el = document.body) {
 			return;
 		}
 
-		const html = helpers.escape(el.textContent).replace(/(█+)/g, '<del class="redacted" aria-label="REDACTED">$1</del>');
+		const html = helpers.escape(el.textContent).replace(/([█\p{Cf}]+)/gu, '<del class="redacted" aria-label="REDACTED">$1</del>');
 		if (el.nextElementSibling) {
 			el.nextElementSibling.insertAdjacentHTML('beforebegin', html);
 		} else {

@@ -29,7 +29,8 @@ PLEASE SUBMIT SECURITY CREDENTIALS (LEVEL 5): ████████
 
 `;
 
-		const terminal = document.querySelector('.html-block-iframe');
+		const terminal = [...document.querySelectorAll('#main-content .html-block-iframe')]
+            .sort((a, b) => (b.scrollHeight || 0) - (a.scrollHeight || 0))?.at(0);
 		const newEl = document.createElement('pre');
 		newEl.classList.add('monospace');
 		Object.assign(newEl.style, {
