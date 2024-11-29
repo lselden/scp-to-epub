@@ -31,18 +31,35 @@ output:
     remote: false
     ### compress images. NOTE: if disabled this won't convert webp/other non-compatible types
     compress: true
-
+    
     ### max width of images
-    width: 768
+    width: 480
     ### max height of images
-    height: 1024
+    height: 480
     ### JPEG conversion quality - 70 = higher quality, 30 = smaller size
     quality: 30
-    ### convert SVG to png. Recommended
-    convertSVG: true
     ### set to true to force everything to JPG instead of PNG if bigger than X bytes
     ### default 102400 = 100kb
     jpegIfSizeLargerThan: 102400
+
+
+    ## NOTE -- images can take up A LOT of space in a book! do you really need high quality images?
+
+    ### LOW QUALITY (small size) settings
+    #width: 320
+    #height: 320
+    #quality: 15
+    #jpegIfSizeLargerThan: 51200
+
+    ### HIGH QUALITY settings (recommend to keep chapter count to < 100)
+    #width: 768
+    #height: 1024
+    #quality: 70
+    #jpegIfSizeLargerThan: 102400
+
+    ### convert SVG to png. Recommended
+    convertSVG: true
+
     ### sharp library advanced options
     resizeOptions:
       fit: 'inside'
@@ -128,7 +145,7 @@ cover:
   ### height of cover image
   height: 2560
   ### Image JPEG quality of image (if image is jpg)
-  quality: 70
+  quality: 50
   ### the template HTML to use for creating the cover - default should be fine?
   #templateHTML: 'D:/path/to/cover.html'
   ### Use a SCP page / theme as a basis of the cover - ex: or any linked on https://scp-wiki.wikidot.com/black-highlighter-themes
