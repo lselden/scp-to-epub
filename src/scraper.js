@@ -408,6 +408,18 @@ class Scraper {
 			});
 		}
 
+        // UNDOCUMENTED
+        const shouldAcceptConfirmDialogs = config.get('shouldAcceptConfirmDialogs', false);
+        page.on('dialog', (dialog) => {
+            if (shouldAcceptConfirmDialogs) {
+                console.log('javascript popup auto accepted', dialog.message());
+                dialog.accept();
+            } else {
+                console.log('javascript popup dismissed', dialog.message());
+                dialog.dismiss();
+            }
+        })
+
 		if (this.options.hooks.newDocument) {
 			try {
 				await page.evaluateOnNewDocument(this.options.hooks.newDocument);
@@ -416,17 +428,23 @@ class Scraper {
 			}
 		}
 
-		const response = await page.goto(url, {
-			waitUntil: ['load', 'domcontentloaded', 'networkidle2'],
-			timeout: this.options.browser.timeout
-		});
-
-		const out = {
-			page,
-			response
+        const out = {
+			page
 		};
 
-		if (response && !response.ok() && !response.fromCache()) {
+
+        /** @type {Response} */
+        let response; 
+        try {
+            out.response = response = await page.goto(url, {
+                waitUntil: ['load', 'domcontentloaded', 'networkidle2'],
+                timeout: this.options.browser.timeout
+            });
+        } catch (error) {
+            out.error = error;
+        }
+
+		if (response && !response.ok() && !response.fromCache()  && (response.status() || 500) >= 400 ) {
 			out.error = new Error(`${response.status()} ${response.statusText()}`);
 			Object.assign(out.error, {
 				isError: true,
