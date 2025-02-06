@@ -175,7 +175,9 @@ class CoverCreator {
         const {format = 'jpg', quality = 70} = this.opts;
         const content = await page.screenshot({
             type: format === 'png' ? 'png' : 'jpeg',
-            quality
+            ...(format !== 'png') && { quality },
+            captureBeyondViewport: true,
+            fullPage: false
         });
         await page.close();
         return new Resource({
