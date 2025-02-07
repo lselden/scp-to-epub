@@ -101,7 +101,7 @@ If you see any formatting or other errors in the ebooks then please open a Githu
 * Base CSS stylesheet inspired by [Blitz](https://github.com/FriendsOfEpub/Blitz)
 
 ## LICENSE
-scp-to-epub code is Creative Commons Attribution 3.0 License. Unless otherwise stated, all content within ebooks is licensed under [Creative Commons Attribution-ShareAlike 3.0 License](http://creativecommons.org/licenses/by-sa/3.0/)
+scp-to-epub code is Creative Commons 0 License. Unless otherwise stated, all content within ebooks is licensed under [Creative Commons Attribution-ShareAlike 3.0 License](http://creativecommons.org/licenses/by-sa/3.0/)
 
 ## SIMILAR PROJECTS
 * [SCP Foundation: Ebook edition](http://www.scpwiki.com/ebooks)
