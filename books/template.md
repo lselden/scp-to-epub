@@ -8,11 +8,22 @@ publisher: SCP Foundation
 ### Specify the cover of the book
 ### Don't forget to give credit to the artist!!!
 cover:
-  ### local image
+  ### Option 1: local image
   #path: 'path/to/local/file.jpg'
 
-  ### Set the book cover to a URL.
+  ### Option 2: Set the book cover to a URL.
   url: 'https://scp-wiki.wdfiles.com/local--files/a-sunny-day-at-the-clockwork-gallery/SCP-Logo.png'
+
+  ### Option 3: Use theme and custom CSS
+  #theme: "/theme:minimal"
+  #themeImage: "default"
+  #overrideCSS: |
+  #  body { background: white; }
+  #  #title, #author { color: black; white-space: break-spaces !important; }
+  #  .cover-image { color: rgba(127, 127, 127, 0.3); }
+
+  ### Option 4 - don't include anything, just use default cover generation
+
 
 ### PREFACE CONTENT
 ### This is markdown content -- make sure your lines have a 2 space indentation in front.
