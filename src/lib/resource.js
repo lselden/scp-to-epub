@@ -380,7 +380,7 @@ class Resource {
     }
 	/**
 	 *
-	 * @param {import("puppeteer").Response} response
+	 * @param {import("puppeteer").HTTPResponse} response
 	 */
 	static fromResponse(response) {
 		const opts = {

@@ -1,12 +1,9 @@
-const path = require('path');
-const fs = require('fs');
-const {promisify} = require('util');
+const path = require('node:path');
+const fs = require('node:fs');
 const archiver = require('archiver');
-const rimraf = require('rimraf');
+const {rimraf: rmdir} = require('rimraf');
 const pMap = require('p-map');
 const junk = require('junk');
-const got = require('got');
-const getStream = require('get-stream');
 const Resource = require('./resource');
 const DocPart = require('./doc-part');
 const config = require('../book-config');
@@ -15,10 +12,7 @@ const {genToc, genAppendix} = require('../templates/toc.xhtml');
 const genNcx = require('../templates/epb.ncx');
 const genPreface = require('../templates/preface.xhtml');
 
-const rmdir = promisify(rimraf);
-
-const {uuid} = require('./utils');
-const { exists, getAssetPath } = require('./path-utils');
+const { getAssetPath } = require('./path-utils');
 
 class Book {
 	/**
@@ -241,11 +235,10 @@ class Book {
 				let content;
 				if (!remote) {
 					// TODO ideally we'd just write straight to disk
-					const resp = await got(url, {
-						encoding: null,
+					const resp = await fetch(url, {
 						...requestOptions
 					});
-					content = resp.body;
+					content = Buffer.from(await resp.arrayBuffer());
 				}
 				const r = new Resource({
 					url,

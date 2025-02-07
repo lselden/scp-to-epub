@@ -42,7 +42,7 @@ export function removeUnnecessary(scope = document.body) {
 }
 
 export function cleanupWhitespace(scope = document) {
-	['body', '#main-content', '#page-content'].forEach(sel => {
+    ['body', '#main-content', '#page-content'].forEach(sel => {
 		scope.querySelectorAll(`${sel} > br`)
 			.forEach(br => br.remove());
 		scope.querySelectorAll(`${sel} p`).forEach(p => {

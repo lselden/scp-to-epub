@@ -1,6 +1,6 @@
 {
     "name": "scp-to-epub",
-    "version": "1.5.2",
+    "version": "1.5.3",
     "description": "Generate ebooks from scp foundation wiki articles",
     "main": "index.js",
     "bin": "dist/index.js",
@@ -22,28 +22,23 @@
     "license": "CC-BY-3.0",
     "devDependencies": {
         "@types/node": "^22.9.1",
-        "@yao-pkg/pkg": "^6.1.1",
+        "@yao-pkg/pkg": "^6.3.0",
         "tsup": "^8.3.5",
         "typescript": "^5.6.3"
     },
     "dependencies": {
-        "archiver": "^3.1.1",
-        "color": "^3.1.2",
+        "archiver": "^7.0.1",
         "dot-prop": "^5.2.0",
-        "get-stream": "^5.1.0",
-        "got": "^9.6.0",
         "gray-matter": "^4.0.2",
-        "js-yaml": "^3.13.1",
+        "js-yaml": "^4.1.0",
         "junk": "^3.1.0",
-        "markdown-it": "^10.0.0",
-        "markdown-it-attrs": "^3.0.1",
+        "markdown-it": "^14.1.0",
+        "markdown-it-attrs": "^4.3.1",
         "mime": "^2.4.4",
         "p-map": "^3.0.0",
         "puppeteer": "^23.8.0",
-        "rimraf": "^3.0.0",
+        "rimraf": "^6.0.1",
         "sharp": "^0.33.5",
-        "turndown": "^6.0.0",
-        "turndown-plugin-gfm": "^1.0.2",
-        "yargs": "^14.2.0"
+        "yargs": "^17.7.2"
     }
 }

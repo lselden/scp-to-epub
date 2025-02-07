@@ -1,4 +1,3 @@
-const got = require('got');
 const urlLib = require('url');
 
 let baseUri = 'http://scpper.com';
@@ -77,13 +76,10 @@ function parseResponse(data) {
  * @returns {Promise<SCPStats>}
  */
 async function getByPageId(pageId) {
-	const response = await got(`${baseUri}/api/page`, {
-		query: {
-			id: pageId
-		},
-		json: true
-	});
-	return parseResponse(response.body);
+    const url = new URL('/api/page', baseUri);
+    url.searchParams.set('id', pageId);
+	const response = await fetch(url);
+	return parseResponse(await response.json());
 }
 
 /**
@@ -101,11 +97,10 @@ async function getByTitle(title, options = {}) {
 	};
 	const returnAll = !!options.returnAll;
 
-	const response = await got(`${baseUri}/api/find-pages`, {
-		query,
-		json: true
-	});
-	const {pages, error} = response.body;
+    const url = new URL('/api/find-pages', baseUri);
+    url.search = new URLSearchParams(query).toString();
+	const response = await (await fetch(url)).json();
+	const {pages, error} = response;
 	if (error) {
 		throw new Error(error);
 	}

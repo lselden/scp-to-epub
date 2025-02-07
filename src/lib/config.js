@@ -1,9 +1,10 @@
-const fs = require('fs');
-const path = require('path');
+// @ts-check
+const fs = require('node:fs');
+const path = require('node:path');
 const yaml = require('js-yaml');
 const dotProp = require('dot-prop');
 
-const debuglog = require('util').debuglog('config');
+const debuglog = require('node:util').debuglog('config');
 const GLOBAL_CONFIG = Symbol.for('_config.singleton');
 
 function isObject (val) {
@@ -128,7 +129,7 @@ class Config {
 				if (!exists) {
 					continue;
 				}
-				const data = yaml.safeLoad(fs.readFileSync(filepath, { encoding: 'utf8' }));
+				const data = yaml.load(fs.readFileSync(filepath, { encoding: 'utf8' }));
 				extendDeep(cfg, data);
 			} catch (err) {
 				console.debug(`unable to read config file ${cfgfile}`, err);

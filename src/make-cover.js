@@ -1,12 +1,9 @@
 const fs = require('fs').promises;
-const got = require('got');
-const path = require('path');
-const urlLib = require('url');
 const mime = require('mime');
 const Resource = require('./lib/resource');
 const { getAssetPath } = require('./lib/path-utils');
-const { debug, normalizeRelativePath, normalizeUrl } = require('./lib/utils');
-const { configureLocalMirror, shouldMirrorUrl, maybeMirrorUrl } = require('./lib/kiwiki-cache');
+const { debug, normalizeUrl } = require('./lib/utils');
+const { configureLocalMirror, maybeMirrorUrl } = require('./lib/kiwiki-cache');
 const config = require('./lib/config');
 
 
