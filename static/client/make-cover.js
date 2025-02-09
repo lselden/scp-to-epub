@@ -287,7 +287,6 @@ async function makeCover({
             line-height: 1;
             text-transform: uppercase;
             text-align: center;
-            /*font-size: 7vh;*/
         }
         .cover-text {
             grid-row: 1 / 1;
