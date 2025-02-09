@@ -12,6 +12,7 @@
         @import url(https://cdn.scpwiki.com/theme/en/sigma/css/sigma.min.css);
         @import url("https://cdn.scpwiki.com/theme/en/black-highlighter/css/min/normalize.min.css");
         @import url("https://cdn.scpwiki.com/theme/en/black-highlighter/css/min/black-highlighter.min.css");
+        @import url("https://scp-wiki.wdfiles.com/local--code/theme:extra-black-highlighter-theme");
 
 
         :root {
@@ -26,6 +27,7 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
+            background-size: auto;
         }
         .cover-content {
             text-align: center;
@@ -45,15 +47,15 @@
             align-content: space-evenly;
         }
         .cover-image {
-            width: 90%;
-            height: 50%;
+            width: 90vw;
+            height: 50vh;
             object-fit: contain;
             margin: 0 auto;
 
         }
         @media (max-aspect-ratio: 4/5) {
             .cover-image {
-                height: 66%;
+                height: 66vh;
             }
         }
         @media (max-aspect-ratio: 6/5) {
@@ -67,6 +69,8 @@
             padding: 0 !important;
             line-height: 1;
             text-transform: uppercase;
+            text-align: center;
+            /*font-size: 7vh;*/
         }
         .cover-text {
             grid-row: 1 / 1;
@@ -94,16 +98,33 @@
         h1 {
             margin: 0;
             padding: 0;
-            color: #fbfbfb;
-            text-align: center;
             
             /* -webkit-text-stroke-width: 3pt;
             -webkit-text-stroke-color: rgba(0, 0, 0, 1); */
-            text-shadow:
-                -2pt -2pt 1pt #000,  
-                2pt -2pt 1pt #000,
-                -2pt 2pt 1pt #000,
-                2pt 2pt 1pt #000;
+            --inverted-title-color: var(--swatch-background);
+            filter: 
+                drop-shadow(.01em .01em rgb(var(--inverted-title-color)))
+                drop-shadow(.01em -.01em rgb(var(--inverted-title-color)))
+                drop-shadow(-.01em .01em rgb(var(--inverted-title-color)))
+                drop-shadow(.01em .01em rgb(var(--inverted-title-color)));
+            /*text-shadow: 
+                -.2vh -.2vh .1vh rgb(var(--inverted-title-color)), 
+                .2vh -.2vh .1vh rgb(var(--inverted-title-color)),
+                -.2vh .2vh .1vh rgb(var(--inverted-title-color)), 
+                .2vh .2vh .1vh rgb(var(--inverted-title-color));*/
+        }
+        h2 {
+            margin: 0;
+            padding: 0;
+            
+            /* -webkit-text-stroke-width: 3pt;
+            -webkit-text-stroke-color: rgba(0, 0, 0, 1); */
+            --inverted-author-color: var(--swatch-text-dark);
+            filter: 
+                drop-shadow(.01em .01em rgb(var(--inverted-author-color)))
+                drop-shadow(.01em -.01em rgb(var(--inverted-author-color)))
+                drop-shadow(-.01em .01em rgb(var(--inverted-author-color)))
+                drop-shadow(.01em .01em rgb(var(--inverted-author-color)));
         }
         .cover {
             display: grid;
@@ -111,7 +132,8 @@
             grid-template-rows: 1fr;
         }
         .cover-image {
-            color: rgb(var(--swatch-text-light));
+            color: rgb(var(--swatch-text-general));            
+            opacity: .75;
         }
         .cover-image-container {
             grid-row: 1 / 1;
@@ -122,21 +144,16 @@
             align-items: center;
             height: 100vh;
         }
-        .colors {
-            color: #990000;
-            color: #ca6d6d;
-            color: #6e0f0f;
-        }
     </style>
 	</head>
 	<body>
 		<div class="cover">
             <div class="cover-text">
                 <div class="text-item">
-                    <h2 id="author" class="top-text fit">SCP Foundation</h2>
+                    <h1 id="page-title" class="bottom-text fit">Title Of Book</h1>
                 </div>
                 <div class="text-item">
-                    <h1 id="page-title" class="bottom-text fit">Title Of Book</h1>
+                    <h2 id="author" class="top-text fit">SCP Foundation</h2>
                 </div>
             </div>
             <div class="cover-image-container">
@@ -228,8 +245,12 @@
                 </svg>
             </div>
         </div>
+        <!-- Fitty called twice to avoid a glich where sometimes a different size is applied to the text -->
         <script>
-            fitty('.fit', {minSize: 60});
+            fitty('.fit');
+        </script>
+        <script>
+            fitty('.fit', { minSize: document.documentElement.clientHeight * 0.06 });
         </script>
 	</body>
 </html>
