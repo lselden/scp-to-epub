@@ -202,12 +202,13 @@ async function makeCover({
 
     if (elements.logo) {
         elements.logo.id = 'image';
+        elements.logo.className = 'cover-image';
     }
 
     document.body.innerHTML = `<div class="cover">
         <div class="cover-text">
             <div class="text-item">
-                <h1 id="title" class="top-text fit"><span>${title}</span></h1>
+                <h1 id="page-title" class="top-text fit"><span>${title}</span></h1>
             </div>
             <div class="text-item">
                 <h2 id="author" class="bottom-text fit"><span>${author}</span></h2>
@@ -218,7 +219,7 @@ async function makeCover({
     <div id="extra-div-2"><span></span></div>`;
     
     const imgContainer = document.querySelector('#image-container');
-    const titleEl = document.querySelector('#title');
+    const titleEl = document.querySelector('#page-title');
     const authorEl = document.querySelector('#author');
     if (elements.logo) imgContainer.appendChild(elements.logo);
     
@@ -226,13 +227,14 @@ async function makeCover({
 
     var s = document.createElement('style');
     s.innerText = `
-    :root {
+        :root {
             --header-background-image-size: 100% 100%;
             --header-height-on-mobile: 100%;
             --header-height-on-desktop: 100%;
         }
         body {
             margin: 0;
+            padding: 20px;
             box-sizing: border-box;
             width: 100vw;
             height: 100vh;
@@ -242,6 +244,7 @@ async function makeCover({
             background-position: center;
             background-size: cover;`
                 : ''}
+            background-size: auto;
         }
         .cover-content {
             text-align: center;
@@ -261,17 +264,29 @@ async function makeCover({
             align-content: space-evenly;
         }
         .cover-image {
-            width: 90%;
-            height: 50%;
+            width: 90vw;
+            height: 50vh;
             object-fit: contain;
             margin: 0 auto;
 
         }
-        #title, #author, .cover .cover-title, .cover .cover-subtitle {
+        @media (max-aspect-ratio: 4/5) {
+            .cover-image {
+                height: 66vh;
+            }
+        }
+        @media (max-aspect-ratio: 6/5) {
+            .text-item {
+                min-height: 20%;
+                align-items: center;
+            }
+        }
+        #page-title, #author, .cover .cover-title, .cover .cover-subtitle {
             margin: 0 !important;
             padding: 0 !important;
             line-height: 1;
             text-transform: uppercase;
+            text-align: center;
         }
         .cover-text {
             grid-row: 1 / 1;
@@ -282,6 +297,7 @@ async function makeCover({
             left: 0; */
             width: 100%;
             height: 100%;
+            max-width: calc(100vw - 5%);
             padding: 20px;
             box-sizing: border-box;
             display: flex;
@@ -289,6 +305,22 @@ async function makeCover({
             justify-content: space-between;
             padding: 5% 5%;
             color: rgb(var(--swatch-text-light));
+        }
+        h1 {
+            --inverted-title-color: var(--swatch-background);
+            filter: 
+                drop-shadow(.01em .01em rgb(var(--inverted-title-color)))
+                drop-shadow(.01em -.01em rgb(var(--inverted-title-color)))
+                drop-shadow(-.01em .01em rgb(var(--inverted-title-color)))
+                drop-shadow(.01em .01em rgb(var(--inverted-title-color)));
+        }
+        h2 {
+            --inverted-author-color: var(--swatch-text-dark);
+            filter: 
+                drop-shadow(.01em .01em rgb(var(--inverted-author-color)))
+                drop-shadow(.01em -.01em rgb(var(--inverted-author-color)))
+                drop-shadow(-.01em .01em rgb(var(--inverted-author-color)))
+                drop-shadow(.01em .01em rgb(var(--inverted-author-color)));
         }
         .text-item {
             width: 100%;
@@ -301,7 +333,8 @@ async function makeCover({
             grid-template-rows: 1fr;
         }
         .cover-image {
-            color: rgb(var(--bright-accent, 255 255 255));
+            color: rgb(var(--swatch-text-general));
+            opacity: .75;
         }
         .cover-image-container {
             grid-row: 1 / 1;
@@ -312,25 +345,13 @@ async function makeCover({
             align-items: center;
             height: 100vh;
         }
-        @media (max-aspect-ratio: 4/5) {
-            .cover-image {
-                height: 66%;
-            }
-        }
-        @media (max-aspect-ratio: 6/5) {
-            .text-item {
-                min-height: 20%;
-                align-items: center;
-            }
-        }
 `;
     document.head.appendChild(s);
     await new Promise(done => setTimeout(done, 100));
     
-    fitty('.top-text.fit', { minSize: 24, maxSize: 120, observeMutations: false });
+    fitty('.top-text.fit', { minSize: document.documentElement.clientHeight * 0.06,  observeMutations: false });
     await new Promise(done => setTimeout(done, 100));
-    var titleSize = getComputedStyle(titleEl).fontSize;
-    fitty('.bottom-text.fit', { minSize: 24, maxSize: titleSize.endsWith('px') ? parseInt(titleSize) : 96, observeMutations: false });
+    fitty('.bottom-text.fit', { minSize: document.documentElement.clientHeight * 0.06,  observeMutations: false });
 
     await new Promise(done => setTimeout(done, 100));
 
