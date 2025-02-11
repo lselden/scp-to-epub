@@ -194,7 +194,8 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		keepTempFiles,
 		remoteImages,
         coverTheme,
-		output
+		output,
+		appendixDepthCutoff
 	} = argv;
 
 	const cfg = {
@@ -211,6 +212,9 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		metadata: {
 			title,
 			author
+		},
+		bookOptions: {
+			appendixDepthCutoff
 		},
 		discovery: {
 			maxChapters,
