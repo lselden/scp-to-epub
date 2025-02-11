@@ -291,7 +291,7 @@ class Scraper {
 
 			// not a chapter, but content.
 			// TODO COMBAK save these as resource? maybe....
-			if (/image|video|audio|zip/.test(mimeType)) {
+			if (/image|video|audio|zip|7z/.test(mimeType)) {
 				console.debug(`Ignoring non-html content ${payload.url}`);
 				return;
 			}
