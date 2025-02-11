@@ -2,10 +2,10 @@ const urlLib = require('url');
 const path = require('path');
 const pMap = require('p-map');
 const config = require('./book-config');
-const { filenameForUrl, debug } = require('./lib/utils');
+const {filenameForUrl, debug} = require('./lib/utils');
 const DocPart = require('./lib/doc-part');
 const Resource = require('./lib/resource');
-const { genChapterFooter, genChapterHeader } = require('./templates/chapter-parts');
+const {genChapterFooter, genChapterHeader} = require('./templates/chapter-parts');
 const { getAssetPath } = require('./lib/path-utils');
 const { isLocalMirrorEnabled, getLocalMirrorUrl } = require('./lib/kiwiki-cache');
 const Chapter = require('./lib/chapter');
@@ -57,7 +57,7 @@ class PostProcessor {
 		};
 	}
 	async initialize() {
-		this.page = await this.browser.newPage();
+        this.page = await this.browser.newPage();
 		// TODO handle fragment: urls
 		this.page.exposeFunction('getBookPath', href => {
 			const resource = this.cache.get(href);
@@ -67,7 +67,7 @@ class PostProcessor {
 			}
 			return href;
 		});
-		this.page.exposeFunction('registerRemoteResource', async (resourceUrl, originalUrl, { typeHint = undefined, shouldCompress = undefined } = {}) => {
+		this.page.exposeFunction('registerRemoteResource', async (resourceUrl, originalUrl, {typeHint = undefined, shouldCompress = undefined} = {}) => {
 			let resource = this.cache.get(resourceUrl);
 			// if no resource already then just mark as remote
 			if (!resource) {
@@ -77,38 +77,38 @@ class PostProcessor {
 				this.cache.set(resource);
 			}
 
-			if (!resource.mimeType && typeHint) {
-				resource.mimeType = typeHint;
-			} else if (!resource.mimeType) {
-				// REVIEW - necessary to make sure content type is good?
-				// await resource.tryDetectMimeType();
-			}
+            if (!resource.mimeType && typeHint) {
+                resource.mimeType = typeHint;
+            } else if (!resource.mimeType) {
+                // REVIEW - necessary to make sure content type is good?
+                // await resource.tryDetectMimeType();
+            }
 
 			// check if should be stored locally
 			if (resource.isImage && resource.content && !this.options.remoteImages) {
-				// COMBAK QUESTION pass configurable options?
-				try {
-					await resource.compress({
-						...(shouldCompress !== undefined) && { compress: shouldCompress }
-					});
-					resource.setLocal();
-				} catch (err) {
-					console.debug(`error compressing image for ${originalUrl} ${resourceUrl} - likely invalid ${err}`)
-					// clear out content b/c not falid
-					resource.content = undefined;
-					resource.setInvalid();
-				}
+                // COMBAK QUESTION pass configurable options?
+                try {
+                    await resource.compress({
+                        ...(shouldCompress !== undefined) && { compress: shouldCompress }
+                    });
+                    resource.setLocal();
+                } catch (err) {
+                    console.debug(`error compressing image for ${originalUrl} ${resourceUrl} - likely invalid ${err}`)
+                    // clear out content b/c not falid
+                    resource.content = undefined;
+                    resource.setInvalid();
+                }
 			}
 
 			if (!resource.shouldWrite) {
 				resource.setRemote();
 			}
 
-			try {
-				resource.addBacklinks(originalUrl);
-			} catch (err) {
-				console.debug(`error adding resource backlinks for ${originalUrl} ${resourceUrl} - ${err}`);
-			}
+            try {
+			    resource.addBacklinks(originalUrl);
+            } catch (err) {
+                console.debug(`error adding resource backlinks for ${originalUrl} ${resourceUrl} - ${err}`);
+            }
 
 			const chapter = /** @type {import("./lib/chapter")} */(this.cache.get(originalUrl));
 			if (!chapter) {
@@ -123,7 +123,7 @@ class PostProcessor {
 		this.page.on('console', msg => {
 			console.log('POST PROCESS CONSOLE', msg.type(), msg.text());
 		})
-		await this.page.addScriptTag({
+        await this.page.addScriptTag({
 			path: await getAssetPath('client/post-process.js')
 		});
 	}
@@ -131,7 +131,7 @@ class PostProcessor {
 		if (!this.page) {
 			await this.initialize();
 		}
-		const { concurrency } = this.options;
+		const {concurrency} = this.options;
 		const allChapters = [...chapters];
 		for (let chapter of chapters) {
 			// NOTE this doesn't do recursion for multiple depths, but I dont' see why we'd want to do that
@@ -159,7 +159,7 @@ class PostProcessor {
 				pageName: chapter.stats.pageName
 			};
 
-			let { content, error } = await page.evaluate((content, extras, config) => {
+			let {content, error} = await page.evaluate((content, extras, config) => {
 				// @ts-ignore
 				return window.processChapter(content, extras, config);
 			}, chapter.content, extras, config);
@@ -169,12 +169,12 @@ class PostProcessor {
 				console.warn(`Failed to parse ${chapter.url} completely - parse error. ${error}`);
 			}
 
-			if (isLocalMirrorEnabled()) {
-				debug(`removing local mirror address from any links in ${chapter.url}`);
-				const localMirror = getLocalMirrorUrl();
-				content = content.replaceAll(localMirror.replace(/https?:\/\//, ''), '');
+            if (isLocalMirrorEnabled()) {
+                debug(`removing local mirror address from any links in ${chapter.url}`);
+                const localMirror = getLocalMirrorUrl();
+                content = content.replaceAll(localMirror.replace(/https?:\/\//, ''), '');
 
-			}
+            }
 
 			// not valid doctype
 			if (!/^<!DOCTYPE html>/.test(content)) {
