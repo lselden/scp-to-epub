@@ -31,7 +31,7 @@ function formatChapter(chapter, chapterIndex, options = {}) {
 	const {
 		bookPath,
 		title = `Chapter ${chapterIndex || ''}`,
-		stats: { rating }
+		stats: { rating } = {}
 	} = chapter;
 
 	const author = Array.isArray(chapter.author) ? chapter.author.join(', ') : chapter.author;
@@ -101,11 +101,16 @@ function genToc(data, options = {}) {
 				chapters
 					.map((chapter, index) => {
 						// NOTE TODO doc parts will mess up this count
-						const result = formatChapter(chapter, chapterIndex, options);
-						if (!(chapter instanceof DocPart)) {
-							chapterIndex += 1;
+						try {
+							const result = formatChapter(chapter, chapterIndex, options);
+							if (!(chapter instanceof DocPart)) {
+								chapterIndex += 1;
+							}
+							return result;
+						} catch (err) {
+							console.error(`Error formatting chapter at ${chapter?.url || chapter.message} - ${err}`)
+							return ''
 						}
-						return result;
 					})
 					.join('\n')
 
@@ -143,7 +148,14 @@ function genAppendix(data, options) {
 	const html = `<h1>Appendix</h1>
 <ol class="toc-list">${
 	supplemental
-		.map((c, i) => formatChapter(c, i, options))
+		.map((c, i) => {
+			try {
+				return formatChapter(c, i, options);
+			} catch (err) {
+				console.error(`Error formatting chapter at ${c?.url || c.message} - ${err}`)
+				return ''
+			}
+		})
 		.join('\n')
 }</ol>`
 
