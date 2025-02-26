@@ -148,17 +148,17 @@ class PostProcessor {
 	async updateChapter(chapter) {
 		const page = this.page;
 
-		const extras = await this.genWrappers(chapter);
-
-		const config = {
-			originalUrl: chapter.url,
-			haltOnError: false,
-			depth: chapter.depth || 0,
-			isSupplemental: chapter.depth >= this.options.appendixDepthCutoff,
-			pageName: chapter.stats.pageName
-		};
-
 		try {
+			const extras = await this.genWrappers(chapter);
+
+			const config = {
+				originalUrl: chapter.url,
+				haltOnError: false,
+				depth: chapter.depth || 0,
+				isSupplemental: chapter.depth >= this.options.appendixDepthCutoff,
+				pageName: chapter.stats.pageName
+			};
+
 			let {content, error} = await page.evaluate((content, extras, config) => {
 				// @ts-ignore
 				return window.processChapter(content, extras, config);
