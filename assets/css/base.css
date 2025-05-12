@@ -173,7 +173,6 @@ sup {
 
 /* FIGURES + IMAGES  */
 figure {
-  display: table;
   page-break-inside: avoid;
   break-inside: avoid;
   margin: 1.2em auto;
