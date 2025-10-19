@@ -332,7 +332,7 @@ class Resource {
 		// const meta = await sharp(this.content).metadata();
 		// }
 
-		let shouldUsePng = /svg|gif|png|mng|apng/i.test(this.extension);
+		let shouldUsePng = /svg|gif|png|mng|apng|webp/i.test(this.extension);
 
         if ((this.content.length || this.content.size) >= jpegIfSizeLargerThan) {
             shouldUsePng = false;
