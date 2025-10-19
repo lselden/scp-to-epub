@@ -388,6 +388,11 @@ class Resource {
 			from: [(response.frame() || {url(){ return ''; }}).url()],
 			mimeType: response.headers()['content-type']
 		};
+		
+		// Quick fix for webp images returned as application/octet-stream
+		if (opts.url.endsWith(".webp")) {
+		    opts.mimeType = 'image/webp';
+		}
 		// make sure original urls are asssociated with redirected versions
 		const request = response.request();
 		const redirectChain = request.redirectChain();
