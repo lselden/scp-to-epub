@@ -176,7 +176,11 @@ class CoverCreator {
             captureBeyondViewport: true,
             fullPage: false
         });
-        await page.close();
+        if (this.opts.previewCover) {
+            console.warn('Cover preview - leaving browser open');
+        } else {
+            await page.close();
+        }
         return new Resource({
             id: 'cover-image',
 		    url: `http://localhost/cover-image.${format}`,

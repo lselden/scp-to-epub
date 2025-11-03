@@ -7,8 +7,7 @@ const viewPage = require('./src/view-page');
 const {safeFilename, maybeMirrorUrl, normalizeRelativePath, normalizeUrl} = require('./src/lib/utils');
 const { configureLocalMirror } = require('./src/lib/kiwiki-cache');
 
-
-async function processSingle (urls, cfg, tmpDir, destination) {
+async function processSingle (urls, cfg) {
 	const defaultOrigin = cfg.defaultOrigin || config.get('discovery.defaultOrigin', 'http://www.scpwiki.com');
     configureLocalMirror();
 
@@ -41,15 +40,10 @@ async function processSingle (urls, cfg, tmpDir, destination) {
         }
     }
     await builder.makeCover();
-
-	console.log('WRITING');
-	await builder.finalize();
-	await builder.write(destination, tmpDir);
-	console.log('FINISHED');
 	return builder;
 }
 
-async function processBook (bookUrl, cfg, tmpDir, destination) {
+async function processBook (bookUrl, cfg) {
 	const builder = new BookMaker(bookUrl, {
 		preProcess: {
 			concurrency: 3,
@@ -60,11 +54,30 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 	await builder.initialize();
 	const bookSettings = await builder.loadBook();
 	await builder.processBook(bookSettings);
-	console.log('WRITING');
-	await builder.finalize();
-	await builder.write(destination, tmpDir);
-	console.log('FINISHED');
 	return builder;
+}
+
+async function viewCover (bookUrl, cfg) {
+    config.set('browser.headless', false);
+    const builder = new BookMaker(bookUrl, {
+		preProcess: {
+			concurrency: 3,
+			closeTabs: true
+		},
+		...cfg,
+        headless: false
+	});
+	await builder.initialize();
+    const bookSettings = await builder.loadBook();
+    await builder.makeCover({ ...bookSettings, previewCover: true});
+    console.log('WAITING - CLOSE BROWSER TO EXIT');
+	await new Promise((resolve, reject) => {
+		builder.browser.on('disconnected', () => {
+			resolve();
+		});
+	});
+	await builder.destroy();
+    return;
 }
 
 
@@ -90,6 +103,11 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 			describe: 'Open a single URL, format, and view in browser',
 			type: 'string'
 		})
+        .option('previewCover', {
+            describe: 'Use specified book config and view a preview of the cover image',
+            type: 'boolean',
+            hidden: true
+        })
 		.option('output', {
 			alias: 'o',
 			type: 'string',
@@ -159,7 +177,8 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 			number: true,
 			hidden: true,
 			default: config.get('browser.height')
-		});
+		})
+        .wrap(Math.min(120, yargs.terminalWidth()));
 
 	const {argv} = cmd;
 
@@ -189,6 +208,7 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		author,
 		debug,
 		showBrowser,
+        previewCover,
 		maxChapters,
 		maxDepth,
 		keepTempFiles,
@@ -250,6 +270,12 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
 		return;
 	}
 
+    if (previewCover) {
+        const book = bookUrl || new Book(cfg);
+        await viewCover(book, cfg);
+        return;
+    }
+
 	const tempDir = path.join(argv.tempDir, pageName);
 	const destination = output.endsWith('.epub') ? output : path.join(output, `${pageName}.epub`);
 
@@ -265,14 +291,22 @@ async function processBook (bookUrl, cfg, tmpDir, destination) {
     if (argv.onlyZip) {
 		const book = new Book(cfg);
 		await book.zip(tempDir, destination);
-	} else if (bookUrl) {
-		builder = await processBook(bookUrl, cfg, tempDir, destination);
+    } else if (bookUrl) {
+		builder = await processBook(bookUrl, cfg);
 	} else if (page) {
-		builder = await processSingle(page, cfg, tempDir, destination);
+		builder = await processSingle(page, cfg);
 	} else {
 		cmd.showHelp();
         process.exit();
 	}
+
+    
+    if (builder) {
+        console.log('WRITING');
+        await builder.finalize();
+        await builder.write(destination, tempDir);
+        console.log('FINISHED');
+    }
 
 	console.log(`Wrote ${title} to ${destination}, temp files in ${tempDir}`);
 
