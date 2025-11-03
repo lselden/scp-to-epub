@@ -22,9 +22,9 @@
     "license": "CC-BY-3.0",
     "devDependencies": {
         "@types/node": "^22.9.1",
-        "@yao-pkg/pkg": "^6.3.0",
-        "tsup": "^8.3.5",
-        "typescript": "^5.6.3"
+        "@yao-pkg/pkg": "^6.10.1",
+        "tsup": "^8.5.0",
+        "typescript": "^5.9.3"
     },
     "dependencies": {
         "archiver": "^7.0.1",
