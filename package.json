@@ -1,6 +1,6 @@
 {
     "name": "scp-to-epub",
-    "version": "1.5.7",
+    "version": "1.6.0",
     "description": "Generate ebooks from scp foundation wiki articles",
     "main": "index.js",
     "bin": "dist/index.js",
