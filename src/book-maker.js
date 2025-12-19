@@ -112,7 +112,7 @@ class BookMaker {
 		// 	.map(link => Resource.asCanononical(link, this.options.defaultOrigin));
 	}
 	async initialize() {
-		const {width, height, debug, headless, executablePath} = config.toObject('browser');
+		const {width, height, debug, headless, executablePath, args} = config.toObject('browser');
 		if (!this.browser) {
 			this.browser = await puppeteer.launch({
 				defaultViewport: {
@@ -121,7 +121,8 @@ class BookMaker {
 				},
 				headless,
 				devtools: !headless && debug,
-                ...executablePath && {executablePath}
+                ...executablePath && {executablePath},
+                ...args && {args}
 			});
 		}
 		// TODO fix this

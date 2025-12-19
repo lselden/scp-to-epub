@@ -129,9 +129,17 @@ browser:
   width: 768
   ### change browser height
   height: 1024
-  timeout: 600000
+  timeout: 300000
   ### User agent for created browser to report
   ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
+
+  args:
+    ### add additional args to puppeteer browser instance
+    ### see https://peter.sh/experiments/chromium-command-line-switches/
+    - '--disable-features=HttpsFirstBalancedModeAutoEnable'
+
+    #- '--proxy-server=direct://'
+    #- '--proxy-bypass-list=*'
 ### Cover settings
 ### NOTE: this is for all books made. You can set the cover for individual books
 ### by using the book markdown format
