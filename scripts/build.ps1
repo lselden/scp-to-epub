@@ -80,7 +80,7 @@ $pkg | ConvertTo-Json -Depth 10 | Set-Content $stagingPackagePath
 # install sharp as WASM
 Push-Location $stagingFolder
 
-npm install --cpu=wasm32
+npm install sharp
 
 pop-location
 

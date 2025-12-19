@@ -13,7 +13,7 @@
     },
     "pkg": {
         "assets": [
-            "/node_modules/@img/sharp-win32-x64/lib/**/*",
+            "/node_modules/@img/**",
             "assets/**/*",
             "static/**/*"
         ]
