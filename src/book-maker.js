@@ -426,6 +426,11 @@ class BookMaker {
 				console.log(`Ignoring non-wiki link ${url}`);
 				return;
 			}
+            const isUnlisted = /unlisted:/.test(url);
+            if (isUnlisted) {
+                console.log(`Ignoring unlisted/private link ${url}`);
+                return;
+            }
 
 			console.log(`LOADING ${current ? `Part ${current}/${total} ` : ''}${url} (${index + 1}/${targets.length})`);
 			// just a list of pages tagged
