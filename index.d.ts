@@ -262,7 +262,20 @@ export interface BookMakerConfig extends BookMakerPrivateConfig {
      */
     defaultOrigin?: string,
     localArchiveMirror?: string,
-    browser?: Browser
+    browser?: {
+        headless?: boolean,
+        debug?: boolean,
+        width?: number,
+        height?: number,
+        /**
+         * timeout for browser operations (in milliseconds)
+         * @default 2 minutes
+         */
+        timeout?: number,
+        executablePath?: string,
+        args?: string[],
+        ua?: string
+    }
 }
 
 export interface BookConfig {
