@@ -5,6 +5,7 @@ const { getAssetPath } = require('./lib/path-utils');
 const { debug, normalizeUrl } = require('./lib/utils');
 const { configureLocalMirror, maybeMirrorUrl } = require('./lib/kiwiki-cache');
 const config = require('./lib/config');
+const { setPageContent, gotoPage } = require('./lib/browser-utils');
 
 
 async function fromImage({ imagePath, imageUrl, format = 'jpg'}) {
@@ -46,9 +47,7 @@ async function fromImage({ imagePath, imageUrl, format = 'jpg'}) {
 async function loadUrl(page, url) {
     configureLocalMirror();
     url = await maybeMirrorUrl(url);
-    await page.goto(url, {
-        waitUntil: ['networkidle2']
-    });
+    await gotoPage(page, url);
     return page;
 }
 
@@ -158,11 +157,9 @@ class CoverCreator {
             }
             configureLocalMirror();
             url = await maybeMirrorUrl(url);
-            await page.goto(url, {
-                waitUntil: ['networkidle2']
-            });
+            await gotoPage(page, url);
         } else if (html) {
-            await page.setContent(html, { waitUntil: ['load', 'networkidle0']});
+            await setPageContent(page, html);
         }
 
         return page;

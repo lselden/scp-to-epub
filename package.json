@@ -36,7 +36,7 @@
         "markdown-it-attrs": "^4.3.1",
         "mime": "^2.4.4",
         "p-map": "^3.0.0",
-        "puppeteer": "^23.8.0",
+        "puppeteer": "^24.28.0",
         "rimraf": "^6.0.1",
         "sharp": "^0.33.5",
         "yargs": "^17.7.2"

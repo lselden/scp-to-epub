@@ -4,6 +4,7 @@ const MarkdownIt = require('markdown-it');
 const markdownItAttrs = require('markdown-it-attrs');
 const genDocPart = require('./templates/doc-part.xhtml');
 const DocPart = require('./lib/doc-part');
+const { setPageContent } = require('./lib/browser-utils');
 
 const md = new MarkdownIt({
 	html: true,
@@ -89,7 +90,7 @@ async function extractDocParts(html, app) {
 	// const page = await browser.newPage();
 	const {page} = await scraper.createPage('about:blank');
 
-	await page.setContent(html, { waitUntil: ['load', 'networkidle0']});
+    await setPageContent(page, html);
 
 	await scraper.switchImagesToLocal(page);
 
