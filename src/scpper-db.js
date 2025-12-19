@@ -1,4 +1,5 @@
 const urlLib = require('url');
+const { getUrlObj } = require('./lib/utils');
 
 let baseUri = 'http://scpper.com';
 let defaultSite = 'en';
@@ -34,6 +35,7 @@ let defaultSite = 'en';
  * @property {Date} [lastCached]
  */
 
+
 /**
  *
  * @param {*} data
@@ -54,7 +56,7 @@ function parseResponse(data) {
 	} = data;
 	return {
 		id,
-		site: (urlLib.parse(site || '').hostname || '').split('.')[0] || 'scp-wiki',
+		site: getUrlObj(site).hostname?.split('.')?.[0] || 'scp-wiki',
 		title,
 		altTitle: (altTitle || '').replace(/^&$/, ''),
 		kind,

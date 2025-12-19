@@ -3,7 +3,7 @@ const path = require('path/posix');
 const urlLib = require('url');
 const pMap = require('p-map');
 const config = require('../book-config');
-const {safeFilename, normalizePath, debug} = require('./utils');
+const {safeFilename, normalizePath, debug, getUrlObj} = require('./utils');
 
 function isEmpty(arr) {
 	return !(arr && (typeof arr === 'object') && Object.keys(arr).length > 0);
@@ -199,7 +199,7 @@ class DiskCache {
 		}
 		// absolute
 		if (pageName.startsWith('http')) {
-			pageName = urlLib.parse(pageName).pathname;
+			pageName = getUrlObj(pageName).pathname;
 		}
 		// relative
 		if (pageName.startsWith('/')) {

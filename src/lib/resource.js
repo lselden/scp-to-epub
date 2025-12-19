@@ -6,7 +6,7 @@ const mime = require('mime');
 const sharp = require('sharp');
 const config = require('../book-config');
 const { isProxiedUrl, fromMirrorUrl } = require('./kiwiki-cache');
-const { debug } = require('./utils');
+const { debug, getUrlObj } = require('./utils');
 
 // set the block untrusted env variable unless already explicitly set
 if (!process.env.VIPS_BLOCK_UNTRUSTED) {
@@ -45,7 +45,7 @@ function safeName(str) {
 
 const folders = config.get('output.folders');
 const defaultOrigin = config.get('discovery.defaultOrigin', 'http://www.scpwiki.com');
-const defaultUrlObj = urlLib.parse(defaultOrigin);
+const defaultUrlObj = new URL(defaultOrigin);
 
 /** @typedef {'local' | 'remote' | 'none' | 'maybe'} CacheType */
 
@@ -410,18 +410,7 @@ class Resource {
         if (isProxiedUrl(url)) {
             url = fromMirrorUrl(url);
         }
-		if (url instanceof URL) {
-			url = urlLib.parse(`${url}`);
-		}
-		if (typeof url === 'string') {
-			url = urlLib.parse(url);
-		}
-
-		// assign defaults
-		url = {
-			...defaultUrlObj,
-			...url
-		};
+        url = getUrlObj(url, defaultOrigin);
 
         // TODO FIXME HACK
 		// this is to normalize the URLs to the standard domain

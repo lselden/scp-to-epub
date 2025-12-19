@@ -77,7 +77,7 @@ function safeFilename(str, extension = '') {
 }
 
 function filenameForUrl(url, extension = '') {
-	const pathname = urlLib.parse(url).pathname;
+	const pathname = getUrlObj(url).pathname;
 	const name = safeFilename(pathname.replace(/^\//, ''));
 	if (!extension) {
 		return name;
@@ -112,6 +112,22 @@ function normalizeRelativePath(url) {
 }
 
 /**
+ * parse URL, falling back to legacy behavior if not able
+ * @param {string | URL} url 
+ * @param {string | URL} [baseUrl]
+ * @returns {URL | import("node:url").UrlObject}
+ */
+function getUrlObj(url, baseUrl) {
+    if (url instanceof URL) return url;
+    if (typeof url === 'object' && typeof url?.href === 'string') {
+        return new URL(url, baseUrl);
+    }
+    return URL.canParse?.(url)
+            ? new URL(url, baseUrl)
+            : urlLib.parse(url);
+}
+
+/**
  * 
  * @param {string} u 
  * @param {string | URL} [defaultOrigin]
@@ -136,5 +152,6 @@ module.exports = {
     maybeMirrorUrl,
     normalizeRelativePath,
     normalizeUrl,
+    getUrlObj,
     debug
 };

@@ -62,7 +62,7 @@ class PostProcessor {
 		this.page.exposeFunction('getBookPath', href => {
 			const resource = this.cache.get(href);
 			if (resource && resource.shouldWrite) {
-				const hash = urlLib.parse(href).hash || '';
+				const hash = new URL(href).hash || '';
 				return `${resource.bookPath}${hash}`;
 			}
 			return href;

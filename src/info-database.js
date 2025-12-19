@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 const path = require('path/posix');
 const urlLib = require('url');
-const {safeFilename, debug} = require('./lib/utils');
+const {safeFilename, debug, getUrlObj} = require('./lib/utils');
 const scpperDB = require('./scpper-db');
 const Resource = require('./lib/resource');
 const DiskCache = require('./lib/disk-cache');
@@ -499,7 +499,7 @@ class WikiDataLookup {
 		}
 		// absolute
 		if (pageName.startsWith('http')) {
-			pageName = urlLib.parse(pageName).pathname;
+			pageName = getUrlObj(pageName).pathname;
 		}
 		// relative
 		if (pageName.startsWith('/')) {

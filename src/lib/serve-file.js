@@ -44,8 +44,8 @@ class StaticServer {
 			return;
 		}
 
-		if (typeof url === 'string') {
-			url = urlLib.parse(url);
+		if (typeof url === 'string' && URL.canParse?.(url)) {
+			url = new URL(url);
 		}
 
 		if (

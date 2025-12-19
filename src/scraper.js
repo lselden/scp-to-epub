@@ -6,7 +6,7 @@ const StaticServer = require('./lib/serve-file');
 const Resource = require('./lib/resource');
 const Chapter = require('./lib/chapter');
 const Link = require('./lib/link');
-const {safeFilename, filenameForUrl, debug} = require('./lib/utils');
+const {safeFilename, filenameForUrl, debug, getUrlObj} = require('./lib/utils');
 const { configureLocalMirror, maybeMirrorUrl, shouldMirrorUrl, serveResponseFromMirror, toMirrorUrl, fromMirrorUrl, isProxiedUrl, checkMirrorHasUrl } = require('./lib/kiwiki-cache');
 const { gotoPage } = require('./lib/browser-utils');
 
@@ -141,8 +141,7 @@ class Scraper {
 	 */
 	async interceptRequest(request) {
 		let url = request.url();
-		const urlObj = urlLib.parse(url);
-
+		const urlObj = getUrlObj(url);
 		try {
 			const isHandled = this.options.hooks.request(request);
 			if (isHandled) {
@@ -578,7 +577,7 @@ class Scraper {
 
 		// actually run the processing
 		await page.addScriptTag({
-			url: await this.server.getUrlForFile('/client/epub-formatter.js', urlLib.parse(page.url())),
+			url: await this.server.getUrlForFile('/client/epub-formatter.js', new URL(page.url())),
 			type: 'module'
 		});
 
@@ -715,7 +714,7 @@ class Scraper {
 		// @ts-ignore
 		const {defaultOrigin} = this.options;
 		if (defaultOrigin && !/\/\/(www\.|)scp-wiki(\.net|\.wikidot\.com)$/.test(defaultOrigin)) {
-			defaultSite = (urlLib.parse(defaultOrigin).hostname || '').replace(/www\.|\.com|\.wikidot|\.net|\.org/g, '');
+			defaultSite = (getUrlObj(defaultOrigin).hostname || '').replace(/www\.|\.com|\.wikidot|\.net|\.org/g, '');
 		}
         /**
          * @type {import('./scpper-db').SCPStats}
