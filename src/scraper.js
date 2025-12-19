@@ -8,6 +8,7 @@ const Chapter = require('./lib/chapter');
 const Link = require('./lib/link');
 const {safeFilename, filenameForUrl, debug} = require('./lib/utils');
 const { configureLocalMirror, maybeMirrorUrl, shouldMirrorUrl, serveResponseFromMirror, toMirrorUrl, fromMirrorUrl, isProxiedUrl, checkMirrorHasUrl } = require('./lib/kiwiki-cache');
+const { gotoPage } = require('./lib/browser-utils');
 
 const {CacheEnum} = Resource;
 
@@ -436,8 +437,7 @@ class Scraper {
         /** @type {Response} */
         let response; 
         try {
-            out.response = response = await page.goto(url, {
-                waitUntil: ['load', 'domcontentloaded', 'networkidle2'],
+            out.response = response =   await gotoPage(page, url, {
                 timeout: this.options.browser.timeout
             });
         } catch (error) {
