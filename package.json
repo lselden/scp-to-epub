@@ -8,7 +8,7 @@
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
         "pkg": "npx @yao-pkg/pkg build/staging --output build/release/",
-        "build": "tsup",
+        "build": "tsdown",
         "package": "pwsh scripts/build.ps1 -CopyPuppeteerArtifacts"
     },
     "pkg": {
@@ -23,7 +23,7 @@
     "devDependencies": {
         "@types/node": "^22.9.1",
         "@yao-pkg/pkg": "^6.10.1",
-        "tsup": "^8.5.0",
+        "tsdown": "^0.18.1",
         "typescript": "^5.9.3"
     },
     "dependencies": {
