@@ -11,7 +11,7 @@ param (
     [Parameter()] [string] $BundledExecutablePath = 'bin/chrome.exe',
     [Parameter()] [string] $BinaryName = 'scp-to-epub.exe',
     # change this if you want to try building for other platforms -- see @yao-pkg/pkg docs
-    [Parameter()] [string] $PkgTarget = 'node20-win',
+    [Parameter()] [string] $PkgTarget = 'node22-win',
     [Parameter()] [switch] $NoCleanup
 )
 
