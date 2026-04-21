@@ -115,7 +115,11 @@ ${
 				.filter(x => x)
 				.join(EOL)
 		}
-		<item id="appendix" href="${ appendixPath }" media-type="application/xhtml+xml" />
+		${
+			(appendix.length > 0)
+				? `<item id="appendix" href="${ appendixPath }" media-type="application/xhtml+xml" />`
+				: ''
+		}
 	</manifest>
 
 	<spine toc="ncx">
@@ -136,7 +140,11 @@ ${
 				})
 				.join(EOL)
 		}
-		<itemref idref="appendix" />
+		${
+			(appendix.length > 0)
+				? '<itemref idref="appendix" />'
+				: ''
+		}
 	</spine>
 </package>`
 }

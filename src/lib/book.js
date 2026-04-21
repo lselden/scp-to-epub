@@ -187,9 +187,12 @@ class Book {
 			'EPUB/package.opf': genManifest(this, this.options),
 			[`EPUB/${this.toc.path}`]: genToc(this, this.options),
 			[`EPUB/${this.toc.ncxPath}`]: genNcx(this, this.options),
-			[`EPUB/${this.toc.prefacePath}`]: genPreface(this, this.options),
-			[`EPUB/${this.toc.appendixPath}`]: genAppendix(this, this.options)
+			[`EPUB/${this.toc.prefacePath}`]: genPreface(this, this.options)
 		};
+
+		if (this.layout.appendix.length > 0) {
+			files[`EPUB/${this.toc.appendixPath}`] = genAppendix(this, this.options);
+		}
 
 		await pMap(Object.entries(files), ([filepath, content]) => {
 			return this.writeFile(path.join(destination, filepath), content);
