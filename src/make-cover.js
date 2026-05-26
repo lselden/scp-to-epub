@@ -1,11 +1,11 @@
-const fs = require('fs').promises;
-const mime = require('mime');
-const Resource = require('./lib/resource');
-const { getAssetPath } = require('./lib/path-utils');
-const { debug, normalizeUrl } = require('./lib/utils');
-const { configureLocalMirror, maybeMirrorUrl } = require('./lib/kiwiki-cache');
-const config = require('./lib/config');
-const { setPageContent, gotoPage } = require('./lib/browser-utils');
+import fs from 'node:fs/promises';
+import mime from 'mime';
+import Resource from './lib/resource.js';
+import { getAssetPath } from './lib/path-utils.js';
+import { debug, normalizeUrl } from './lib/utils.js';
+import { configureLocalMirror, maybeMirrorUrl } from './lib/kiwiki-cache.js';
+import config from './lib/config.js';
+import { setPageContent, gotoPage } from './lib/browser-utils.js';
 
 
 async function fromImage({ imagePath, imageUrl, format = 'jpg'}) {
@@ -342,7 +342,7 @@ class CoverCreator {
  * @param {import("puppeteer").Browser} browser
  * @param {*} opts
  */
-async function makeCover(browser, opts = {}) {
+export default async function makeCover(browser, opts = {}) {
     const {
 		author = 'SCP Foundation',
 		title = 'Export',
@@ -364,5 +364,3 @@ async function makeCover(browser, opts = {}) {
     const resource = await creator.makeCover();
 	return resource;
 }
-
-module.exports = makeCover;

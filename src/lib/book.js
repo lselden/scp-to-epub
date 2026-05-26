@@ -1,23 +1,26 @@
-const path = require('node:path');
-const fs = require('node:fs');
-const archiver = require('archiver');
-const {rimraf: rmdir} = require('rimraf');
-const pMap = require('p-map');
-const junk = require('junk');
-const Resource = require('./resource');
-const DocPart = require('./doc-part');
-const config = require('../book-config');
-const genManifest = require('../templates/content.opf');
-const {genToc, genAppendix} = require('../templates/toc.xhtml');
-const genNcx = require('../templates/epb.ncx');
-const genPreface = require('../templates/preface.xhtml');
+import path from 'node:path';
+import fs from 'node:fs';
+import {ZipArchive} from 'archiver';
+import pMap from 'p-map';
+import {isJunk} from 'junk';
+import Resource from './resource.js';
+import DocPart from './doc-part.js';
+import config, { baseDir } from '../book-config.js';
+import genManifest from '../templates/content.opf.js';
+import {genToc, genAppendix} from '../templates/toc.xhtml.js';
+import genNcx from '../templates/epb.ncx.js';
+import genPreface from '../templates/preface.xhtml.js';
 
-const { getAssetPath } = require('./path-utils');
+import { getAssetPath } from './path-utils.js';
 
-class Book {
+const rmdir = (dir) => {
+    return fs.promises.rm(dir, { recursive: true, force: true });
+}
+
+export default class Book {
 	/**
 	 *
-	 * @param {import('../..').BookConfig} opts
+	 * @param {import('../../index.js').BookConfig} opts
 	 */
 	constructor(opts = {}) {
 		/** @type {string} */
@@ -35,12 +38,13 @@ class Book {
 		/** @type {string[]} */
 		this._author = [].concat(config.get('metadata.author', 'SCP Foundation'));
 
-		/** @type {import("./chapter")[]} */
+		/** @type {import("./chapter.js").default[]} */
 		this.chapters = [];
 
-		/** @type {import("./resource")[]} */
+		/** @type {import("./resource.js").default[]} */
 		this.resources = [];
 
+        /** @type {Record<'nested' | 'chapters' | 'appendix', import("./chapter.js").default[]>} */
 		this.layout = {
 			nested: [],
 			chapters: [],
@@ -78,7 +82,7 @@ class Book {
 			...otherOpts
 		};
 
-		this.localAssetsPath = config.get('output.localResources', path.join(__dirname, '../../assets'));
+		this.localAssetsPath = config.get('output.localResources', path.join(baseDir, '../../assets'));
 
 		// TODO just pull this from assetFolders...will need to grab before starting to generate various files...maybe at beginning of process
 		this.stylesheets = config.get('bookOptions.stylesheets', ['css/base.css', 'css/style.css', 'css/fonts.css']);
@@ -292,7 +296,7 @@ class Book {
 		await pMap(localFiles, async file => {
 			try {
 				// skip junk files
-				if (junk.is(file)) {
+				if (isJunk(file)) {
 					return;
 				}
 				const content = await fs.promises.readFile(file);
@@ -356,7 +360,7 @@ class Book {
 	async zip(source, destination) {
 		await this.ensureDir(destination);
 
-		const archive = archiver('zip', {zlib: {level: 9}});
+		const archive = new ZipArchive({zlib: {level: 9}});
 		const output = fs.createWriteStream(destination);
 		console.log(`Zipping temp dir ${source} to ${destination}`);
 		// write the all important mimetype in first
@@ -366,6 +370,7 @@ class Book {
 		archive.directory(path.join(source, 'EPUB'), 'EPUB');
 		archive.pipe(output);
 
+        /** @type {Promise<void>} */
 		const whenClosed = new Promise((resolve, reject) => {
 			let timer;
 			const cleanup = () => clearTimeout(timer);
@@ -390,5 +395,3 @@ class Book {
 		console.log(`Zipped archive to ${destination}`);
 	}
 }
-
-module.exports = Book;

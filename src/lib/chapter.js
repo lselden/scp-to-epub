@@ -1,6 +1,6 @@
-const Resource = require('./resource');
+import Resource from './resource.js';
 
-class Chapter extends Resource {
+export default class Chapter extends Resource {
 	constructor(opts = {}) {
 		const {
 			title = '',
@@ -20,7 +20,7 @@ class Chapter extends Resource {
 		/** @type {string[]} */
 		this._author;
 
-		/** @type {import("../scpper-db").SCPStats & {licenseInfo?: string}} */
+		/** @type {import("../scpper-db.js").SCPStats & {licenseInfo?: string}} */
 		// @ts-ignore
 		this.stats = {};
 
@@ -123,5 +123,3 @@ class Chapter extends Resource {
 		return this.hasRemoteResources ? ['remote-resources'] : [];
 	}
 }
-
-module.exports = Chapter;

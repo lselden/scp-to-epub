@@ -1,24 +1,21 @@
-const puppeteer = require('puppeteer');
-const fs = require('fs').promises;
-const path = require('path/posix');
-const urlLib = require('url');
-const {safeFilename, debug, getUrlObj} = require('./lib/utils');
-const scpperDB = require('./scpper-db');
-const Resource = require('./lib/resource');
-const DiskCache = require('./lib/disk-cache');
-const {systemLinks, systemPrefixes, metaTags} = require('./system-links');
-const config = require('./book-config');
-const { maybeMirrorUrl } = require('./lib/kiwiki-cache');
+import path from 'node:path/posix';
+import {safeFilename, debug, getUrlObj} from './lib/utils.js';
+import * as scpperDB from './scpper-db.js';
+import Resource from './lib/resource.js';
+import DiskCache from './lib/disk-cache.js';
+import {systemLinks, systemPrefixes, metaTags} from './system-links.js';
+import { maybeMirrorUrl } from './lib/kiwiki-cache.js';
+import { baseDir } from './book-config.js';
 
 function isEmpty(arr) {
 	return !(arr && (typeof arr === 'object') && Object.keys(arr).length > 0);
 }
 
-class WikiDataLookup {
+export default class WikiDataLookup {
 	/**
 	 *
-	 * @param {import('./book-maker')} app
-	 * @param {import('..').BookMakerConfig} opts
+	 * @param {import('./book-maker.js').default} app
+	 * @param {import('../index.js').BookMakerConfig} opts
 	 */
 	constructor(app, opts = {}) {
 		/** @type {import("puppeteer").Browser} */
@@ -26,7 +23,7 @@ class WikiDataLookup {
 
 		const cacheOpts = {
 			stats: true,
-			path: path.join(__dirname, '../cache'),
+			path: path.join(baseDir, '../cache'),
 			// one month default cache time
 			maxAge: 30 * 24 * 60 * 60 * 1000,
 			...(opts.cache)
@@ -567,5 +564,3 @@ class WikiDataLookup {
 		return !!this.hubList[this._normalizeUrl(url)];
 	}
 }
-
-module.exports = WikiDataLookup;

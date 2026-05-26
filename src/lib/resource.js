@@ -1,12 +1,11 @@
 
-const path = require('path');
-const crypto = require('crypto');
-const urlLib = require('url');
-const mime = require('mime');
-const sharp = require('sharp');
-const config = require('../book-config');
-const { isProxiedUrl, fromMirrorUrl } = require('./kiwiki-cache');
-const { debug, getUrlObj } = require('./utils');
+import path from 'path';
+import crypto from 'crypto';
+import mime from 'mime';
+import sharp from 'sharp';
+import config from '../book-config.js';
+import { isProxiedUrl, fromMirrorUrl } from './kiwiki-cache.js';
+import { debug, getUrlObj } from './utils.js';
 
 // set the block untrusted env variable unless already explicitly set
 if (!process.env.VIPS_BLOCK_UNTRUSTED) {
@@ -50,7 +49,7 @@ const defaultUrlObj = new URL(defaultOrigin);
 /** @typedef {'local' | 'remote' | 'none' | 'maybe'} CacheType */
 
 /** @type {{local: 'local', remote: 'remote', none: 'none', maybe: 'maybe'}} */
-const CacheEnum = {
+export const CacheEnum = {
 	local: 'local',
 	remote: 'remote',
 	none: 'none',
@@ -60,7 +59,7 @@ const CacheEnum = {
 /**
  *
  */
-class Resource {
+export default class Resource {
 	/**
 	 *
 	 * @param {object} opts
@@ -436,5 +435,3 @@ class Resource {
 		return CacheEnum;
 	}
 }
-
-module.exports = Resource;

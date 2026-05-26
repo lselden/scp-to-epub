@@ -1,4 +1,4 @@
-import { Browser, Page, Request, Response } from "puppeteer";
+import { Browser, Page, HTTPRequest, HTTPResponse } from "puppeteer";
 import { Url } from "url";
 
 export interface PreProcessConfig {
@@ -192,8 +192,8 @@ interface BookMakerPrivateConfig {
      * @private
      */
     hooks?: {
-        request(request: Request): boolean,
-        response(resource: Resource, response: Response): void
+        request(request: HTTPRequest): boolean,
+        response(resource: Resource, response: HTTPResponse): void
     }
 }
 

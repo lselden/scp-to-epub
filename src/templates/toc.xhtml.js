@@ -1,6 +1,6 @@
-const config = require('../book-config');
-const {escape} = require('../lib/utils');
-const DocPart = require('../lib/doc-part');
+import config from '../book-config.js';
+import {escape} from '../lib/utils.js';
+import DocPart from '../lib/doc-part.js';
 
 function formatDocPart(docPart, options) {
 	const {
@@ -74,9 +74,9 @@ function genPage(data, title, html) {
 /**
  *
  * @param {*} data
- * @param {import('../..').BookOptions} options
+ * @param {import('../../index.js').BookOptions} options
  */
-function genToc(data, options = {}) {
+export function genToc(data, options = {}) {
 	const {
 		toc: {
 			title: tocTitle = 'Table Of Contents',
@@ -131,7 +131,7 @@ function genToc(data, options = {}) {
 	return genPage(data, tocTitle, html);
 }
 
-function genAppendix(data, options) {
+export function genAppendix(data, options) {
 	const {
 		layout: {
 			appendix: supplemental = []
@@ -154,8 +154,3 @@ function genAppendix(data, options) {
 
 	return genPage(data, 'Appendix', html);
 }
-
-module.exports = {
-	genToc,
-	genAppendix
-};

@@ -1,20 +1,17 @@
-const urlLib = require('url');
-const path = require('path');
-const pMap = require('p-map');
-const config = require('./book-config');
-const {filenameForUrl, debug} = require('./lib/utils');
-const DocPart = require('./lib/doc-part');
-const Resource = require('./lib/resource');
-const {genChapterFooter, genChapterHeader} = require('./templates/chapter-parts');
-const { getAssetPath } = require('./lib/path-utils');
-const { isLocalMirrorEnabled, getLocalMirrorUrl } = require('./lib/kiwiki-cache');
-const Chapter = require('./lib/chapter');
+import pMap from 'p-map';
+import config from './book-config.js';
+import {filenameForUrl, debug} from './lib/utils.js';
+import DocPart from './lib/doc-part.js';
+import Resource from './lib/resource.js';
+import {genChapterFooter, genChapterHeader} from './templates/chapter-parts.js';
+import { getAssetPath } from './lib/path-utils.js';
+import { isLocalMirrorEnabled, getLocalMirrorUrl } from './lib/kiwiki-cache.js';
 
-class PostProcessor {
+export default class PostProcessor {
 	/**
 	 *
-	 * @param {import('./book-maker')} app
-	 * @param {import('..').BookMakerConfig} options
+	 * @param {import('./book-maker.js').default} app
+	 * @param {import('../index.js').BookMakerConfig} options
 	 */
 	constructor(app, options = {}) {
 		const {
@@ -26,10 +23,10 @@ class PostProcessor {
 		/** @type {import("puppeteer").Browser} */
 		this.browser = browser;
 
-		/** @type {import("./lib/resource-cache")} */
+		/** @type {import("./lib/resource-cache.js").default} */
 		this.cache = cache;
 
-		/** @type {import("./info-database")} */
+		/** @type {import("./info-database.js").default} */
 		this.wikiLookup = wikiLookup;
 	}
 	setOptions(opts) {
@@ -110,7 +107,7 @@ class PostProcessor {
                 console.debug(`error adding resource backlinks for ${originalUrl} ${resourceUrl} - ${err}`);
             }
 
-			const chapter = /** @type {import("./lib/chapter")} */(this.cache.get(originalUrl));
+			const chapter = /** @type {import("./lib/chapter.js").default} */(this.cache.get(originalUrl));
 			if (!chapter) {
 				console.warn(`Unable to find chapter resource for ${originalUrl} when registering ${resourceUrl}`);
 			} else if (!resource.shouldWrite) {
@@ -143,7 +140,7 @@ class PostProcessor {
 
 	}
 	/**
-	 * @param {import("./lib/chapter")} chapter
+	 * @param {import("./lib/chapter.js").default} chapter
 	 */
 	async updateChapter(chapter) {
 		const page = this.page;
@@ -325,4 +322,3 @@ class PostProcessor {
 	// }
 }
 
-module.exports = PostProcessor;

@@ -1,47 +1,48 @@
-/// <reference types=".." />
+/// <reference types="../index.js" />
 
-const fs = require('fs');
-const puppeteer = require('puppeteer');
-const path = require('path');
-const urlLib = require('url');
-const pMap = require('p-map');
-const config = require('./book-config');
-const Book = require('./lib/book');
+import puppeteer from 'puppeteer';
+import pMap from 'p-map';
+import config from './book-config.js';
+import Book from './lib/book.js';
 // for loading page and converting to chapter etc.
-const Scraper = require('./scraper');
+import Scraper from './scraper.js';
 // for updating content after everything is loaded
-const PostProcessor = require('./post-process');
-const ResourceCache = require('./lib/resource-cache');
-const WikiDataLookup = require('./info-database');
-const Resource = require('./lib/resource');
-const Chapter = require('./lib/chapter');
-const DocPart = require('./lib/doc-part');
-const {loadBookConfig, loadBookRemote, extractDocParts} = require('./parse-book-config');
-const makeCover = require('./make-cover');
-const { debug } = require('./lib/utils');
+import PostProcessor from './post-process.js';
+import ResourceCache from './lib/resource-cache.js';
+import WikiDataLookup from './info-database.js';
+import Resource from './lib/resource.js';
+import Chapter from './lib/chapter.js';
+import DocPart from './lib/doc-part.js';
+import {loadBookConfig, loadBookRemote, extractDocParts} from './parse-book-config.js';
+import makeCover from './make-cover.js';
+import { debug } from './lib/utils.js';
 
 /** @typedef {import("puppeteer").Browser} Browser */
 /** @typedef {import("puppeteer").Page} Page */
-/** @typedef {import("puppeteer").Request} Request */
-/** @typedef {import("puppeteer").Response} Response */
+/** @typedef {import("puppeteer").HTTPRequest} Request */
+/** @typedef {import("puppeteer").HTTPResponse} Response */
 
-class BookMaker {
+export default class BookMaker {
 	/**
 	 *
-	 * @param {import('..').Book | import('..').BookOptions} book
-	 * @param {import('..').BookMakerConfig} [opts]
+	 * @param {import('../index.js').Book | import('../index.js').BookOptions} book
+	 * @param {import('../index.js').BookMakerConfig} [opts]
 	 * @param {Browser} [browser]
 	 */
 	constructor(book, opts = {}, browser) {
-		/** @type {Browser} */
+		/** @type {Browser | undefined} */
 		this.browser = (browser && typeof browser === 'object') ? browser : undefined ;
 
-		this._setOptions(opts);
+        /** @type {import('../index.js').BookMakerConfig} */
+		this.options = this._setOptions(opts);
 
 		this.wikiLookup = new WikiDataLookup(this, this.options);
 		this.cache = new ResourceCache();
 		this.scraper = new Scraper(this, this.options);
 		this.postProcessor = new PostProcessor(this, opts);
+
+        /** @type {Book} */
+        this.book;
 
 		if (book instanceof Book) {
 			this.book = book;
@@ -71,8 +72,7 @@ class BookMaker {
 		// 	...inOpts
 		// } = opts;
 
-		/** @type {import('..').BookMakerConfig} */
-		this.options = config.util.extendDeep({
+		return config.util.extendDeep({
 			bookOptions: {
 				...config.get('bookOptions'),
 				// ...bookOptions
@@ -100,7 +100,6 @@ class BookMaker {
 			},
 			static: {
 				prefix: '__epub__',
-				// root: path.join(__dirname, '../static'),
 				cache: true,
 			},
 			ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'
@@ -140,7 +139,7 @@ class BookMaker {
 		// await this.getToken();
 	}
 
-	async loadBook(bookOptions = this.options.bookOptions) {
+	async loadBook(bookOptions = this.options.bookOptions ?? {}) {
 		if (typeof bookOptions === 'string') {
 			bookOptions = {
 				...(this.options.bookOptions || {}),
@@ -148,7 +147,7 @@ class BookMaker {
 			};
 		}
 		const {
-			url: bookUrl,
+			url: bookUrl = '',
 			path: bookPath,
 			wikidot: shouldFormat = true
 		} = bookOptions;
@@ -205,6 +204,8 @@ class BookMaker {
 		return bookSettings;
 	}
 	async processBook(bookSettings = {}) {
+        if (!this.book) throw new TypeError('Book not initialized');
+
 		let {
 			docParts = [],
 			include = [],
@@ -215,6 +216,7 @@ class BookMaker {
 			...this.options,
 			...bookSettings
 		};
+
 
 		await this.makeCover(coverOpts);
 
@@ -293,6 +295,7 @@ class BookMaker {
 	 * @param {{maxChapters?: number, limit?: number, maxDepth?: number, exclude?: string[]}} opts
 	 */
 	async includePending(depth = 1, opts = {}) {
+        
 		const {
 			maxChapters,
 			limit,
@@ -476,4 +479,3 @@ class BookMaker {
 	}
 }
 
-module.exports = BookMaker;

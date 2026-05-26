@@ -1,9 +1,9 @@
-const config = require('../book-config');
+import config from '../book-config.js';
 
 
 const REPOSITORY_URL = 'https://github.com/lselden/scp-to-epub';
 
-function genPreface(data, options = {}) {
+export default function genPreface(data, options = {}) {
 	const {
 		id = '',
 		lang = 'en',
@@ -56,5 +56,3 @@ function genPreface(data, options = {}) {
 	</body>
 </html>`;
 }
-
-module.exports = genPreface;

@@ -1,7 +1,6 @@
-const {escape} = require('../lib/utils');
-const config = require('../book-config');
+import config from '../book-config.js';
 
-function genPartIntro(data, options = {}) {
+export default function genPartIntro(data, options = {}) {
 	const {
 		lang = 'en',
 		// TODO should this be stylesheets?
@@ -41,5 +40,3 @@ function genPartIntro(data, options = {}) {
 	</body>
 	</html>`;
 }
-
-module.exports = genPartIntro;

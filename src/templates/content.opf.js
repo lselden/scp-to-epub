@@ -1,14 +1,13 @@
-const {EOL} = require('os');
-const config = require('../book-config');
-const {maybeEscape} = require('../lib/utils');
-const DocPart = require('../lib/doc-part');
+import {EOL} from 'node:os';
+import config from '../book-config.js';
+import {maybeEscape} from '../lib/utils.js';
 
 /**
  *
- * @param {import("../lib/book")} data
+ * @param {import("../lib/book.js").default} data
  * @returns {string}
  */
-function genContent(data, options = {}) {
+export default function genContent(data, options = {}) {
 	let {
 		id: uniqueId = config.get('metadata.id', `scp.foundation.${Math.random().toString(16).slice(2)}`),
 		title,
@@ -149,4 +148,3 @@ ${
 </package>`
 }
 
-module.exports = genContent;

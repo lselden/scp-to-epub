@@ -1,6 +1,6 @@
-const Resource = require('./resource');
+import Resource from './resource.js';
 
-class Link extends Resource {
+export default class Link extends Resource {
 	constructor(opts = {}) {
 		super(opts);
 	}
@@ -8,5 +8,3 @@ class Link extends Resource {
 		return true;
 	}
 }
-
-module.exports = Link;

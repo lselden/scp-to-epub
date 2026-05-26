@@ -1,24 +1,23 @@
-const path = require('path');
-const mime = require('mime');
-const urlLib = require('url');
-const config = require('./book-config');
-const StaticServer = require('./lib/serve-file');
-const Resource = require('./lib/resource');
-const Chapter = require('./lib/chapter');
-const Link = require('./lib/link');
-const {safeFilename, filenameForUrl, debug, getUrlObj} = require('./lib/utils');
-const { configureLocalMirror, maybeMirrorUrl, shouldMirrorUrl, serveResponseFromMirror, toMirrorUrl, fromMirrorUrl, isProxiedUrl, checkMirrorHasUrl } = require('./lib/kiwiki-cache');
-const { gotoPage } = require('./lib/browser-utils');
+import path from 'node:path';
+import mime from 'mime';
+import config from './book-config.js';
+import StaticServer from './lib/serve-file.js';
+import Resource from './lib/resource.js';
+import Chapter from './lib/chapter.js';
+import Link from './lib/link.js';
+import {safeFilename, filenameForUrl, debug, getUrlObj} from './lib/utils.js';
+import { configureLocalMirror, maybeMirrorUrl, shouldMirrorUrl, serveResponseFromMirror, toMirrorUrl, fromMirrorUrl, isProxiedUrl, checkMirrorHasUrl } from './lib/kiwiki-cache.js';
+import { gotoPage } from './lib/browser-utils.js';
 
 const {CacheEnum} = Resource;
 
 /**
  * @import {Browser, Page, HTTPRequest as Request, HTTPResponse as Response} from 'puppeteer'
- * @import {BookMakerConfig} from '..'
- * @import BookMaker from './book-maker'
+ * @import {BookMakerConfig} from '../index.js'
+ * @import BookMaker from './book-maker.js'
  */
 
-class Scraper {
+export default class Scraper {
 	/**
 	 *
 	 * @param {BookMaker} app
@@ -41,10 +40,10 @@ class Scraper {
 		/** @type {import("puppeteer").Browser} */
 		this.browser = browser;
 
-		/** @type {import("./lib/resource-cache")} */
+		/** @type {import("./lib/resource-cache.js").default} */
 		this.cache = cache;
 
-		/** @type {import("./info-database")} */
+		/** @type {import("./info-database.js").default} */
 		this.wikiLookup = wikiLookup;
 
 		this._frontPromise = Promise.resolve();
@@ -59,7 +58,6 @@ class Scraper {
 			},
 			static: {
 				prefix: '__epub__',
-				// root: path.join(__dirname, '../static'),
 				cache: true
 			},
 			preProcess: {
@@ -428,6 +426,7 @@ class Scraper {
 			}
 		}
 
+        /** @type {{page: Page, error?: Error}} */
         const out = {
 			page
 		};
@@ -851,4 +850,3 @@ class Scraper {
 	}
 }
 
-module.exports = Scraper;

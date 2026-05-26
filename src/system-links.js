@@ -1,6 +1,6 @@
 // these are hardcoded list of "meta" pages
 
-const systemLinks = [
+export const systemLinks = [
 	// blank is homepage
 	"",
 	"scp-series-6",
@@ -82,7 +82,7 @@ const systemLinks = [
 	"licensing-master-list"
 ];
 
-const systemPrefixes = [
+export const systemPrefixes = [
 	"featured-tale",
 	"featured-scp",
 	"featured-goi",
@@ -90,15 +90,9 @@ const systemPrefixes = [
 	"scp-series"
 ];
 
-const metaTags = [
+export const metaTags = [
 	'artwork',
 	'author',
 	'hub',
 	'essay'
 ];
-
-module.exports = {
-	systemLinks,
-	systemPrefixes,
-	metaTags
-};

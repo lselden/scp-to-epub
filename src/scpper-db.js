@@ -1,5 +1,4 @@
-const urlLib = require('url');
-const { getUrlObj } = require('./lib/utils');
+import { getUrlObj } from './lib/utils.js';
 
 let baseUri = 'http://scpper.com';
 let defaultSite = 'en';
@@ -77,7 +76,7 @@ function parseResponse(data) {
  * @param {string | number} pageId
  * @returns {Promise<SCPStats>}
  */
-async function getByPageId(pageId) {
+export async function getByPageId(pageId) {
     const url = new URL('/api/page', baseUri);
     url.searchParams.set('id', pageId);
 	const response = await fetch(url);
@@ -90,7 +89,7 @@ async function getByPageId(pageId) {
  * @param {*} [options]
  * @returns {Promise<SCPStats>}
  */
-async function getByTitle(title, options = {}) {
+export async function getByTitle(title, options = {}) {
 	const query = {
 		site: defaultSite,
 		title,
@@ -111,8 +110,3 @@ async function getByTitle(title, options = {}) {
 	}
 	return pages.length ? parseResponse(pages[0]) : undefined;
 }
-
-module.exports = {
-	getByPageId,
-	getByTitle
-};

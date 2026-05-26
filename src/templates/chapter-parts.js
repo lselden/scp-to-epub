@@ -1,6 +1,5 @@
-const config = require('../book-config');
-const Chapter = require('../lib/chapter');
-const {filenameForUrl, escape} = require('../lib/utils');
+import Chapter from '../lib/chapter.js';
+import {escape} from '../lib/utils.js';
 
 function genSystemChapterHeader(chapter, config = {}) {
 	const {
@@ -14,11 +13,11 @@ function genSystemChapterHeader(chapter, config = {}) {
 
 /**
  *
- * @param {import('../lib/chapter')} chapter
+ * @param {import('../lib/chapter.js')} chapter
  * @param {{url: string, title: string}[]} audioAdaptations
- * @param {import('../..').BookOptions} options
+ * @param {import('../../index.js').BookOptions} options
  */
-function genChapterHeader(chapter, audioAdaptations = [], options = {}) {
+export function genChapterHeader(chapter, audioAdaptations = [], options = {}) {
 	const {
 		stats,
 		url,
@@ -114,10 +113,10 @@ function genChapterHeader(chapter, audioAdaptations = [], options = {}) {
  * @param {Chapter} chapter 
  * @param {Array<{title: string, url: string}>} bookLinks 
  * @param {Array<{title: string, url: string}>} externalLinks 
- * @param {import('../..').BookMakerConfig} options 
+ * @param {import('../../index.js').BookMakerConfig} options 
  * @returns 
  */
-function genChapterFooter(chapter, bookLinks = [], externalLinks = [], options = {}) {
+export function genChapterFooter(chapter, bookLinks = [], externalLinks = [], options = {}) {
     const {
 		stats,
 		url,
@@ -156,8 +155,3 @@ function genChapterFooter(chapter, bookLinks = [], externalLinks = [], options =
         ${tagsText || ''}
 	</footer>`;
 }
-
-module.exports = {
-	genChapterHeader,
-	genChapterFooter
-};

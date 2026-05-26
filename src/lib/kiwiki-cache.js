@@ -1,12 +1,13 @@
 // @ts-check
-const config = require("./config");
-const { debug } = require("./utils");
-const {setTimeout} = require('node:timers/promises');
+import config from "./config.js";
+import { debug } from "./utils.js";
+import {setTimeout} from 'node:timers/promises';
 
+/** @type {string | undefined} */
 let localCacheUrl = undefined;
 let localMirrorSettings = {};
 
-function configureLocalMirror() {
+export function configureLocalMirror() {
     localCacheUrl = config.get('discovery.localArchiveMirror');
     localMirrorSettings = {
         staticPrefix: `/${config.get('static.prefix', '__epub__')}`,
@@ -23,15 +24,15 @@ function configureLocalMirror() {
 
 const urlVerifyCache = new Map();
 
-function isLocalMirrorEnabled() {
+export function isLocalMirrorEnabled() {
     return !!localCacheUrl;
 }
 
-function getLocalMirrorUrl() {
+export function getLocalMirrorUrl() {
     return localCacheUrl;
 }
 
-function shouldMirrorUrl(url = '') {
+export function shouldMirrorUrl(url = '') {
     url = `${url || ''}`;
     if (!localCacheUrl || !url) return false;
 
@@ -47,7 +48,7 @@ function shouldMirrorUrl(url = '') {
  * @param {string} url 
  * @returns 
  */
-function toMirrorUrl(url = '') {
+export function toMirrorUrl(url = '') {
     return `${localCacheUrl}${`${url}`.replace(/https?:\/\//, '')}`;
 }
 
@@ -56,16 +57,16 @@ function toMirrorUrl(url = '') {
  * @param {string} mirrorUrl 
  * @returns 
  */
-function fromMirrorUrl(mirrorUrl = '') {
+export function fromMirrorUrl(mirrorUrl = '') {
     if (!localCacheUrl) return mirrorUrl;
     return `${mirrorUrl}`.replace(localCacheUrl, mirrorUrl.replace(/:.+/, '://'))
 }
 
-function isProxiedUrl(url) {
+export function isProxiedUrl(url) {
     return !!localCacheUrl && `${url}`.includes(localCacheUrl);
 }
 
-async function maybeMirrorUrl(url) {
+export async function maybeMirrorUrl(url) {
     if (!shouldMirrorUrl(url)) return url;
 
     
@@ -79,7 +80,7 @@ async function maybeMirrorUrl(url) {
     return inMirror ? mirrorUrl : url;
 }
 
-async function checkMirrorHasUrl(mirrorUrl) {
+export async function checkMirrorHasUrl(mirrorUrl) {
     // NOTE this ignores query parameters...should be okay for proxy purposes I think?
     const [_cacheKey] = `${mirrorUrl}`.split('?');
     let inMirror = urlVerifyCache.get(_cacheKey);
@@ -97,7 +98,7 @@ async function checkMirrorHasUrl(mirrorUrl) {
     return inMirror;
 }
 
-async function serveResponseFromMirror(mirrorUrl) {
+export async function serveResponseFromMirror(mirrorUrl) {
     const res = await fetch(mirrorUrl).catch(err => {
         debug(`Error trying to get content from proxy`, err);
         return undefined;
@@ -110,17 +111,3 @@ async function serveResponseFromMirror(mirrorUrl) {
         status: res.status
     };
 }
-
-
-module.exports = {
-    configureLocalMirror,
-    maybeMirrorUrl,
-    checkMirrorHasUrl,
-    isLocalMirrorEnabled,
-    isProxiedUrl,
-    toMirrorUrl,
-    fromMirrorUrl,
-    shouldMirrorUrl,
-    getLocalMirrorUrl,
-    serveResponseFromMirror
-};

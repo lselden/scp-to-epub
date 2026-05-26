@@ -1,10 +1,10 @@
-const fs = require('fs');
-const matter = require('gray-matter');
-const MarkdownIt = require('markdown-it');
-const markdownItAttrs = require('markdown-it-attrs');
-const genDocPart = require('./templates/doc-part.xhtml');
-const DocPart = require('./lib/doc-part');
-const { setPageContent } = require('./lib/browser-utils');
+import fs from 'node:fs';
+import matter from 'gray-matter';
+import MarkdownIt from 'markdown-it';
+import markdownItAttrs from 'markdown-it-attrs';
+import genDocPart from './templates/doc-part.xhtml.js';
+import DocPart from './lib/doc-part.js';
+import { setPageContent } from './lib/browser-utils.js';
 
 const md = new MarkdownIt({
 	html: true,
@@ -17,7 +17,7 @@ md.use(markdownItAttrs, {
 	allowedAttributes: []
 });
 
-function renderMarkdown(raw) {
+export function renderMarkdown(raw) {
 	return md.render(raw);
 }
 
@@ -31,7 +31,7 @@ function parseBookConfig(text) {
 	return settings;
 }
 
-async function loadBookConfig(filepath) {
+export async function loadBookConfig(filepath) {
 	const raw = await fs.promises.readFile(filepath);
 	const config = parseBookConfig(raw.toString());
 	return config;
@@ -41,7 +41,7 @@ async function loadBookConfig(filepath) {
  *
  * @param {import("puppeteer").Page} page
  */
-async function loadBookRemote(page) {
+export async function loadBookRemote(page) {
 	const {
 		frontmatter,
 		tocHTML
@@ -77,10 +77,10 @@ async function loadBookRemote(page) {
 
 /**
  *
- * @param {import("./book-maker")} app
+ * @param {import("./book-maker.js").default} app
  * @param {string} html
  */
-async function extractDocParts(html, app) {
+export async function extractDocParts(html, app) {
 	const {options, browser, scraper} = app;
 	const headerSelector = 'h2';
 	const {
@@ -225,10 +225,3 @@ async function extractDocParts(html, app) {
 		return new DocPart(docPart);
 	});
 }
-
-module.exports = {
-	renderMarkdown,
-	loadBookConfig,
-	loadBookRemote,
-	extractDocParts
-};

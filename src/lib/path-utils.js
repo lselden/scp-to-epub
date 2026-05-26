@@ -1,10 +1,13 @@
-const fs = require('fs');
-const path = require('path');
-const config = require('./config');
-const {debug} = require('./utils');
+import fs from 'node:fs';
+import path from 'node:path';
+import config from './config.js';
+import {debug} from './utils.js';
+import { fileURLToPath } from 'node:url';
 
 const isPkg = !!(process).pkg;
 const isElectron = process.versions && (process.versions).electron;
+const thisFilePath = fileURLToPath(import.meta.url);
+const baseDir = path.dirname(thisFilePath);
 
 function getExec(filename) {
 	if (isPkg || isElectron) {
@@ -14,7 +17,7 @@ function getExec(filename) {
 }
 
 
-function getEnv(filename = __filename, dirname = __dirname) {
+function getEnv(filename = thisFilePath, dirname = baseDir) {
     const isBundled = dirname && !/lib/.test(dirname);
 
 	const directories = {
@@ -92,14 +95,14 @@ async function configPathEnv() {
     return searchDirs;
 }
 
-async function exists(filepath) {
+export async function exists(filepath) {
     return fs.promises.access(filepath, fs.constants.R_OK).then(() => true, () => false);
 }
 const assetPaths = {};
 let pathEnv = undefined;
 let searchDirs;
 let isFirst = true;
-async function getAssetPath(file) {
+export async function getAssetPath(file) {
     if (assetPaths[file]) return assetPaths[file];
     if (!pathEnv) {
         debug('loading local filepath environment');
@@ -118,7 +121,3 @@ async function getAssetPath(file) {
     return undefined;
 }
 
-module.exports = {
-    exists,
-    getAssetPath
-}

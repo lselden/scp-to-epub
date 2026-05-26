@@ -1,13 +1,11 @@
-const fs = require('fs');
-const path = require('path');
-const Book = require('./lib/book');
-const BookMaker = require('./book-maker');
-const config = require('./book-config');
-const { getAssetPath } = require('./lib/path-utils');
+import Book from './lib/book.js';
+import BookMaker from './book-maker.js';
+import config from './book-config.js';
+import { getAssetPath } from './lib/path-utils.js';
 
 
 
-module.exports = async function testPage (urls, cfg = {}) {
+export default async function testPage (urls, cfg = {}) {
 	const {
 		waitTime = 500,
 		defaultOrigin = config.get('discovery.defaultOrigin', 'http://www.scpwiki.com')

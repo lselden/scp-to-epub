@@ -1,15 +1,14 @@
-const fs = require('fs').promises;
-const path = require('path/posix');
-const urlLib = require('url');
-const pMap = require('p-map');
-const config = require('../book-config');
-const {safeFilename, normalizePath, debug, getUrlObj} = require('./utils');
+import fs from 'node:fs/promises';
+import path from 'node:path/posix';
+import pMap from 'p-map';
+import config from '../book-config.js';
+import {safeFilename, normalizePath, debug, getUrlObj} from './utils.js';
 
 function isEmpty(arr) {
 	return !(arr && (typeof arr === 'object') && Object.keys(arr).length > 0);
 }
 
-class DiskCache {
+export default class DiskCache {
 	constructor(opts = {}) {
 		this.options = {
 			enable: true,
@@ -208,5 +207,3 @@ class DiskCache {
 		return pageName;
 	}
 }
-
-module.exports = DiskCache;

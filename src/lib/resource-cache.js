@@ -1,12 +1,8 @@
-const Resource = require('./resource');
-const Link = require('./link');
-const Chapter = require('./chapter');
+import Resource from './resource.js';
+import Link from './link.js';
+import Chapter from './chapter.js';
 
-/**
- * @typedef {import("./resource")} Resource
- */
-
-class ResourceCache {
+export default class ResourceCache {
 	constructor() {
 		/** @type {Map<string, Resource>} */
 		this.cache = new Map();
@@ -16,7 +12,7 @@ class ResourceCache {
     /**
 	 *
 	 * @param {string | Resource} resource
-	 * @returns {Resource}
+	 * @returns {Resource | undefined}
 	 */
 	get(resource) {
 		if ((typeof resource === 'string') || resource instanceof URL) {
@@ -99,5 +95,3 @@ class ResourceCache {
 		return [...this.cache.values()].filter(r => r instanceof Chapter);
 	}
 }
-
-module.exports = ResourceCache;

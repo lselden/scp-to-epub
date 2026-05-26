@@ -1,7 +1,7 @@
-const {escape} = require('../lib/utils');
-const DocPart = require('../lib/doc-part');
+import {escape} from '../lib/utils.js';
+import DocPart from '../lib/doc-part.js';
 
-function genNcx(data, options = {}) {
+export default function genNcx(data, options = {}) {
 	const {
 		id,
 		title,
@@ -78,5 +78,3 @@ function genNcx(data, options = {}) {
 
 	`
 }
-
-module.exports = genNcx;

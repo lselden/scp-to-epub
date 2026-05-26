@@ -1,9 +1,11 @@
 //@ts-check
-
-const path = require('path');
-const config = require('./lib/config');
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import config from './lib/config.js';
 
 const defaultOrigin = config.get('discovery.defaultOrigin', 'http://www.scpwiki.com');
+
+export const baseDir = path.dirname(fileURLToPath(import.meta.url));
 
 config.util.defaults({
 	metadata: {
@@ -108,7 +110,7 @@ config.util.defaults({
 	static: {
 		enabled: true,
 		prefix: '__epub__',
-		root: path.join(__dirname, '../static'),
+		root: path.join(baseDir, '../static'),
 		cache: true
 	},
 	cache: {
@@ -144,4 +146,4 @@ Object.entries({
 	additionalResources: 'input.additionalResources'
 }).forEach(([alias, fullKey]) => config.util.alias(alias, fullKey));
 
-module.exports = config;
+export default config;

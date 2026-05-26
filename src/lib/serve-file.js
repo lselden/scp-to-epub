@@ -1,17 +1,16 @@
-const path = require('path');
-const fs = require('fs').promises;
-const urlLib = require('url');
-const mime = require('mime');
-const config = require('./config');
-const { getAssetPath } = require('./path-utils');
+import path from 'node:path';
+import fs from 'node:fs/promises';
+import mime from 'mime';
+import { baseDir } from '../book-config.js';
+import { getAssetPath } from './path-utils.js';
 
 const UP_PATH_REGEXP = /(?:^|[\\/])\.\.(?:[\\/]|$)/
 
-class StaticServer {
+export default class StaticServer {
 	constructor(options = {}) {
 		const {
 			prefix = '__epub__',
-			root = path.join(__dirname, '../../static'),
+			root = path.join(baseDir, '../../static'),
 			cache = false,
 			enabled = true
 		} = options;
@@ -144,5 +143,3 @@ class StaticServer {
 		return payload;
 	}
 }
-
-module.exports = StaticServer;

@@ -1,11 +1,11 @@
-const yargs = require('yargs');
-const path = require('path');
-const config = require('./src/book-config');
-const Book = require('./src/lib/book');
-const BookMaker = require('./src/book-maker');
-const viewPage = require('./src/view-page');
-const {safeFilename, maybeMirrorUrl, normalizeRelativePath, normalizeUrl} = require('./src/lib/utils');
-const { configureLocalMirror } = require('./src/lib/kiwiki-cache');
+import yargs from 'yargs';
+import path from 'node:path';
+import config from './src/book-config.js';
+import Book from './src/lib/book.js';
+import BookMaker from './src/book-maker.js';
+import viewPage from './src/view-page.js';
+import {safeFilename, normalizeUrl} from './src/lib/utils.js';
+import { configureLocalMirror } from './src/lib/kiwiki-cache.js';
 
 async function processSingle (urls, cfg) {
 	const defaultOrigin = cfg.defaultOrigin || config.get('discovery.defaultOrigin', 'http://www.scpwiki.com');
@@ -26,7 +26,7 @@ async function processSingle (urls, cfg) {
 	await builder.include(urls);
 
 	// TODO REVIEW - for single start at 0?
-	for (let depth = (urls.length === 1 ? 0 : 1); depth <= builder.options.maxDepth; depth++) {
+	for (let depth = (urls.length === 1 ? 0 : 1); depth <= (builder.options.maxDepth ?? 2); depth++) {
 		console.log(`SUPPLEMENTAL ${depth}/${builder.options.maxDepth}`);
 		await builder.includePending(depth);
 	}

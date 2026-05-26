@@ -1,10 +1,12 @@
 // @ts-check
-const fs = require('node:fs');
-const path = require('node:path');
-const yaml = require('js-yaml');
-const dotProp = require('dot-prop');
+import fs from 'node:fs';
+import path from 'node:path';
+import yaml from 'js-yaml';
 
-const debuglog = require('node:util').debuglog('config');
+import {debug} from 'node:util'
+
+const debuglog = debug('config');
+
 const GLOBAL_CONFIG = Symbol.for('_config.singleton');
 
 function isObject (val) {
@@ -264,4 +266,4 @@ config.util.defaults({
     ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
 });
 
-module.exports = config;
+export default config;

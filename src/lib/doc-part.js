@@ -1,9 +1,9 @@
-const Chapter = require('./chapter');
-const {safeFilename} = require('./utils');
-const config = require('../book-config');
-const {CacheEnum} = require('./resource');
+import Chapter from './chapter.js';
+import {safeFilename} from './utils.js';
+import config from '../book-config.js';
+import {CacheEnum} from './resource.js';
 
-class DocPart extends Chapter {
+export default class DocPart extends Chapter {
 	constructor(opts = {}) {
 		const {
 			title,
@@ -45,5 +45,3 @@ class DocPart extends Chapter {
 		this.chapters = [];
 	}
 }
-
-module.exports = DocPart;
