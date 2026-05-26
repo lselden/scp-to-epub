@@ -5,10 +5,12 @@ export default defineConfig({
     outDir: 'build/staging',
     outExtensions: (ctx) => ({ js: '.js'}),
     format: 'cjs',
-    target: 'node22',
-    external: ['sharp'],
+    target: 'node24',
     clean: true,
-    noExternal: [/.*/],
+    deps: {
+        alwaysBundle: [/.*/],
+        neverBundle: ['sharp']
+    },
     inputOptions: {
         checks: {
             /**

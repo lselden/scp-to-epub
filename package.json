@@ -3,6 +3,7 @@
     "version": "1.6.0",
     "description": "Generate ebooks from scp foundation wiki articles",
     "main": "index.js",
+    "type": "module",
     "bin": "dist/index.js",
     "types": "index.d.ts",
     "scripts": {
@@ -21,24 +22,25 @@
     "author": "Luke Selden",
     "license": "CC-BY-3.0",
     "devDependencies": {
-        "@types/node": "^22.9.1",
+        "@types/archiver": "^7.0.0",
+        "@types/mime": "^3.0.4",
+        "@types/node": "^24.12.4",
         "@yao-pkg/pkg": "^6.10.1",
-        "tsdown": "^0.18.1",
-        "typescript": "^5.9.3"
+        "typescript": "^6.0.3"
     },
     "dependencies": {
-        "archiver": "^7.0.1",
-        "dot-prop": "^5.2.0",
+        "archiver": "^8.0.0",
+        "dot-prop": "^10.1.0",
         "gray-matter": "^4.0.2",
         "js-yaml": "^4.1.0",
-        "junk": "^3.1.0",
+        "junk": "^4.0.1",
         "markdown-it": "^14.1.1",
-        "markdown-it-attrs": "^4.3.1",
-        "mime": "^2.4.4",
-        "p-map": "^3.0.0",
-        "puppeteer": "^24.28.0",
-        "rimraf": "^6.0.1",
-        "sharp": "^0.33.5",
-        "yargs": "^17.7.2"
+        "markdown-it-attrs": "^5.0.0",
+        "mime": "^4.1.0",
+        "p-map": "^7.0.4",
+        "puppeteer": "^25.1.0",
+        "sharp": "^0.34.5",
+        "tsdown": "^0.22.0",
+        "yargs": "^18.0.0"
     }
 }

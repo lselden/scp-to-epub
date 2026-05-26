@@ -202,12 +202,12 @@ export interface BookMakerConfig extends BookMakerPrivateConfig {
      * Limit loaded pages to this count. Recommend values between 50-100
      * @default 500
      */
-    maxChapters?: number,
+    maxChapters: number,
     /**
      * Limit crawler depth to X levels of recursion.
      * @default 1
      */
-    maxDepth?: number,
+    maxDepth: number,
     /**
      * explicitly specify pages to include in book. Can be relative ('taboo') or absolute ('http://www.scpwiki.com/taboo')
      */

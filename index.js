@@ -1,4 +1,5 @@
 import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
 import path from 'node:path';
 import config from './src/book-config.js';
 import Book from './src/lib/book.js';
@@ -82,7 +83,8 @@ async function viewCover (bookUrl, cfg) {
 
 
 (async () => {
-	const cmd = yargs
+    const yargsInstance = yargs(hideBin(process.argv));
+	const cmd = yargsInstance
 		.option('title', {
 			alias: 't',
 			type: 'string',
@@ -178,9 +180,9 @@ async function viewCover (bookUrl, cfg) {
 			hidden: true,
 			default: config.get('browser.height')
 		})
-        .wrap(Math.min(120, yargs.terminalWidth()));
+        .wrap(Math.min(120, yargsInstance.terminalWidth()));
 
-	const {argv} = cmd;
+	const argv = await cmd.argv;
 
 	let pageName;
 	if (argv.page) {
@@ -191,7 +193,7 @@ async function viewCover (bookUrl, cfg) {
 		pageName = safeFilename(`${argv.title}`);
 	}
 
-    const argInclude = (argv.include || '')
+    const argInclude = `${argv.include || ''}`
         .split(',')
         .map(s => s.trim())
         .filter(Boolean);
@@ -254,7 +256,7 @@ async function viewCover (bookUrl, cfg) {
 			debug
 		},
         cover: {
-            ...coverTheme && {
+            ...!!coverTheme && {
                 theme: coverTheme
             }
         }

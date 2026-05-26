@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import yaml from 'js-yaml';
+import {getProperty,hasProperty, setProperty} from 'dot-prop';
 
 import {debug} from 'node:util'
 
@@ -140,23 +141,23 @@ class Config {
 		this.assign(cfg);
 	}
 	has (key) {
-		return dotProp.has(this, key);
+		return hasProperty(this, key);
 	}
 	get (subKey, defaultValue) {
 		return this.toObject(subKey, defaultValue);
 	}
 	set (key, value) {
-		dotProp.set(this, key, value);
+		setProperty(this, key, value);
 		return this;
 	}
 	assign (key, ...rest) {
 		// TODO QUESTION do we need to worry about symbols?
 		if (typeof key === 'string') {
 			// avoid error if key doesn't yet exist
-			if (!dotProp.has(this, key)) {
+			if (!hasProperty(this, key)) {
 				this.set(key, {});
 			}
-			extendDeep(dotProp.get(this, key), ...rest);
+			extendDeep(getProperty(this, key), ...rest);
 		} else {
 			extendDeep(this, key, ...rest);
 		}
@@ -166,7 +167,7 @@ class Config {
 		// allow 0 as index, otherwise must be truthy
 		const isKey = (subKey || subKey === 0);
 		const obj = isKey ?
-			dotProp.get(this, subKey, defaultValue) :
+			getProperty(this, subKey, defaultValue) :
 			this;
 		if (!isObject(obj) || obj === defaultValue) {
 			return obj;

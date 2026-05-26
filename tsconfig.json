@@ -1,19 +1,18 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "NodeNext",
     "esModuleInterop": true,
-    "target": "ES2018",
+    "target": "ES2022",
     "checkJs": true,
     "allowJs": true,
-    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "moduleResolution": "nodenext",
     "sourceMap": true,
-    "outDir": "dist",
-    "downlevelIteration": true
+    "outDir": "dist"
   },
   "exclude": [
     "node_modules"
   ],
-  "lib": ["es2017"],
   "compileOnSave": true,
   "typeAcquisition": {"enable": true}
 }
