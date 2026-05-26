@@ -52,13 +52,17 @@ export default function () {
 		newEl.classList.value = `epub-figure ${container.classList.value.replace(/block-(left|right|center)/, 'epub-figure-$1')}`;
 		// container.parentNode.insertBefore(newEl, block);
 
+        if (container.style.width) {
+            newEl.style.width = container.style.width;
+        }
+
 		image.removeAttribute('style');
 		image.removeAttribute('width');
 		image.removeAttribute('height');
 		newEl.appendChild(image);
 		newEl.insertAdjacentHTML(
 			'beforeend',
-			`<figcaption class="scp-image-caption">${caption.innerHTML}</figcaption>`
+			`<figcaption class="scp-image-caption">${caption.innerHTML.replace(/<\/?p[^>]*>/g, '')}</figcaption>`
 		);
 
 		container.replaceWith(newEl);

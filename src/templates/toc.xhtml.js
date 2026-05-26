@@ -114,14 +114,7 @@ function genToc(data, options = {}) {
 					})
 					.join('\n')
 
-		}<li class="toc-doc-part"><a href="${appendixPath}">Appendix</a>${
-			''
-			// <ol class="toc-list">${
-			// supplemental.map(chapter => {
-			// 	return formatChapter(chapter);
-			// }).join('\n')
-			//</ol>
-		}</li>
+		}${ (supplemental.length > 0) ? `<li class="toc-doc-part"><a href="${appendixPath}">Appendix</a></li>` : '' }
 		</ol>
 	</nav>
 	<nav epub:type="landmarks" id="guide" hidden="hidden">
@@ -130,7 +123,7 @@ function genToc(data, options = {}) {
 			<li><a epub:type="toc" href="#toc">${ tocTitle }</a></li>
 			<li><a epub:type="frontmatter" href="${prefacePath}">Preface</a></li>
 			<li><a epub:type="bodymatter" href="${ firstChapter.bookPath }">Begin Reading</a></li>
-			<li><a epub:type="backmatter" href="${appendixPath}">Appendix</a></li>
+			${ (supplemental.length > 0) ? `<li><a epub:type="backmatter" href="${appendixPath}">Appendix</a></li>` : '' }
 		</ol>
 	</nav>
 </div>`;
