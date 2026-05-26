@@ -172,6 +172,9 @@ preProcess:
   skipMetaDepth: 1
   ### whether to re-write any scp-wiki.net links to scp-wiki.wikidot.com
   useWikiDotUrls: true
+
+  ### how many times to retry pages that time out on load
+  maxRetries: 3
 postProcess:
   ### number of pages to run in parallel when sanitizing xml and adding internal links
   concurrency: 3

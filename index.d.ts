@@ -17,6 +17,10 @@ export interface PreProcessConfig {
      * @default 1
      */
     skipMetaDepth?: number
+    /**
+     * max attempts to load chapter that gets a timeout
+     */
+    maxRetries?: number
 }
 
 export interface PostProcessConfig {

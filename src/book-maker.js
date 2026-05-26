@@ -402,7 +402,7 @@ export default class BookMaker {
 		return docPart;
 	}
 	async loadChapters(targets, depth = 0, {current = undefined, total = 1} = {}) {
-		const {concurrency} = this.options.preProcess;
+		const {concurrency, maxRetries = 3} = this.options.preProcess;
 		let chapters = await pMap(targets, async (url, index) => {
 			let chapterDepth = depth;
 			if (url instanceof Resource) {
@@ -441,19 +441,27 @@ export default class BookMaker {
 			// if (/system:page-tags/.test(url)) {
 
 			// }
-			try {
-				// TODO add check for 404 on page
-				const chapter = await this.scraper.loadPage(url, chapterDepth);
-				if (chapter && !(chapter instanceof Chapter) && chapter.isError) {
-					console.warn(`${chapter.statusCode} ${(chapter.statusText || 'ERROR').toUpperCase()} ${url}`);
-					return;
-				}
-				// reduce memory usage
-				this.cache.cleanCacheForPage(url, { onlyWithContent: true });
-				return chapter;
-			} catch (err) {
-				console.warn(`failed loading ${url}`, err);
-			}
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    // TODO add check for 404 on page
+                    const chapter = await this.scraper.loadPage(url, chapterDepth);
+                    if (chapter && !(chapter instanceof Chapter) && chapter.isError) {
+                        console.warn(`${chapter.statusCode} ${(chapter.statusText || 'ERROR').toUpperCase()} ${url}`);
+                        return;
+                    }
+                    // reduce memory usage
+                    this.cache.cleanCacheForPage(url, { onlyWithContent: true });
+                    return chapter;
+                } catch (err) {
+                    if (err?.cause?.name === 'ProtocolError' && /Waiting failed/.test(err?.message)) {
+                        if (attempt < maxRetries) {
+                            console.log(`Retrying ${url} (attempt ${attempt + 1}/${maxRetries})`);
+                            continue;
+                        }
+                    }
+                    console.warn(`failed loading ${url}`, err);
+                }
+            }
 		}, { concurrency });
 
 		chapters = chapters.filter(x => x);
