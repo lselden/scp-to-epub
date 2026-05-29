@@ -82,6 +82,12 @@ will reload overrides / styles).
 * **Friendly footnotes** - "fancy"-style popup footnotes for iBooks and some other e-readers
 * **Book Templates** - Create new ebook based on a template, either local (see `books` folder) or [remote](http://scp-sandbox-3.wikidot.com/tmonty).
 
+## TROUBLESHOOTING
+
+* Try using the `--debug` and `--show-browser` commandline options
+* Set `NODE_DEBUG` environment variable to `scp` to see some additional logging in the console
+* If you're using `--view` and the page keeps opening up in a new tab then you may need to increase the `timeout` setting in your config.
+
 ## CAVEATS
 * Books may not be in the best order, or have wrong chapters. I made this tool to read books, not write them. If you have an idea for improving a book template, or want to add more then add an issue or pull request.
 * EPUB only. Use Calibre or an online conversion tool to convert to MOBI, PDF, etc.

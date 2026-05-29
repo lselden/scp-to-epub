@@ -1,6 +1,12 @@
 ## 2.0
 
-This is a major version update not because of new features, but because it impacts the developer experience.
+### Features
+
+* Use Node's built-in "Self-Contained Executable" build, which results in a larger filesize but is less likely to trigger false-positive antivirus warnings
+* tweaked detection of when page has finished loading, so scraping should go faster
+* Added retries in case page load doesn't succeed
+* Update puppeteer library so built-in browser is more modern
+* added configurable option to block network requests by regex(s)
 
 ### Bugfixes
 
