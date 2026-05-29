@@ -106,7 +106,7 @@ $packageName = $pkg.name
 Write-Host "zipping"
 
 $zipPath = Join-Path (Split-Path $releaseFolder -Parent) "$packageName.$releaseVersion.zip"
-Compress-Archive -Path $releaseFolder -DestinationPath $zipPath -Force
+Compress-Archive -Path "$releaseFolder\*" -DestinationPath $zipPath -Force
 
 Pop-Location
 
