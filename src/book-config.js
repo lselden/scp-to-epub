@@ -91,9 +91,14 @@ config.util.defaults({
 		height: 1024,
 		timeout: 10 * 60 * 1000,
 		ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'
+        userAgentOptions: {
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36',
+            platform: 'Win32'
+        },
 		blockFilters: [
             { url: /favicon\.(gif|ico)/ },
             { url: /p\.png/, referer: /if\.html/ },
+            { url: /ad-delivery\.net\/px\.gif/ }
         ]
 	},
 	cover: {

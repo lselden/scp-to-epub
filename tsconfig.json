@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "NodeNext",
     "esModuleInterop": true,
-    "target": "ES2022",
+    "target": "esnext",
     "checkJs": true,
     "allowJs": true,
     "noImplicitAny": false,

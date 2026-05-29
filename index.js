@@ -47,7 +47,7 @@ async function processSingle (urls, cfg) {
 async function processBook (bookUrl, cfg) {
 	const builder = new BookMaker(bookUrl, {
 		preProcess: {
-			concurrency: 3,
+			// concurrency: 3,
 			closeTabs: true
 		},
 		...cfg
@@ -62,7 +62,7 @@ async function viewCover (bookUrl, cfg) {
     config.set('browser.headless', false);
     const builder = new BookMaker(bookUrl, {
 		preProcess: {
-			concurrency: 3,
+			// concurrency: 3,
 			closeTabs: true
 		},
 		...cfg,

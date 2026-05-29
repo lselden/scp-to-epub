@@ -143,6 +143,13 @@ browser:
       #mobile: false
       #platformVersion: '10.0'
       #uaFullVersion: ''
+  ### Requests that match any of these filters will be blocked. Set to empty array to allow all requests. Useful if the wait for page loads is hitting the timeout because of regular ad network traffic
+  blockFilters: [
+    { url: /favicon\.(gif|ico)/ },
+    { url: /p\.png/, referer: /if\.html/ },
+    { url: /ad-delivery\.net\/px\.gif|btloader\.com/ }
+  ]
+
 
   args:
     ### add additional args to puppeteer browser instance

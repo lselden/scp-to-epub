@@ -270,7 +270,7 @@ export interface BookMakerConfig extends BookMakerPrivateConfig {
      */
     defaultOrigin?: string,
     localArchiveMirror?: string,
-    browser?: {
+    browser: {
         headless?: boolean,
         debug?: boolean,
         width?: number,
@@ -283,6 +283,19 @@ export interface BookMakerConfig extends BookMakerPrivateConfig {
         executablePath?: string,
         args?: string[],
         ua?: string
+        blockFilters?: { url: RegExp, referer?: RegExp, method?: string }[]
+        hooks: {
+            // I think these run in the page context
+            // evalulateOnNewDocument
+            newDocument?: (...args: unknown[]) => any,
+            // page.evalulate
+            beforeFormat?: () => any,
+            afterFormat?: () => any,
+            // this runs on a network request
+            request?(request: HTTPRequest): boolean,
+            // this runs on a network response after it's processed and turned into a Resource
+            response?(resource: Resource, response: HTTPResponse): void
+        },
     }
 }
 

@@ -55,6 +55,10 @@ export default class Scraper {
 				debug: false,
 				timeout: 10 * 60 * 1000,
 				// ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Googlebot Chrome/76.0.3809.132 Safari/537.36',
+                blockFilters: [
+                    { url: /favicon\.gif/ },
+                    { url: /p\.png/, referer: /if\.html/ }
+                ]
 			},
 			static: {
 				prefix: '__epub__',
@@ -75,15 +79,15 @@ export default class Scraper {
 				beforeFormat() {},
 				// run after page is formatted
 				afterFormat() {},
-				request: req => {
+				request: async req => {
 					const requestUrl = req.url();
 					this.totalRequests += 1;
 					// these are removed just because they hijack DOM prototypes or significantly slow down page loading
 					if (
-						/(nitropay|onesignal|doubleclick).*\.js.*/.test(requestUrl) &&
+						/(nitropay|onesignal|doubleclick).*\.js[^o].*/.test(requestUrl) &&
 						(typeof req.respond === 'function')
 					) {
-						/** @type {Request} */(req).respond({
+						await req.respond({
 							// body: 'console.log("noload");',
 							body: 'window.nads={createAd(){}}',
 							contentType: 'application/x-javascript',
@@ -91,22 +95,39 @@ export default class Scraper {
 						});
 						return true;
 					}
+
+                    const shouldBlock = this.options.browser?.blockFilters?.some(({ method, url, referer }) => {
+                        if (method && req.method() !== method) return false;
+                        if (!(url || referer)) return false;
+                        if (url?.test(requestUrl) === false) return false;
+                        if (referer) {
+                            const isTop = req.frame() === req.frame()?.page().mainFrame();
+                            const frameUrl = isTop ? '' : req.frame()?.url() || '';
+                            const reqReferer = frameUrl || req.headers().referer || '';
+                            if (referer?.test(reqReferer) === false) return false;
+                        }
+                        // return true if both regex pass
+                        return true;
+                    });
+
 					// loading favicon is surprisingly slow
-					if (/favicon.gif/.test(requestUrl) &&
+					if (shouldBlock &&
 					(typeof req.respond === 'function')) {
-						/** @type {Request} */(req)
+                        debug(`Blocking request ${requestUrl.slice(0, 80)}`);
+						return await req
 							.abort('blockedbyclient')
+                            .then(() => true)
 							.catch(err => {
 								console.warn('Failed to abort request', err);
+                                return false;
 							});
-						return true;
 					}
 				},
 				response() {
 
 				}
 			}
-		},
+		}),
 		this.options,
 		{
 			browser: config.get('browser'),
@@ -116,6 +137,12 @@ export default class Scraper {
             localArchiveMirror: config.get('discovery.localArchiveMirror')
 		},
 		opts);
+
+        this.options.browser.blockFilters = this.options.browser.blockFilters?.map(({method, url, referer}) => ({
+            ...!!method && {method},
+            ...!!url && {url: typeof url === 'string' ? new RegExp(url.replaceAll(/^\/|\/$/g, '')) : url},
+            ...!!referer && {referer: typeof referer === 'string' ? new RegExp(referer.replaceAll(/^\/|\/$/g, '')) : referer}
+        }));
 
 		if (this.options.remoteImages === undefined) {
 			this.options.remoteImages = config.get('output.images.remote', false);
@@ -141,7 +168,7 @@ export default class Scraper {
 		let url = request.url();
 		const urlObj = getUrlObj(url);
 		try {
-			const isHandled = this.options.hooks.request(request);
+			const isHandled = await this.options.hooks?.request?.(request);
 			if (isHandled) {
 				// QUESTION should this just return, and let hook do continue?
 				// request.continue();
@@ -198,7 +225,7 @@ export default class Scraper {
                 .replace(/www.scp-wiki.net|www.scpwiki.com/, 'scp-wiki.wikidot.com');
         }
 
-        request.continue({ ...rewriteUrl && {url: rewriteUrl}});
+        request.continue({ ...!!rewriteUrl && {url: rewriteUrl}});
 	}
 	/**
 	 * @param {Response} res
@@ -426,13 +453,13 @@ export default class Scraper {
 			}
 		}
 
-        /** @type {{page: Page, error?: Error}} */
+        /** @type {{page: Page, error?: Error, response?: HTTPResponse}} */
         const out = {
 			page
 		};
 
 
-        /** @type {Response} */
+        /** @type {HTTPResponse | undefined} */
         let response; 
         try {
             out.response = response =   await gotoPage(page, url, {
