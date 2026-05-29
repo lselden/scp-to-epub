@@ -15,7 +15,7 @@ import Chapter from './lib/chapter.js';
 import DocPart from './lib/doc-part.js';
 import {loadBookConfig, loadBookRemote, extractDocParts} from './parse-book-config.js';
 import makeCover from './make-cover.js';
-import { debug } from './lib/utils.js';
+import { debug, waitRandom } from './lib/utils.js';
 
 /** @typedef {import("puppeteer").Browser} Browser */
 /** @typedef {import("puppeteer").Page} Page */
@@ -106,7 +106,7 @@ export default class BookMaker {
 				cache: true,
 			},
 			ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36'
-		}, config.toObject(), opts);
+		}, config.toObject(), this.options, opts);
 
 		// TODO FIXME this isn't getting used when loading a book or main list of links it seems.
 		// this.options.exclude = this.options.discovery.exclude
@@ -180,7 +180,7 @@ export default class BookMaker {
 		// aliases should take care of setting in correct places
 		config.assign(bookSettings);
 		// pull updated settings from config
-		this._setOptions();
+		this._setOptions(bookSettings);
 		this.scraper.initialize();
 		this.postProcessor.setOptions();
 
@@ -459,7 +459,7 @@ export default class BookMaker {
                     if (err?.cause?.name === 'ProtocolError' && /Waiting failed/.test(err?.message)) {
                         if (attempt < maxRetries) {
                             console.log(`Retrying ${url} (attempt ${attempt + 1}/${maxRetries})`);
-                            await new Promise(resolve => setTimeout(resolve, waitBetweenRetriesSeconds * 1000));
+                            await waitRandom(waitBetweenRetriesSeconds * 1000, 500);
                             continue;
                         }
                     }

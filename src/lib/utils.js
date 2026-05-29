@@ -141,3 +141,9 @@ export function maybeMirrorUrl(u, defaultOrigin = undefined, localArchiveMirror)
 }
 
 export const debug = debuglog('scp'); 
+
+
+export function waitRandom(targetMs, rangeMs = 0) {
+    const jitter = (Math.random() - 0.5) * rangeMs * 2;
+    return new Promise(resolve => setTimeout(resolve, targetMs + jitter));
+}

@@ -463,8 +463,9 @@ export default class Scraper {
         let response; 
         try {
             out.response = response =   await gotoPage(page, url, {
-                timeout: this.options.browser.timeout
-            });
+                timeout: this.options.browser.timeout,
+                uniqueRequestsHeartbeatTimeoutMs: this.options.browser.uniqueRequestsHeartbeatTimeoutMs
+            }) || undefined;
         } catch (error) {
             out.error = error;
         }

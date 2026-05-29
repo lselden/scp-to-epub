@@ -6,7 +6,7 @@ export default function () {
 
     warning.classList.add('warning-box');
     warning.style.height = 'initial';
-    warning.closest('.modal-wrapper').replaceWith(warning);
+    warning.closest('.modal-wrapper')?.replaceWith(warning);
     const header = warning.querySelector('#u-adult-header');
     if (header) {
         header.classList.add('red');

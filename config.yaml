@@ -129,7 +129,10 @@ browser:
   width: 768
   ### change browser height
   height: 1024
-  timeout: 300000
+  ### Timeout waiting for page to load before continuing. Default 30 seconds. The sweet spot is enough time for all resources (images, etc) to load, but not too long that it's stuck waiting on ads to stop refreshing
+  timeout: 30000
+  ### consider network load as done if there's no more unique requests. This is to avoid ad requests making initial page load wait too long. Default is 5 seconds. Set to 0 to disable.
+  uniqueRequestsHeartbeatTimeoutMs: 5000
   ### User agent for created browser to report
   ### DEPRECATED - consider using userAgentOptions instead which allows you to set platform as well
   ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'

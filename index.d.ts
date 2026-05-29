@@ -263,6 +263,7 @@ export interface BookMakerConfig extends BookMakerPrivateConfig {
      * @default 10 minutes
      */
     timeout?: number,
+    
     /**
      * base origin for links - for using with Wanderers library or international sites
      * Changing this is not fully tested
@@ -280,6 +281,10 @@ export interface BookMakerConfig extends BookMakerPrivateConfig {
          * @default 2 minutes
          */
         timeout?: number,
+        /**
+         * consider network load as done if there's no more unique requests. This is to avoid ad requests making initial page load wait too long. Default is 5 seconds. Set to 0 to disable.
+         */
+        uniqueRequestsHeartbeatTimeoutMs: number,
         executablePath?: string,
         args?: string[],
         ua?: string
