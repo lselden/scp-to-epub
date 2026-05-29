@@ -405,7 +405,7 @@ export default class BookMaker {
 		return docPart;
 	}
 	async loadChapters(targets, depth = 0, {current = undefined, total = 1} = {}) {
-		const {concurrency, maxRetries = 3} = this.options.preProcess;
+		const {concurrency, maxRetries = 3, waitBetweenRetriesSeconds = 5} = this.options.preProcess ?? {};
 		let chapters = await pMap(targets, async (url, index) => {
 			let chapterDepth = depth;
 			if (url instanceof Resource) {
@@ -459,6 +459,7 @@ export default class BookMaker {
                     if (err?.cause?.name === 'ProtocolError' && /Waiting failed/.test(err?.message)) {
                         if (attempt < maxRetries) {
                             console.log(`Retrying ${url} (attempt ${attempt + 1}/${maxRetries})`);
+                            await new Promise(resolve => setTimeout(resolve, waitBetweenRetriesSeconds * 1000));
                             continue;
                         }
                     }

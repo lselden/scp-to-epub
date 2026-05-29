@@ -175,6 +175,9 @@ preProcess:
 
   ### how many times to retry pages that time out on load
   maxRetries: 3
+
+  ### Retry sleep interval
+  waitBetweenRetriesSeconds: 5
 postProcess:
   ### number of pages to run in parallel when sanitizing xml and adding internal links
   concurrency: 3

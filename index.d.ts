@@ -21,6 +21,10 @@ export interface PreProcessConfig {
      * max attempts to load chapter that gets a timeout
      */
     maxRetries?: number
+    /**
+     * how long to wait between retries
+     */
+    waitBetweenRetriesSeconds?: number
 }
 
 export interface PostProcessConfig {
