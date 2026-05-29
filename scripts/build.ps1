@@ -11,7 +11,9 @@ param (
     [Parameter()] [string] $BundledExecutablePath = 'bin/chrome.exe',
     [Parameter()] [string] $BinaryName = 'scp-to-epub.exe',
     # change this if you want to try building for other platforms -- see @yao-pkg/pkg docs
-    [Parameter()] [string] $PkgTarget = 'node22-win',
+    [Parameter()] [string] $PkgTarget = 'node24-win',
+    # use node --sea flag
+    [Parameter()] [switch] $Sea,
     [Parameter()] [switch] $NoCleanup
 )
 
@@ -88,7 +90,11 @@ Write-Host "build to binary using pkg"
 
 # build using pkg
 $outputExecutable = Join-Path $releaseFolder $BinaryName
-npx @yao-pkg/pkg $stagingPackagePath --output $outputExecutable --target $PkgTarget
+if ($Sea) {
+    npx @yao-pkg/pkg $stagingPackagePath --output $outputExecutable --target $PkgTarget --options use-env-proxy --sea
+} else {
+    npx @yao-pkg/pkg $stagingPackagePath --output $outputExecutable --options use-env-proxy --target $PkgTarget
+}
 
 $releaseVersion = $pkg.version
 $packageName = $pkg.name

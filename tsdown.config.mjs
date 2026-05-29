@@ -4,7 +4,7 @@ export default defineConfig({
     entry: ['index.js'],
     outDir: 'build/staging',
     outExtensions: (ctx) => ({ js: '.js'}),
-    format: 'cjs',
+    format: 'esm',
     target: 'node24',
     clean: true,
     deps: {
