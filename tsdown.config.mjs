@@ -21,5 +21,9 @@ export default defineConfig({
             eval: false
         }
     },
+    outputOptions: {
+        keepNames: true
+    },
+    nodeProtocol: true,
     dts: false,
 })

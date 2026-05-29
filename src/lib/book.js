@@ -1,273 +1,275 @@
 import path from 'node:path';
-import fs from 'node:fs';
-import {ZipArchive} from 'archiver';
+import { createWriteStream } from 'node:fs';
+import fs from 'node:fs/promises';
+import { ZipArchive } from 'archiver';
 import pMap from 'p-map';
-import {isJunk} from 'junk';
+import { isJunk } from 'junk';
 import Resource from './resource.js';
 import DocPart from './doc-part.js';
 import config, { baseDir } from '../book-config.js';
 import genManifest from '../templates/content.opf.js';
-import {genToc, genAppendix} from '../templates/toc.xhtml.js';
+import { genToc, genAppendix } from '../templates/toc.xhtml.js';
 import genNcx from '../templates/epb.ncx.js';
 import genPreface from '../templates/preface.xhtml.js';
 
 import { getAssetPath } from './path-utils.js';
+import { debug } from './utils.js';
 
 const rmdir = (dir) => {
-    return fs.promises.rm(dir, { recursive: true, force: true });
+    return fs.rm(dir, { recursive: true, force: true });
 }
 
 export default class Book {
-	/**
-	 *
-	 * @param {import('../../index.js').BookConfig} opts
-	 */
-	constructor(opts = {}) {
-		/** @type {string} */
-		this.title;
+    /**
+     *
+     * @param {import('../../index.js').BookConfig} opts
+     */
+    constructor(opts = {}) {
+        /** @type {string} */
+        this.title;
 
-		/** @type {string} */
-		this.lang = config.get('metadata.lang', 'en');
+        /** @type {string} */
+        this.lang = config.get('metadata.lang', 'en');
 
-		/** @type {string} */
-		this.publisher = config.get('metadata.publisher');
+        /** @type {string} */
+        this.publisher = config.get('metadata.publisher');
 
-		/** @type {Date} */
-		this.publishDate = new Date();
+        /** @type {Date} */
+        this.publishDate = new Date();
 
-		/** @type {string[]} */
-		this._author = [].concat(config.get('metadata.author', 'SCP Foundation'));
+        /** @type {string[]} */
+        this._author = [].concat(config.get('metadata.author', 'SCP Foundation'));
 
-		/** @type {import("./chapter.js").default[]} */
-		this.chapters = [];
+        /** @type {import("./chapter.js").default[]} */
+        this.chapters = [];
 
-		/** @type {import("./resource.js").default[]} */
-		this.resources = [];
+        /** @type {import("./resource.js").default[]} */
+        this.resources = [];
 
         /** @type {Record<'nested' | 'chapters' | 'appendix', import("./chapter.js").default[]>} */
-		this.layout = {
-			nested: [],
-			chapters: [],
-			appendix: []
-		};
+        this.layout = {
+            nested: [],
+            chapters: [],
+            appendix: []
+        };
 
-		let {
-			title = '',
-			lang,
-			author,
-			publisher,
-			publishDate,
-			...otherOpts
-		} = opts;
+        let {
+            title = '',
+            lang,
+            author,
+            publisher,
+            publishDate,
+            ...otherOpts
+        } = opts;
 
-		Object.assign(this, config.util.compact({title, author, publisher, publishDate}));
+        Object.assign(this, config.util.compact({ title, author, publisher, publishDate }));
 
-		this.id = config.get('metadata.bookId', `scp.to.epub.${Math.random().toString(16).slice(2)}`);
+        this.id = config.get('metadata.bookId', `scp.to.epub.${Math.random().toString(16).slice(2)}`);
 
-		this.toc = {
-			title: config.get('bookOptions.tocTitle', 'Table Of Contents'),
-			path: 'toc.xhtml',
-			ncxPath: 'epb.ncx',
-			prefacePath: 'preface.xhtml',
-			appendixPath: 'appendix.xhtml'
-		};
+        this.toc = {
+            title: config.get('bookOptions.tocTitle', 'Table Of Contents'),
+            path: 'toc.xhtml',
+            ncxPath: 'epb.ncx',
+            prefacePath: 'preface.xhtml',
+            appendixPath: 'appendix.xhtml'
+        };
 
-		this.creator = config.get('metadata.creator', 'scp-epub-gen');
+        this.creator = config.get('metadata.creator', 'scp-epub-gen');
 
-		this.options = {
-			appendixDepthCutoff: config.get('bookOptions.appendixDepthCutoff', config.get('discovery.maxDepth', 2)),
-			keepTempFiles: config.get('output.keepTempFiles', false),
-			cleanTempFolder: config.get('output.cleanTempFolder', true),
-			additionalResources: config.get('input.additionalResources', []),
-			...otherOpts
-		};
+        this.options = {
+            appendixDepthCutoff: config.get('bookOptions.appendixDepthCutoff', config.get('discovery.maxDepth', 2)),
+            keepTempFiles: config.get('output.keepTempFiles', false),
+            cleanTempFolder: config.get('output.cleanTempFolder', true),
+            additionalResources: config.get('input.additionalResources', []),
+            ...otherOpts
+        };
 
-		this.localAssetsPath = config.get('output.localResources', path.join(baseDir, '../../assets'));
+        this.localAssetsPath = config.get('output.localResources', path.join(baseDir, '../../assets'));
 
-		// TODO just pull this from assetFolders...will need to grab before starting to generate various files...maybe at beginning of process
-		this.stylesheets = config.get('bookOptions.stylesheets', ['css/base.css', 'css/style.css', 'css/fonts.css']);
+        // TODO just pull this from assetFolders...will need to grab before starting to generate various files...maybe at beginning of process
+        this.stylesheets = config.get('bookOptions.stylesheets', ['css/base.css', 'css/style.css', 'css/fonts.css']);
 
-		this._written = new Set();
+        this._written = new Set();
 
-		this.concurrency = config.get('output.diskConcurrency', 1);
-	}
-	get author() {
-		return this._author.join(', ');
-	}
-	get authors() {
-		return this._author || [''];
-	}
-	set author(val) {
-		this.authors = [].concat(val);
-	}
-	set authors(val) {
-		if (!val) {
-			this._author = [''];
-			return;
-		}
+        this.concurrency = config.get('output.diskConcurrency', 1);
+    }
+    get author() {
+        return this._author.join(', ');
+    }
+    get authors() {
+        return this._author || [''];
+    }
+    set author(val) {
+        this.authors = [].concat(val);
+    }
+    set authors(val) {
+        if (!val) {
+            this._author = [''];
+            return;
+        }
 
-		if (Array.isArray(val)) {
-			this._author = val;
-		} else if (typeof val === 'string') {
-			this._author = [val];
-		} else {
-			throw new TypeError(`Invalid author value ${val}`);
-		}
-	}
-	getChapterCount() {
-		// NOTE doesn't check for duplicates, which shouldn't happen anyways
-		let sum = 0;
-		for (let chapter of this.chapters) {
-			if (chapter instanceof DocPart) {
-				sum += chapter.chapters.length;
-			} else {
-				sum += 1;
-			}
-		}
-		return sum;
-	}
-	arrangeChapters() {
-		const {
-			appendixDepthCutoff = 1
-		} = this.options;
+        if (Array.isArray(val)) {
+            this._author = val;
+        } else if (typeof val === 'string') {
+            this._author = [val];
+        } else {
+            throw new TypeError(`Invalid author value ${val}`);
+        }
+    }
+    getChapterCount() {
+        // NOTE doesn't check for duplicates, which shouldn't happen anyways
+        let sum = 0;
+        for (let chapter of this.chapters) {
+            if (chapter instanceof DocPart) {
+                sum += chapter.chapters.length;
+            } else {
+                sum += 1;
+            }
+        }
+        return sum;
+    }
+    arrangeChapters() {
+        const {
+            appendixDepthCutoff = 1
+        } = this.options;
 
-		this.layout = {
-			nested: [],
-			chapters: [],
-			appendix: []
-		};
-		const recurse = (chapters, depth = 0) => {
-			for (let chapter of chapters) {
-				if (chapter instanceof DocPart) {
-					this.layout.chapters.push(chapter);
-					this.layout.nested.push(chapter);
-					recurse(chapter.chapters, depth + 1);
-					continue;
-				}
-				// avoid duplicates
-				if (
-					this.layout.chapters.includes(chapter) ||
-					this.layout.appendix.includes(chapter)
-				) {
-					continue;
-				}
-				if (
-					// TODO add check about linear or not?
-					chapter.isSupplemental ||
-					(chapter.depth && chapter.depth >= appendixDepthCutoff)
-				) {
-					this.layout.appendix.push(chapter);
-				} else {
-					if (depth === 0) {
-						this.layout.nested.push(chapter);
-					}
-					this.layout.chapters.push(chapter);
-				}
-			}
-		}
-		recurse(this.chapters);
+        this.layout = {
+            nested: [],
+            chapters: [],
+            appendix: []
+        };
+        const recurse = (chapters, depth = 0) => {
+            for (let chapter of chapters) {
+                if (chapter instanceof DocPart) {
+                    this.layout.chapters.push(chapter);
+                    this.layout.nested.push(chapter);
+                    recurse(chapter.chapters, depth + 1);
+                    continue;
+                }
+                // avoid duplicates
+                if (
+                    this.layout.chapters.includes(chapter) ||
+                    this.layout.appendix.includes(chapter)
+                ) {
+                    continue;
+                }
+                if (
+                    // TODO add check about linear or not?
+                    chapter.isSupplemental ||
+                    (chapter.depth && chapter.depth >= appendixDepthCutoff)
+                ) {
+                    this.layout.appendix.push(chapter);
+                } else {
+                    if (depth === 0) {
+                        this.layout.nested.push(chapter);
+                    }
+                    this.layout.chapters.push(chapter);
+                }
+            }
+        }
+        recurse(this.chapters);
 
-	}
-	async writeMetaResources(destination) {
-		this.arrangeChapters();
+    }
+    async writeMetaResources(destination) {
+        this.arrangeChapters();
 
-		const concurrency = this.concurrency;
+        const concurrency = this.concurrency;
 
-		const ibookOpts = `<?xml version="1.0" encoding="UTF-8"?>
+        const ibookOpts = `<?xml version="1.0" encoding="UTF-8"?>
 		<display_options><platform name="*"><option name="specified-fonts">true</option></platform></display_options>`;
 
-		const container = `<?xml version="1.0" encoding="UTF-8"?>
+        const container = `<?xml version="1.0" encoding="UTF-8"?>
 		<container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">
 		<rootfiles>
 		<rootfile full-path="EPUB/package.opf" media-type="application/oebps-package+xml"/>
 		</rootfiles>
 		</container>`;
 
-		const files = {
-			// mimetype file - must come first
-			'mimetype': 'application/epub+zip',
-			'META-INF/com.apple.ibooks.display-options.xml': ibookOpts,
-			'META-INF/container.xml': container,
-			'EPUB/package.opf': genManifest(this, this.options),
-			[`EPUB/${this.toc.path}`]: genToc(this, this.options),
-			[`EPUB/${this.toc.ncxPath}`]: genNcx(this, this.options),
-			[`EPUB/${this.toc.prefacePath}`]: genPreface(this, this.options)
-		};
+        const files = {
+            // mimetype file - must come first
+            'mimetype': 'application/epub+zip',
+            'META-INF/com.apple.ibooks.display-options.xml': ibookOpts,
+            'META-INF/container.xml': container,
+            'EPUB/package.opf': genManifest(this, this.options),
+            [`EPUB/${this.toc.path}`]: genToc(this, this.options),
+            [`EPUB/${this.toc.ncxPath}`]: genNcx(this, this.options),
+            [`EPUB/${this.toc.prefacePath}`]: genPreface(this, this.options)
+        };
 
-		if (this.layout.appendix.length > 0) {
-			files[`EPUB/${this.toc.appendixPath}`] = genAppendix(this, this.options);
-		}
+        if (this.layout.appendix.length > 0) {
+            files[`EPUB/${this.toc.appendixPath}`] = genAppendix(this, this.options);
+        }
 
-		await pMap(Object.entries(files), ([filepath, content]) => {
-			return this.writeFile(path.join(destination, filepath), content);
-		}, {concurrency});
-	}
-	async writeFile(outputPath, content) {
-		// QUESTION include check against already written?
-		await this.ensureDir(outputPath);
-		await fs.promises.writeFile(outputPath, content);
-	}
-	async ensureDir(outputPath) {
-		const outDir = path.dirname(outputPath);
-		if (this._written.has(outDir)) {
-			return;
-		}
-		try {
-			// console.debug(`Ensuring directory ${outDir}`);
-			await fs.promises.mkdir(outDir, {recursive: true});
-			this._written.add(outDir);
-		} catch (err) {
-			console.warn(`unable to create dir ${outDir}`);
-		}
-	}
-	/**
-	 *
-	 * @param {{url: string, id?: string, remote?: boolean, filename?: string, requestOptions?: any }[]} list
-	 */
-	async addRemoteResources(list = this.options.additionalResources) {
-		const {concurrency} = this;
-		await pMap(list, async item => {
-			try {
-				const {
-					url,
-					id,
-					remote,
-					requestOptions = {}
-				} = item;
+        await pMap(Object.entries(files), ([filepath, content]) => {
+            return this.writeFile(path.join(destination, filepath), content);
+        }, { concurrency });
+    }
+    async writeFile(outputPath, content) {
+        // QUESTION include check against already written?
+        await this.ensureDir(outputPath);
+        await fs.writeFile(outputPath, content);
+    }
+    async ensureDir(outputPath) {
+        const outDir = path.dirname(outputPath);
+        if (this._written.has(outDir)) {
+            return;
+        }
+        try {
+            // console.debug(`Ensuring directory ${outDir}`);
+            await fs.mkdir(outDir, { recursive: true });
+            this._written.add(outDir);
+        } catch (err) {
+            console.warn(`unable to create dir ${outDir}`);
+        }
+    }
+    /**
+     *
+     * @param {{url: string, id?: string, remote?: boolean, filename?: string, requestOptions?: any }[]} list
+     */
+    async addRemoteResources(list = this.options.additionalResources) {
+        const { concurrency } = this;
+        await pMap(list, async item => {
+            try {
+                const {
+                    url,
+                    id,
+                    remote,
+                    requestOptions = {}
+                } = item;
 
-				const {
-					filename = path.basename(url || '') || id
-				} = item;
+                const {
+                    filename = path.basename(url || '') || id
+                } = item;
 
-				let content;
-				if (!remote) {
-					// TODO ideally we'd just write straight to disk
-					const resp = await fetch(url, {
-						...requestOptions
-					});
-					content = Buffer.from(await resp.arrayBuffer());
-				}
-				const r = new Resource({
-					url,
-					content,
-					id,
-					filename,
-					cache: remote ? Resource.CacheEnum.remote : Resource.CacheEnum.local
-				});
-				this.resources.push(r);
-				console.log(`REMOTE RESOURCE: ADDED ${r.bookPath}`);
-			} catch (err) {
-				console.warn(`REMOTE RESOURCE: FAILED ${item && item.url}`, err);
-			}
-		}, {concurrency});
-	}
-	async addLocalResources(localPath = this.localAssetsPath) {
-		const {concurrency} = this;
-		// HACK direct file copy would be a better option than reading into memory
-		/**
-		 * @type {string[]}
-		 */
-		let localFiles;
+                let content;
+                if (!remote) {
+                    // TODO ideally we'd just write straight to disk
+                    const resp = await fetch(url, {
+                        ...requestOptions
+                    });
+                    content = Buffer.from(await resp.arrayBuffer());
+                }
+                const r = new Resource({
+                    url,
+                    content,
+                    id,
+                    filename,
+                    cache: remote ? Resource.CacheEnum.remote : Resource.CacheEnum.local
+                });
+                this.resources.push(r);
+                console.log(`REMOTE RESOURCE: ADDED ${r.bookPath}`);
+            } catch (err) {
+                console.warn(`REMOTE RESOURCE: FAILED ${item && item.url}`, err);
+            }
+        }, { concurrency });
+    }
+    async addLocalResources(localPath = this.localAssetsPath) {
+        const { concurrency } = this;
+        // HACK direct file copy would be a better option than reading into memory
+        /**
+         * @type {string[]}
+         */
+        let localFiles;
 
         const assetsDir = await getAssetPath(localPath);
         if (!assetsDir) {
@@ -275,123 +277,148 @@ export default class Book {
             return;
         }
 
-		try {
-			const dirListing = await fs.promises.readdir(assetsDir, { withFileTypes: true });
-			const subFolders = dirListing
-				.filter(dir => {
-					return dir.isDirectory();
-				});
-			localFiles = [];
-			await pMap(subFolders, async dirent => {
-				const dir = path.join(assetsDir, dirent.name);
-				// NOTE no try/catch...?...
-				const files = await fs.promises.readdir(dir);
-				// QUESTION do we need to filter out thumbs / ds_config files?
-				localFiles.push(...files.map(f => path.join(dir, f)));
-			}, {concurrency});
-		} catch (err) {
-			console.error(`Failed loading local assets listing at ${localPath}`, err);
-			return;
-		}
-		await pMap(localFiles, async file => {
-			try {
-				// skip junk files
-				if (isJunk(file)) {
-					return;
-				}
-				const content = await fs.promises.readFile(file);
-				const basename = path.basename(file);
-				const r = new Resource({
-					url: `http://localhost/${basename}`,
-					content,
-					filename: basename
-				});
-				r.setLocal();
-				this.resources.push(r);
-			} catch (err) {
-				console.error('failed reading local file', file, err);
-			}
-		}, { concurrency: this.concurrency });
-	}
-	async writeToDisk(destination) {
-		const concurrency = this.concurrency;
+        /**
+         * 
+         * @param {import("node:fs").Dirent} dirent 
+         * @returns 
+         */
+        const isValidDir = (dirent) => {
+            return dirent.isDirectory() && !isJunk(dirent.name);
+        }
+        /**
+         * @type {Pick<import("node:fs").Dirent, 'name' | 'isDirectory' | 'isFile'>[]}
+         */
+        let dirListing;
+        try {
+            dirListing = await fs.readdir(assetsDir, { withFileTypes: true });
+            if (typeof dirListing[0] === 'string') {
+                // if we just get strings back, convert to Dirent-like objects
+                dirListing = await pMap(dirListing.filter(Boolean), async (name) => {
+                    const stats = await fs.stat(path.join(assetsDir, `${name}`));
+                    return {
+                        name: `${name}`,
+                        isDirectory: () => stats.isDirectory(),
+                        isFile: () => stats.isFile()
+                    };
+                }, { concurrency });
+            }
+            const subFolders = dirListing.filter((dir) => {
+                return dir.isDirectory() && !isJunk(dir.name)
+            });
+            localFiles = [];
+            await pMap(subFolders, async dirent => {
+                const dir = path.join(assetsDir, dirent.name);
+                // NOTE no try/catch...?...
+                const files = await fs.readdir(dir, { withFileTypes: false }).catch(err => {
+                    console.error(`Error getting files in asset subfolder ${dir}`, err);
+                    return [];
+                });
+                // QUESTION do we need to filter out thumbs / ds_config files?
+                localFiles.push(...files.map(f => path.join(dir, f)));
+            }, { concurrency });
+        } catch (err) {
+            console.error(`Failed loading local assets listing at ${localPath}`, err);
+            return;
+        }
+        await pMap(localFiles, async file => {
+            try {
+                // skip junk files
+                if (isJunk(file)) {
+                    return;
+                }
+                const content = await fs.readFile(file);
+                const basename = path.basename(file);
+                const r = new Resource({
+                    url: `http://localhost/${basename}`,
+                    content,
+                    filename: basename
+                });
+                r.setLocal();
+                this.resources.push(r);
+            } catch (err) {
+                console.error('failed reading local file', file, err);
+            }
+        }, { concurrency: this.concurrency });
+    }
+    async writeToDisk(destination) {
+        const concurrency = this.concurrency;
 
-		if (this.options.cleanTempFolder) {
-			try {
-				await rmdir(destination);
-			} catch (err) {
-				console.error('Failed to clean temp directory', err);
-			}
-		}
+        if (this.options.cleanTempFolder) {
+            try {
+                await rmdir(destination);
+            } catch (err) {
+                console.error('Failed to clean temp directory', err);
+            }
+        }
 
-		// console.log('Reading local resources');
-		await Promise.all([
-			this.addLocalResources(),
-			this.addRemoteResources()
-		]);
+        // console.log('Reading local resources');
+        await Promise.all([
+            this.addLocalResources(),
+            this.addRemoteResources()
+        ]);
 
-		// console.log('Writing epub skeleton');
-		await this.writeMetaResources(destination);
+        // console.log('Writing epub skeleton');
+        await this.writeMetaResources(destination);
 
-		// console.log('Writing resources');
-		await pMap(this.resources, async (resource, index) => {
-			if (!resource.shouldWrite) {
-				return;
-			}
+        // console.log('Writing resources');
+        await pMap(this.resources, async (resource, index) => {
+            if (!resource.shouldWrite) {
+                return;
+            }
 
-			try {
-				// console.log(`saving" ${outputPath}`);
-				// NOTE not compressing cover image
-				if (resource.isImage && resource.id !== 'cover-image') {
-					// console.debug('Compressing image');
-					// now doing in scraper
-					// await resource.compress();
-				}
-				const outputPath = path.join(destination, 'EPUB', resource.bookPath);
+            try {
+                // console.log(`saving" ${outputPath}`);
+                // NOTE not compressing cover image
+                if (resource.isImage && resource.id !== 'cover-image') {
+                    // console.debug('Compressing image');
+                    // now doing in scraper
+                    // await resource.compress();
+                }
+                const outputPath = path.join(destination, 'EPUB', resource.bookPath);
 
-				await this.writeFile(outputPath, resource.content);
-			} catch (err) {
-				// COMBAK
-				console.warn('Failed saving file', err);
-			}
-		}, { concurrency });
-		// console.log('Finished!');
-	}
-	async zip(source, destination) {
-		await this.ensureDir(destination);
+                await this.writeFile(outputPath, resource.content);
+            } catch (err) {
+                // COMBAK
+                console.warn('Failed saving file', err);
+            }
+        }, { concurrency });
+        // console.log('Finished!');
+    }
+    async zip(source, destination) {
+        await this.ensureDir(destination);
 
-		const archive = new ZipArchive({zlib: {level: 9}});
-		const output = fs.createWriteStream(destination);
-		console.log(`Zipping temp dir ${source} to ${destination}`);
-		// write the all important mimetype in first
-		// @ts-ignore
-		archive.file(path.join(source, 'mimetype'), {name: 'mimetype', store: true });
-		archive.directory(path.join(source, 'META-INF'), 'META-INF');
-		archive.directory(path.join(source, 'EPUB'), 'EPUB');
-		archive.pipe(output);
+        const archive = new ZipArchive({ zlib: { level: 9 } });
+        const output = createWriteStream(destination);
+        console.log(`Zipping temp dir ${source} to ${destination}`);
+        // write the all important mimetype in first
+        // @ts-ignore
+        archive.file(path.join(source, 'mimetype'), { name: 'mimetype', store: true });
+        archive.directory(path.join(source, 'META-INF'), 'META-INF');
+        archive.directory(path.join(source, 'EPUB'), 'EPUB');
+        archive.pipe(output);
 
         /** @type {Promise<void>} */
-		const whenClosed = new Promise((resolve, reject) => {
-			let timer;
-			const cleanup = () => clearTimeout(timer);
-			output
-				.on('close', () => { cleanup(); resolve() })
-				.on('error', err => { cleanup(); reject(err); })
-				.on('finish', () => {
-					timer = setTimeout(() => {
-						console.warn('No Close Event on write stream');
-						resolve();
-					}, 1000);
-				});
-		});
-		await Promise.all([
-			whenClosed,
-			archive.finalize()
-		]);
-		if (!this.options.keepTempFiles) {
-			console.log(`Removing ${source}`);
-			await rmdir(source);
-		}
-		console.log(`Zipped archive to ${destination}`);
-	}
+        const whenClosed = new Promise((resolve, reject) => {
+            let timer;
+            const cleanup = () => clearTimeout(timer);
+            output
+                .on('close', () => { cleanup(); resolve() })
+                .on('error', err => { cleanup(); reject(err); })
+                .on('finish', () => {
+                    timer = setTimeout(() => {
+                        console.warn('No Close Event on write stream');
+                        resolve();
+                    }, 1000);
+                });
+        });
+        await Promise.all([
+            whenClosed,
+            archive.finalize()
+        ]);
+        if (!this.options.keepTempFiles) {
+            console.log(`Removing ${source}`);
+            await rmdir(source);
+        }
+        console.log(`Zipped archive to ${destination}`);
+    }
 }

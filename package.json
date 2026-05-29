@@ -10,7 +10,7 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "pkg": "cd ./build/staging && pkg . --targets node24-win --out-path ../release --options use-env-proxy --sea",
         "build": "tsdown",
-        "package": "pwsh scripts/build.ps1 -CopyPuppeteerArtifacts -Sea"
+        "package": "pwsh scripts/build.ps1 -CopyPuppeteerArtifacts"
     },
     "pkg": {
         "assets": [

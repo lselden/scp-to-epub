@@ -418,7 +418,7 @@ export default class Resource {
 		}
 
         if (!url.host) {
-            debug('Invalid URL in resource');
+            debug('Invalid URL in resource', url);
         }
 
         // standardize wdfiles/scp as https
