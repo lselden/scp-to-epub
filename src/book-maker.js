@@ -26,11 +26,14 @@ export default class BookMaker {
 	/**
 	 *
 	 * @param {import('../index.js').Book | import('../index.js').BookOptions} book
-	 * @param {import('../index.js').BookMakerConfig} [opts]
+	 * @param {Partial<import('../index.js').BookMakerConfig>} [opts]
 	 * @param {Browser} [browser]
 	 */
 	constructor(book, opts = {}, browser) {
-		/** @type {Browser | undefined} */
+		/**
+         * @type {Browser}
+         */
+        // @ts-ignore
 		this.browser = (browser && typeof browser === 'object') ? browser : undefined ;
 
         /** @type {import('../index.js').BookMakerConfig} */

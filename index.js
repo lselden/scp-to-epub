@@ -33,9 +33,9 @@ async function processSingle (urls, cfg) {
 	}
 
     if (!book.title) {
-        let {title, author} = book.chapters[0] ?? {};
+        let {title, author: rawAuthor} = book.chapters[0] ?? {};
         book.title = title;
-        author = (Array.isArray(author) ? author.join(' & ') : author || '').trim();
+        const author = (Array.isArray(rawAuthor) ? rawAuthor.join(' & ') : rawAuthor || '').trim();
         if (author) {
             book.author = `by ${`${author}`.replace(/^\s*by\s+/, '')}`;
         }
@@ -74,7 +74,7 @@ async function viewCover (bookUrl, cfg) {
     console.log('WAITING - CLOSE BROWSER TO EXIT');
 	await new Promise((resolve, reject) => {
 		builder.browser.on('disconnected', () => {
-			resolve();
+			resolve(void 0);
 		});
 	});
 	await builder.destroy();
@@ -320,7 +320,7 @@ async function viewCover (bookUrl, cfg) {
 			}, 1000 * 60 * 10);
 			builder.browser.on('disconnected', () => {
 				clearTimeout(timer);
-				resolve();
+				resolve(void 0);
 			});
 		});
 		await builder.destroy();
