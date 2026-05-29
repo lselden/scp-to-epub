@@ -2,7 +2,6 @@ import {switchTag, escape} from '../client/helpers.js';
 
 export default {
 	async beforeParse() {
-        debugger;
 		const frameEvaluate = window['frameEvaluate'];
 		if (typeof frameEvaluate !== 'function') {
 			console.debug('cannot inline actual contents of iframe');

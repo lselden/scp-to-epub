@@ -10,9 +10,11 @@ function formatDocPart(docPart, options) {
 		chapters = []
 	} = docPart;
 
+    const hasChapters = Array.isArray(chapters) && chapters.length > 0;
+
 	return `<li class="toc-doc-part"><a href="${bookPath}">${titleHTML || escape(title)}</a>${
 		''
-		}<ol class="toc-list">${
+		}${hasChapters ? `<ol class="toc-list">${
 			chapters
 					.map((chapter, j) => {
 						// NOTE not trying to use book chapter numbers because docparts messes that up
@@ -20,7 +22,7 @@ function formatDocPart(docPart, options) {
 						return formatChapter(chapter, '', options);
 					})
 					.join('\n')
-		}</ol></li>`;
+		}</ol>` : ''}</li>`;
 }
 function formatChapter(chapter, chapterIndex, options = {}) {
 	const {includeRating = true} = options;
