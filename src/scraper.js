@@ -7,12 +7,12 @@ import Chapter from './lib/chapter.js';
 import Link from './lib/link.js';
 import {safeFilename, filenameForUrl, debug, getUrlObj} from './lib/utils.js';
 import { configureLocalMirror, maybeMirrorUrl, shouldMirrorUrl, serveResponseFromMirror, toMirrorUrl, fromMirrorUrl, isProxiedUrl, checkMirrorHasUrl } from './lib/kiwiki-cache.js';
-import { gotoPage } from './lib/browser-utils.js';
+import { gotoPage, setUserAgent } from './lib/browser-utils.js';
 
 const {CacheEnum} = Resource;
 
 /**
- * @import {Browser, Page, HTTPRequest as Request, HTTPResponse as Response} from 'puppeteer'
+ * @import {Browser, HTTPResponse, Page, HTTPRequest as Request, HTTPResponse as Response} from 'puppeteer'
  * @import {BookMakerConfig} from '../index.js'
  * @import BookMaker from './book-maker.js'
  */
@@ -49,12 +49,12 @@ export default class Scraper {
 		this._frontPromise = Promise.resolve();
 	}
 	initialize(opts = {}) {
-		this.options = config.util.extendDeep({
+		this.options = config.util.extendDeep(/** @type {BookMakerConfig} */({
 			browser: {
 				headless: false,
 				debug: false,
 				timeout: 10 * 60 * 1000,
-				ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Googlebot Chrome/76.0.3809.132 Safari/537.36'
+				// ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Googlebot Chrome/76.0.3809.132 Safari/537.36',
 			},
 			static: {
 				prefix: '__epub__',
@@ -354,7 +354,7 @@ export default class Scraper {
 	}
 	async createPage(url) {
 		const page = await this.browser.newPage();
-		page.setUserAgent(this.options.browser.ua);
+		setUserAgent(page, this.options.browser);
 		await page.setRequestInterception(true);
 		page.on('request', request => this.interceptRequest(request));
 		page.on('response', response => this.interceptResponse(response));

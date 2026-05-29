@@ -6,6 +6,7 @@ import DiskCache from './lib/disk-cache.js';
 import {systemLinks, systemPrefixes, metaTags} from './system-links.js';
 import { maybeMirrorUrl } from './lib/kiwiki-cache.js';
 import { baseDir } from './book-config.js';
+import { setUserAgent } from './lib/browser-utils.js';
 
 function isEmpty(arr) {
 	return !(arr && (typeof arr === 'object') && Object.keys(arr).length > 0);
@@ -39,6 +40,8 @@ export default class WikiDataLookup {
 			authorsUrl: `${new URL('/system:page-tags/tag/author', defaultOrigin)}`,
 			artworkUrl: `${new URL('/system:page-tags/tag/artwork', defaultOrigin)}`,
 			ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36',
+            userAgentOptions: /** @type {Parameters<import('puppeteer').Page['setUserAgent']>[0]}*/({
+            }),
             enableStats: true,
 			...opts,
 			cache: cacheOpts
@@ -242,7 +245,7 @@ export default class WikiDataLookup {
 		}
         debug('Loading authors meta list');
 		const page = await this.browser.newPage();
-		page.setUserAgent(this.options.ua);
+        setUserAgent(page, this.options);
         const url = await maybeMirrorUrl(this.options.authorsUrl);
 		await page.goto(url);
 		this.authorsList = await page.$$eval('.pages-list-item a', links => {
@@ -283,7 +286,7 @@ export default class WikiDataLookup {
 		}
         debug('loading artworks meta list');
 		const page = await this.browser.newPage();
-		page.setUserAgent(this.options.ua);
+		setUserAgent(page, this.options);
         const url = await maybeMirrorUrl(this.options.artworkUrl);
 		await page.goto(url);
 		this.artworksList = await page.$$eval('.pages-list-item a', links => {
@@ -324,7 +327,7 @@ export default class WikiDataLookup {
 		}
         debug('loading cached hubs list');
 		const page = await this.browser.newPage();
-		page.setUserAgent(this.options.ua);
+		setUserAgent(page, this.options);
         const url = await maybeMirrorUrl(this.options.hubsUrl);
 		await page.goto(url);
 		this.hubList = await page.$$eval('.pages-list-item a', links => {
@@ -365,7 +368,7 @@ export default class WikiDataLookup {
 		}
         debug('loading audio adaptations meta page');
 		const page = await this.browser.newPage();
-		page.setUserAgent(this.options.ua);
+		setUserAgent(page, this.options);
         const url = await maybeMirrorUrl(this.options.audioAdaptationsUrl);
 		await page.goto(url, {
 			waitUntil: ['load', 'domcontentloaded']

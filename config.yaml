@@ -131,7 +131,18 @@ browser:
   height: 1024
   timeout: 300000
   ### User agent for created browser to report
-  ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
+  ### DEPRECATED - consider using userAgentOptions instead which allows you to set platform as well
+  ua: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'
+  userAgentOptions:
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36'
+    platform: 'Win32'
+    # see https://chromedevtools.github.io/devtools-protocol/tot/Emulation/#type-UserAgentMetadata for more options
+    #userAgentMetadata:
+      #architecture: 'x86'
+      #model: ''
+      #mobile: false
+      #platformVersion: '10.0'
+      #uaFullVersion: ''
 
   args:
     ### add additional args to puppeteer browser instance

@@ -30,6 +30,7 @@ export default class PostProcessor {
 		this.wikiLookup = wikiLookup;
 	}
 	setOptions(opts) {
+        /** @type {NonNullable<import('../index.js').BookMakerConfig['postProcess'] & import('../index.js').BookConfig>} */
 		const bookOptions = config.util.extendDeep({},
 			config.get('bookOptions'),
 			config.get('postProcess'),

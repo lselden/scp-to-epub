@@ -25,3 +25,9 @@ export async function gotoPage(page, url, opts) {
     await page.waitForNetworkIdle({idleTime: 500, concurrency: 2, timeout, ...opts});
     return response;
 }
+export function setUserAgent(page, browserOptions) {
+    page.setUserAgent({
+        ...browserOptions.userAgentOptions,
+        userAgent: browserOptions.userAgentOptions.userAgent || browserOptions.ua
+    });
+}
