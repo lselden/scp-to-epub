@@ -765,7 +765,7 @@ output:
 <li><a href="/scp-733">SCP-733</a> - A Pair of Scissors</li>
 <li><a href="/scp-734">SCP-734</a> - The Baby</li>
 <li><a href="/scp-735">SCP-735</a> - Insult Box</li>
-<li><a href="/scp-736">SCP-736</a> - The Iapetus Anomaly</li>
+<li><a href="/scp-736">SCP-736</a> - We Are Enemies but Not Here</li>
 <li><a href="/scp-737">SCP-737</a> - Hungry Train</li>
 <li><a href="/scp-738">SCP-738</a> - The Devil's Deal</li>
 <li><a href="/scp-739">SCP-739</a> - A Mirrored Booth</li>
